@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>GORMITI — Le Pietre di Gorm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="hud-hero" class="panel">
+      <div class="portrait-wrap"><canvas id="portrait" width="16" height="16"></canvas><div id="hero-lvl"></div></div>
+      <div class="hero-info">
+        <div id="hero-name"></div>
+        <div class="bar hp" data-tip="hp"><div class="fill"></div><div class="shieldfill"></div><span></span></div>
+        <div class="bar fury" data-tip="fury"><div class="fill"></div><span></span></div>
+        <div class="bar xp" data-tip="xp"><div class="fill"></div><span></span></div>
+      </div>
+      <div id="hero-stats"></div>
+      <div id="statuses"></div>
+    </div>
+
+    <div id="hud-right">
+      <div id="hud-floor" class="panel">
+        <div id="floor-name"></div>
+        <div id="floor-sub"></div>
+        <canvas id="minimap"></canvas>
+        <div id="gold-line"></div>
+      </div>
+      <div id="relics" class="panel"></div>
+    </div>
+
+    <div id="bossbar" class="hidden">
+      <div id="boss-name"></div>
+      <div class="bar boss"><div class="fill"></div><span></span></div>
+    </div>
+
+    <div id="actionbar" class="panel">
+      <div id="skills"></div>
+      <div class="sep"></div>
+      <div id="items"></div>
+      <div class="sep"></div>
+      <div id="quick">
+        <button class="qbtn" data-act="wait" data-tip="wait">⏳<small>Spazio</small></button>
+        <button class="qbtn" data-act="explore" data-tip="explore">🧭<small>X</small></button>
+        <button class="qbtn" data-act="menu" data-tip="menu">☰<small>Esc</small></button>
+      </div>
+    </div>
+
+    <div id="log"></div>
+    <div id="target-hint" class="hidden"></div>
+  </div>
+
+  <div id="banner" class="hidden"><div class="bt"></div><div class="bs"></div></div>
+  <div id="tooltip" class="hidden"></div>
+  <div id="screen" class="hidden"></div>
+  <div id="modal" class="hidden"></div>
+  <div id="fade"></div>
+  <div id="err" class="hidden"></div>
+
+  <script src="js/core.js"></script>
+  <script src="js/data_world.js"></script>
+  <script src="js/geom.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/mapgen.js"></script>
+  <script src="js/data_heroes.js"></script>
+  <script src="js/data_monsters.js"></script>
+  <script src="js/data_items.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/floor.js"></script>
+  <script src="js/explore.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/tiles.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
