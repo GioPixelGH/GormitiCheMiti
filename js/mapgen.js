@@ -267,6 +267,30 @@
         for (const [x, y] of floorCells) if (nz[I(m, x, y)] > 0.55) set(m, x, y, T.GRASS);
         sprinkle(m, rng, [T.FLOOR, T.GRASS], [[8, 4], [1, 4], [2, 2], [4, 1]], 0.06);
         break;
+      case 'ghiaccio':
+        // lastre di ghiaccio scivoloso e pozze gelide
+        for (const [x, y] of floorCells) { const n = nz[I(m, x, y)]; if (n > 0.56) set(m, x, y, T.ICE); }
+        pools(m, rng, 2, T.DEEP, T.ICE);
+        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+          if (get(m, x, y) !== T.WALL) continue;
+          let adj = false; for (const [dx, dy] of U.DIRS4) if (G.TILE[get(m, x + dx, y + dy)].walk) adj = true;
+          if (adj && nz2[I(m, x, y)] > 0.78 && rng.chance(0.5)) m.t[I(m, x, y)] = T.CRYSTAL;
+        }
+        sprinkle(m, rng, [T.FLOOR], [[7, 4], [1, 4], [4, 1], [13, 3]], 0.07);
+        break;
+      case 'luce':
+        // colonne di cristallo simmetriche nelle sale e mosaici dorati
+        if (m.rooms) for (const r of m.rooms) {
+          if (r.w >= 7 && r.h >= 5 && rng.chance(0.7)) for (const [px, py] of [[r.x + 1, r.y + 1], [r.x + r.w - 2, r.y + 1], [r.x + 1, r.y + r.h - 2], [r.x + r.w - 2, r.y + r.h - 2]]) if (get(m, px, py) === T.FLOOR) set(m, px, py, T.CRYSTAL);
+          if (rng.chance(0.5)) for (let x = r.x + 2; x < r.x + r.w - 2; x++) if (get(m, x, r.cy) === T.FLOOR) m.deco[I(m, x, r.cy)] = 12;
+        }
+        for (const [x, y] of floorCells) if (nz[I(m, x, y)] > 0.72 && get(m, x, y) === T.FLOOR) set(m, x, y, T.RUBBLE);
+        if (m.rooms) for (const r of m.rooms) {
+          for (let x = r.x - 1; x <= r.x + r.w; x++) for (const y of [r.y - 1, r.y + r.h]) tryDoor(m, x, y, rng);
+          for (let y = r.y - 1; y <= r.y + r.h; y++) for (const x of [r.x - 1, r.x + r.w]) tryDoor(m, x, y, rng);
+        }
+        sprinkle(m, rng, [T.FLOOR, T.RUBBLE], [[7, 4], [14, 3], [1, 2]], 0.06);
+        break;
       case 'vulcano':
         for (const [x, y] of floorCells) set(m, x, y, nz2[I(m, x, y)] > 0.55 ? T.ASH : T.FLOOR);
         // fiumi di lava
@@ -340,7 +364,7 @@
 
   // ---------- API principale ----------
   G.generateFloor = function (floor, rng) {
-    const biome = G.BIOMES[G.regionOf(floor)];
+    const biome = G.biomeOf(floor);
     G.BIOME_GEN = biome.gen;
     const W = 54, H = 38;
     let m;
@@ -349,17 +373,60 @@
       case 'rooms': m = genRooms(W, H, rng, { maxRooms: 15 }); break;
       case 'islands': m = genIslands(W, H, rng); break;
       case 'volcano': m = rng.chance(0.5) ? genCaves(W, H, rng, 0.46) : genRooms(W, H, rng, { maxRooms: 12, wide: true }); break;
+      case 'glacier': m = genCaves(W, H, rng, 0.44); break;
+      case 'temple': m = genRooms(W, H, rng, { maxRooms: 13 }); break;
     }
     decorate(m, biome, rng);
     ensureConnected(m, rng);
     placeStartStairs(m, rng);
+    addSecrets(m, rng);
     m.biome = biome.id;
     return m;
   };
 
+  // ---------- Stanze segrete dietro muri incrinati ----------
+  function addSecrets(m, rng) {
+    m.cracked = m.cracked || {};
+    m.secrets = [];
+    const dS = m.distFromStart;
+    const tries = rng.int(1, 2);
+    for (let k = 0; k < tries; k++) {
+      for (let att = 0; att < 300; att++) {
+        const x = rng.int(3, m.w - 4), y = rng.int(3, m.h - 4);
+        if (get(m, x, y) !== T.WALL) continue;
+        // un lato tocca il pavimento raggiungibile, il lato opposto è roccia piena
+        const dirs = rng.shuffle(U.DIRS4.slice());
+        let ok = null;
+        for (const [dx, dy] of dirs) {
+          const fx = x - dx, fy = y - dy;
+          const ft = get(m, fx, fy);
+          if (!G.TILE[ft].walk || ft === T.STAIRS || ft === T.CHASM || ft === T.LAVA || dS[I(m, fx, fy)] === Infinity) continue;
+          // stanza 3x3 oltre il muro
+          const cx = x + dx * 2, cy = y + dy * 2;
+          let solid = true;
+          for (let yy = cy - 2; yy <= cy + 2 && solid; yy++) for (let xx = cx - 2; xx <= cx + 2; xx++) {
+            if (xx <= 0 || yy <= 0 || xx >= m.w - 1 || yy >= m.h - 1) { solid = false; break; }
+            if (xx === x && yy === y) continue;
+            if (get(m, xx, yy) !== T.WALL) { solid = false; break; }
+          }
+          if (solid) { ok = { dx, dy, cx, cy }; break; }
+        }
+        if (!ok) continue;
+        const cells = [];
+        for (let yy = ok.cy - 1; yy <= ok.cy + 1; yy++) for (let xx = ok.cx - 1; xx <= ok.cx + 1; xx++) { set(m, xx, yy, T.FLOOR); cells.push([xx, yy]); }
+        set(m, x + ok.dx, y + ok.dy, T.FLOOR); cells.push([x + ok.dx, y + ok.dy]);
+        set(m, x, y, T.CRACKED);
+        m.cracked[I(m, x, y)] = 3;
+        m.secrets.push({ wall: [x, y], center: [ok.cx, ok.cy], cells });
+        break;
+      }
+    }
+  }
+  G.addSecrets = addSecrets;
+
   // Arena del boss
   G.generateArena = function (floor, rng) {
-    const biome = G.BIOMES[G.regionOf(floor)];
+    const biome = G.biomeOf(floor);
     G.BIOME_GEN = biome.gen;
     const W = 33, H = 27, cx = 16, cy = 12;
     const m = makeMap(W, H, T.WALL);
@@ -402,6 +469,14 @@
         }
         for (const [x, y] of pillars) set(m, x, y, T.PILLAR);
         break;
+      case 'ghiaccio':
+        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR && nz[I(m, x, y)] > 0.58) set(m, x, y, T.ICE);
+        for (const [x, y] of pillars) set(m, x, y, T.CRYSTAL);
+        break;
+      case 'luce':
+        for (const [x, y] of pillars.concat([[cx - 10, cy - 1], [cx + 10, cy - 1], [cx, cy - 8]])) set(m, x, y, T.CRYSTAL);
+        for (let x = cx - 8; x <= cx + 8; x++) if (get(m, x, cy) === T.FLOOR) m.deco[I(m, x, cy)] = 12;
+        break;
       case 'vulcano':
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR) set(m, x, y, nz[I(m, x, y)] > 0.55 ? T.ASH : T.FLOOR);
         for (const [px, py] of [[cx - 7, cy - 5], [cx + 7, cy - 5], [cx - 9, cy + 3], [cx + 9, cy + 3]]) {
@@ -416,7 +491,8 @@
     m.stairs = null;
     m.biome = biome.id;
     m.arena = true;
-    for (let i = 0; i < m.t.length; i++) m.deco[i] = 0;
+    for (let i = 0; i < m.t.length; i++) if (m.deco[i] !== 12) m.deco[i] = 0;
+    m.cracked = {};
     return m;
   };
 })();

@@ -132,6 +132,8 @@
     roscamar: { bpm: 70,  root: 45, scale: 'phrygian', prog: [0, 1, 0, 6], drums: 1, lead: 0.3, seed: 41 },
     cieli:    { bpm: 100, root: 60, scale: 'lydian',   prog: [0, 1, 4, 5], drums: 1, lead: 0.5, seed: 51 },
     vulcano:  { bpm: 112, root: 52, scale: 'harmonic', prog: [0, 5, 3, 4], drums: 2, lead: 0.45, seed: 61 },
+    ghiaccio: { bpm: 74,  root: 52, scale: 'lydian',   prog: [0, 4, 5, 3], drums: 0, lead: 0.45, seed: 111 },
+    luce:     { bpm: 96,  root: 57, scale: 'major',    prog: [0, 4, 5, 3], drums: 1, lead: 0.5, seed: 121 },
     boss:     { bpm: 144, root: 45, scale: 'phrydom',  prog: [0, 1, 0, 6], drums: 3, lead: 0.55, seed: 71 },
     final:    { bpm: 150, root: 43, scale: 'harmonic', prog: [0, 5, 1, 4], drums: 3, lead: 0.6, seed: 81 },
     victory:  { bpm: 96,  root: 55, scale: 'major',    prog: [0, 3, 4, 0], drums: 1, lead: 0.6, seed: 91 },

@@ -8,3 +8,6 @@ desktop.ini
 *.swp
 # Claude Code (impostazioni locali)
 .claude/settings.local.json
+# Build dell'app desktop
+dist/
+desktop/.cache/

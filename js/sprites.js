@@ -270,7 +270,7 @@
 
   function expand(def) {
     let rows = def.rows;
-    if (def.base) rows = S[def.base].rows, def.sym = S[def.base].sym;
+    if (def.base) { let b = S[def.base]; while (b.base) b = S[b.base]; rows = b.rows; def.sym = b.sym; }
     if (def.sym) rows = rows.map(r => r + r.split('').reverse().join(''));
     return rows;
   }
@@ -280,7 +280,8 @@
       const rows = expand(Object.assign({}, def));
       const w = rows[0].length;
       rows.forEach((r, i) => { if (r.length !== w) errs.push(name + ' riga ' + i + ' lunghezza ' + r.length + ' != ' + w); });
-      const size = def.size || (def.base && S[def.base].size) || 16;
+      let bd = def; while (bd.base && !bd.size) bd = S[bd.base];
+      const size = def.size || bd.size || 16;
       if (rows.length !== size || w !== size) errs.push(name + ' dimensioni ' + w + 'x' + rows.length + ' attese ' + size);
     };
     for (const k in S) check(k, S[k]);
@@ -330,6 +331,7 @@
     return c;
   }
 
+  G.renderPixelRows = render;
   G.SPR = {};
   G.buildSprites = function () {
     for (const name in S) {

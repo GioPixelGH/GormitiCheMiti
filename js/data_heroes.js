@@ -8,7 +8,7 @@
   G.HEROES = {
     gheos: {
       name: 'Gheos', title: 'Signore della Terra', elem: 'terra',
-      hp: 40, atk: [3, 6], def: 2, eva: 3, crit: 5, critMul: 1.75,
+      hp: 40, atk: [3, 6], def: 1, eva: 3, crit: 5, critMul: 1.75,
       passive: 'Pelle di Roccia', passiveDesc: 'Riduce di 1 ogni danno subito e non può essere spinto.',
       desc: 'Un colosso di pietra antica. Lento a cadere, devastante quando colpisce. Ideale per iniziare.',
       skills: ['pugno', 'carica', 'scudoroccia', 'terremoto'], difficulty: 1,
@@ -40,7 +40,7 @@
     },
     saggio: {
       name: 'Vecchio Saggio', title: 'Custode dell\'Occhio della Vita', elem: 'neutro',
-      hp: 33, atk: [3, 6], def: 0, eva: 8, crit: 8, critMul: 1.75,
+      hp: 37, atk: [3, 6], def: 0, eva: 8, crit: 8, critMul: 1.75,
       passive: 'Sapienza Antica', passiveDesc: 'Ottiene il 20% di esperienza in più. I suoi dardi non mancano mai.',
       desc: 'Il creatore dei Popoli della Natura. Non ha debolezze elementali e piega lo spazio stesso.',
       skills: ['dardo', 'passo', 'sigillo', 'occhio'], difficulty: 3,

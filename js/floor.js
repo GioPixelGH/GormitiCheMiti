@@ -33,17 +33,25 @@
     opts = opts || {};
     const seed = opts.seed != null ? opts.seed >>> 0 : ((Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0);
     G.run = {
-      version: 3, seed, rng: new G.RNG(seed), heroId, eclissi: opts.eclissi || 0, daily: opts.daily || null,
+      version: 4, seed, rng: new G.RNG(seed), heroId, eclissi: opts.eclissi || 0, daily: opts.daily || null,
       floor: 0, map: null, ents: [], items: [], features: [], traps: [], tele: [], log: [], pending: [],
       turn: 0, tick: 0, nextId: 1, over: null, sealed: false, bossId: 0, bossIntro: false,
-      stats: { kills: 0, dmgDealt: 0, dmgTaken: 0, gold: 0, actions: 0, floors: 0, startTime: Date.now(), playMs: 0, bosses: 0, elites: 0, itemsUsed: 0 },
-      seenMonsters: {}, relicsSeen: [], stones: 0,
+      stats: { kills: 0, dmgDealt: 0, dmgTaken: 0, gold: 0, actions: 0, floors: 0, startTime: Date.now(), playMs: 0, bosses: 0, elites: 0, itemsUsed: 0, champions: 0, secrets: 0, events: 0 },
+      seenMonsters: {}, relicsSeen: [], stones: 0, route: ['foresta', null, null, null, null], portals: [], nextMods: {}, tempTiles: [], eventsSeen: [],
+      rerolls: 0,
     };
+    if (opts.route) for (let i = 0; i < opts.route.length; i++) if (opts.route[i]) G.run.route[i] = opts.route[i];
     const h = G.makeHero(heroId);
     G.run.hero = h;
     G.run.ents.push(h);
     G.addItem(h, 'pozione', 2);
+    // vantaggi acquistati nel Santuario del Saggio (piccoli: varietà, non potenza)
+    const buy = (G.meta.data && G.meta.data.purchases) || {};
+    if (buy.bisaccia) G.addItem(h, 'pozione', 1);
+    if (buy.scorta) h.gold += 25;
+    if (buy.reroll) G.run.rerolls = 1;
     G.enterFloor(1);
+    if (buy.primo_dono) G.run.pending.push({ type: 'levelup', opts: G.rollPerks(h, 3), title: 'Il Primo Dono del Saggio' });
     G.log('Il Vecchio Saggio ti ha scelto, ' + h.name + '. Riporta le Pietre di Gorm e sconfiggi Magor!', 'level');
     return G.run;
   };
@@ -54,9 +62,14 @@
     const R = G.run, h = R.hero, rng = R.rng;
     R.floor = n;
     R.tele = []; R.items = []; R.features = []; R.traps = []; R.sealed = false; R.bossId = 0; R.bossIntro = false;
+    R.portals = []; R.tempTiles = [];
     R.ents = [h];
     R.lastHopeUsed = false;
     R._dm = null; R.distMapsDirty = true;
+    const slot = G.regionOf(n);
+    if (!R.route[slot]) R.route[slot] = rng.pick(G.SLOTS[slot]);
+    R.floorMods = R.nextMods || {};
+    R.nextMods = {};
     const boss = G.isBossFloor(n);
     const map = boss ? G.generateArena(n, rng) : G.generateFloor(n, rng);
     R.map = map;
@@ -75,10 +88,14 @@
     if (h.mods.floorHeal) G.heal(h, h.maxHp * h.mods.floorHeal, true);
     if (h.mods.floorInvis) G.addStatus(h, 'invis', h.mods.floorInvis);
     if (h.mods.revealMap) G.revealMap();
+    if (h.mods.floorFury) G.addFury(h, h.mods.floorFury / Math.max(0.1, h.mods.furyMul));
     G.computeFOV();
-    const biome = G.BIOMES[G.regionOf(n)];
+    const biome = G.biomeOf(n);
     if (G.floorInRegion(n) === 1) G.log(biome.intro, 'boss');
     G.log('Piano ' + n + ' — ' + biome.name + (boss ? ' (Arena del Guardiano)' : ''), 'info');
+    if (R.floorMods.danger) G.log('Hai preso il Sentiero Pericoloso: più nemici, ma tesori migliori.', 'bad');
+    if (R.floorMods.cursed) G.log('La maledizione del tesoro grava su questo piano: i nemici sono più forti.', 'bad');
+    if (h.heroId === 'gheos' && n >= 13) G.meta.unlockHero('kolossus');
     if (n === G.TOTAL_FLOORS - 1) G.log('Senti un potere immenso oltre il portale. Un guardiano lo sigilla.', 'bad');
     G.fx.floorChange && G.fx.floorChange();
     G.ui.onFloor && G.ui.onFloor();
@@ -99,7 +116,7 @@
 
   G.populateFloor = function () {
     const R = G.run, m = R.map, rng = R.rng, h = R.hero;
-    const reg = G.regionOf(R.floor), fl = G.floorInRegion(R.floor), biome = G.BIOMES[reg];
+    const reg = G.regionOf(R.floor), fl = G.floorInRegion(R.floor), biome = G.biomeOf(R.floor);
     const dS = m.distFromStart;
     const far = (x, y, d) => dS[y * m.w + x] !== Infinity && dS[y * m.w + x] >= d && U.cheb(x, y, h.x, h.y) >= d;
     const reach = (x, y) => dS[y * m.w + x] !== Infinity;
@@ -108,8 +125,9 @@
     const free = (x, y) => !occupied(x, y) && !(x === h.x && y === h.y);
     const pick = (cond) => { for (const c of cells) if (free(c[0], c[1]) && (!cond || cond(c[0], c[1]))) return c; return null; };
 
+    const FM = R.floorMods || {};
     // --- mostri ---
-    const count = 8 + fl * 2 + reg + (R.eclissi >= 2 ? 2 : 0);
+    const count = 8 + fl * 2 + reg + (R.eclissi >= 2 ? 2 : 0) + (FM.danger ? 4 : 0);
     let placed = 0, guard = 0;
     while (placed < count && guard++ < 200) {
       const type = rng.weighted(biome.monsters, e => e[1])[0];
@@ -124,15 +142,24 @@
         if (!spot) continue;
         const mon = G.makeMonster(type, spot[0], spot[1]);
         if (mon.ai === 'stone') mon.st.mode = 'hunt';
+        if (d.escort && i === 0) { for (const es of G.spawnNear(d.escort[0], spot[0], spot[1], d.escort[1], { awake: false })) { es.st.mode = mon.st.mode; placed++; } }
+        if (FM.cursed) { mon.maxHp = mon.hp = Math.round(mon.maxHp * 1.25); mon.atk = [Math.round(mon.atk[0] * 1.15), Math.round(mon.atk[1] * 1.15)]; }
+        if (rng.chance(G.affixChance(R.floor, R.eclissi) * (FM.danger ? 1.6 : 1))) G.rollAffixes(mon, rng, 1);
         placed++;
       }
     }
     // --- élite ---
-    const eliteP = 0.35 + reg * 0.08 + (R.eclissi >= 2 ? 0.3 : 0);
+    const eliteP = 0.35 + reg * 0.08 + (R.eclissi >= 2 ? 0.3 : 0) + (FM.danger ? 1 : 0);
     if (rng.chance(eliteP)) {
       const type = rng.pick(biome.elites);
       const s = pick((x, y) => far(x, y, 14) && G.canWalk({ flags: G.MON[type].flags, kind: 'monster' }, x, y));
       if (s) { const e = G.makeMonster(type, s[0], s[1]); e.st.mode = 'sleep'; }
+    }
+    // --- campione (un nemico comune con varianti e un nome) ---
+    if (R.floor > 1 && rng.chance(0.25 + (FM.danger ? 0.75 : 0))) {
+      const type = rng.weighted(biome.monsters, e => e[1])[0];
+      const s = pick((x, y) => far(x, y, 12) && G.canWalk({ flags: G.MON[type].flags || {}, kind: 'monster' }, x, y));
+      if (s) G.makeChampion(G.makeMonster(type, s[0], s[1]), rng);
     }
     // --- guardiano del piano 14: Magmion ---
     if (R.floor === G.TOTAL_FLOORS - 1) {
@@ -150,10 +177,39 @@
     const nGold = rng.int(4, 6);
     for (let i = 0; i < nGold; i++) { const s = pick((x, y) => far(x, y, 3)); if (s) R.items.push({ x: s[0], y: s[1], kind: 'gold', n: rng.int(4, 9) + reg * 4 }); }
     // --- forzieri ---
-    const nChest = rng.int(1, 2);
+    const nChest = rng.int(1, 2) + (FM.danger ? 1 : 0);
     for (let i = 0; i < nChest; i++) {
       const s = pick((x, y) => far(x, y, 6) && wallsAround(x, y) >= 3 && !isChokepoint(x, y));
-      if (s) R.features.push({ id: R.nextId++, type: 'chest', x: s[0], y: s[1], rare: rng.chance(0.4) });
+      if (s) R.features.push({ id: R.nextId++, type: 'chest', x: s[0], y: s[1], rare: FM.danger && i === 0 ? true : rng.chance(0.4) });
+    }
+    if (FM.danger) for (let i = 0; i < 2; i++) { const s = pick((x, y) => far(x, y, 4)); if (s) R.items.push({ x: s[0], y: s[1], kind: 'gold', n: rng.int(15, 25) + reg * 8 }); }
+    // --- stanze segrete dietro i muri incrinati ---
+    for (const sc of (m.secrets || [])) {
+      const [cx, cy] = sc.center;
+      if (rng.chance(0.35)) R.features.push({ id: R.nextId++, type: 'chest', x: cx, y: cy, rare: true, secret: true });
+      else {
+        R.items.push({ x: cx, y: cy, kind: 'gold', n: rng.int(25, 40) + reg * 12 });
+        R.items.push({ x: cx + 1, y: cy, kind: 'item', id: G.randomItemId(rng) });
+        if (rng.chance(0.5)) R.items.push({ x: cx - 1, y: cy, kind: 'item', id: G.randomItemId(rng) });
+      }
+    }
+    // --- evento narrativo ---
+    if (rng.chance(0.45)) {
+      const s = pick((x, y) => far(x, y, 7) && wallsAround(x, y) <= 2 && !isChokepoint(x, y));
+      if (s) { const ev = G.pickEvent(rng); const f = { id: R.nextId++, type: 'event', x: s[0], y: s[1], ev: ev.id, data: {} }; if (ev.init) ev.init(f, rng); R.features.push(f); }
+    }
+    // --- bivio: un secondo portale verso il Sentiero Pericoloso (1° piano di ogni regione) ---
+    if (fl === 1 && m.stairs) {
+      R.portals.push({ x: m.stairs[0], y: m.stairs[1], kind: 'safe' });
+      let best = null, bd = -1;
+      for (const c of cells) {
+        const [x, y] = c;
+        if (!free(x, y) || G.tileAt(x, y) === T.STAIRS || G.tileAt(x, y) === T.SHALLOW || G.tileAt(x, y) === T.ICE) continue;
+        const d = Math.min(dS[y * m.w + x], U.cheb(x, y, m.stairs[0], m.stairs[1]) * 2);
+        if (U.cheb(x, y, m.stairs[0], m.stairs[1]) < 10 || isChokepoint(x, y)) continue;
+        if (d > bd) { bd = d; best = c; }
+      }
+      if (best) { m.t[best[1] * m.w + best[0]] = T.STAIRS; m.stairs2 = best; R.portals.push({ x: best[0], y: best[1], kind: 'danger' }); }
     }
     // --- trappole ---
     const nTraps = 3 + reg + (R.eclissi >= 3 ? 2 : 0);
@@ -186,7 +242,7 @@
 
   G.populateBoss = function () {
     const R = G.run, m = R.map, reg = G.regionOf(R.floor);
-    const type = G.BIOMES[reg].boss;
+    const type = G.biomeOf(R.floor).boss;
     const b = G.makeMonster(type, m.bossSpot[0], m.bossSpot[1]);
     b.st.mode = 'sleep';
     R.bossId = b.id;
@@ -209,6 +265,14 @@
   G.STONE_NAMES = ['Pietra della Foresta', 'Pietra del Mare', 'Pietra della Terra', 'Pietra dell\'Aria', 'Pietra del Fuoco'];
   G.onBossDeath = function (e) {
     const R = G.run, h = R.hero, reg = G.regionOf(R.floor);
+    // la lava evocata dal guardiano si raffredda subito: il portale deve restare raggiungibile
+    const hot = (R.tempTiles || []).filter(tt => tt.tile === T.LAVA);
+    if (hot.length) {
+      for (const tt of hot) if (G.tileAt(tt.x, tt.y) === T.LAVA) { G.setTile(tt.x, tt.y, tt.orig); G.fx.dust(tt.x, tt.y, 0); }
+      R.tempTiles = R.tempTiles.filter(tt => tt.tile !== T.LAVA);
+      R.distMapsDirty = true;
+      G.log('La lava si raffredda e torna roccia.', 'info');
+    }
     if (e.type === 'devilfenix' && !e.st.reborn) {
       const egg = G.makeMonster('uovo', e.x, e.y, { awake: true });
       egg.flags.boss = true; egg.st.hatchAt = h.actions + 7;
@@ -233,16 +297,35 @@
       R.over = { win: true };
       return;
     }
+    // portali verso la prossima regione: se ce ne sono due, si sceglie la strada
     const sp = R.map.stairsSpot;
-    G.setTile(sp[0], sp[1], T.STAIRS);
-    R.map.stairs = sp;
-    // non lasciare il portale occupato da oggetti
-    R.items = R.items.filter(i => !(i.x === sp[0] && i.y === sp[1]));
-    G.dropItem(e.x, e.y, { kind: 'pietra', name: G.STONE_NAMES[reg] });
+    const nextSlot = reg + 1;
+    const opts = G.SLOTS[nextSlot] || [];
+    const spots = opts.length > 1 ? [[sp[0] - 3, sp[1]], [sp[0] + 3, sp[1]]] : [sp];
+    R.portals = [];
+    opts.forEach((dest, i) => {
+      let [px, py] = spots[i];
+      if (G.isSolid(px, py)) { px = sp[0]; py = sp[1] + i; }
+      G.setTile(px, py, T.STAIRS);
+      R.items = R.items.filter(it => !(it.x === px && it.y === py));
+      const occ = G.entityAt(px, py); if (occ && occ.kind !== 'hero') { const s = G.randomFreeTile(occ, 3); if (s) { occ.x = s[0]; occ.y = s[1]; } }
+      R.portals.push({ x: px, y: py, kind: 'region', dest });
+    });
+    R.map.stairs = [R.portals[0].x, R.portals[0].y];
+    const stone = G.biomeOf(R.floor).stone;
+    G.dropItem(e.x, e.y, { kind: 'pietra', name: stone });
     G.dropItem(e.x, e.y, { kind: 'gold', n: 40 + reg * 25 });
-    G.fx.banner(e.name + ' è sconfitto!', 'Raccogli la ' + G.STONE_NAMES[reg]);
-    G.log('Hai sconfitto ' + e.name + '! Il portale si è aperto.', 'level');
+    G.fx.banner(e.name + ' è sconfitto!', 'Raccogli la ' + stone);
+    G.log('Hai sconfitto ' + e.name + '! ' + (opts.length > 1 ? 'Si aprono due portali: scegli la tua strada.' : 'Il portale si è aperto.'), 'level');
     G.fx.sound('victory');
+  };
+  G.portalAt = function (x, y) { return (G.run.portals || []).find(p => p.x === x && p.y === y) || null; };
+  G.portalInfo = function (p) {
+    if (!p) return { name: 'Portale', desc: 'Conduce al piano successivo.' };
+    if (p.kind === 'danger') return { name: 'Portale Cremisi', desc: 'Il Sentiero Pericoloso: il prossimo piano avrà più nemici, un\'élite e un Campione, ma anche uno Scrigno Antico e più Frammenti.' };
+    if (p.kind === 'safe') return { name: 'Portale', desc: 'Il Sentiero Sicuro verso il piano successivo.' };
+    const b = G.BIOME_BY_ID[p.dest];
+    return { name: 'Portale: ' + b.name, desc: (b.pitch || b.intro) };
   };
 
   G.checkBossIntro = function () {
@@ -274,7 +357,7 @@
     stock.push({ kind: 'heal', price: Math.round(30 + reg * 15) });
     return stock;
   };
-  G.shopPrice = (s) => Math.max(1, Math.round(s.price * (1 - (G.run.hero.mods.shopDiscount || 0))));
+  G.shopPrice = (s) => Math.max(1, Math.round(s.price * Math.max(0.3, 1 - (G.run.hero.mods.shopDiscount || 0) - (G.synLevel(G.run.hero, 'fortuna') >= 2 ? 0.2 : 0))));
   G.ensureStockRelics = function (f) {
     for (const s of f.stock) if (s.kind === 'relic' && !s.id) s.id = G.randomRelicId(G.run.rng, s.rarity);
   };
@@ -359,7 +442,12 @@
         if (rng.chance(0.5)) G.dropItem(f.x, f.y, { kind: 'item', id: G.randomItemId(rng) });
         G.log('Hai aperto un forziere.', 'loot');
       }
+      if (G.synLevel(h, 'fortuna') >= 2) G.dropItem(f.x, f.y, { kind: 'item', id: G.randomItemId(rng) });
       return 100;
+    }
+    if (f.type === 'event') {
+      if (f.used) { G.log('Non c\'è più nulla qui.', 'info'); return 0; }
+      R.pending.push({ type: 'event', fid: f.id }); return 0;
     }
     if (f.type === 'merchant') { G.ensureStockRelics(f); R.pending.push({ type: 'shop', fid: f.id }); return 0; }
     if (f.type === 'shrine') {
@@ -373,6 +461,7 @@
   G.skillCd = function (h, id) {
     const d = G.SKILLS[id];
     if (id === 'getto' && h.up.getto_cd) return 1;
+    if (id === 'freccia' && h.up.freccia_up) return 1;
     return Math.max(1, d.cd - h.mods.cdr);
   };
   G.skillRange = (h, d) => (d.range || 0) + (d.target === 'enemy' || d.target === 'tile' ? h.mods.rangeBonus : 0);
@@ -385,7 +474,7 @@
       const nx = h.x + dx, ny = h.y + dy;
       const o = G.entityAt(nx, ny);
       if (o) {
-        if (G.hostile(o, h)) { R.hazardConfirm = null; G.attack(h, o); return 100; }
+        if (G.hostile(o, h)) { R.hazardConfirm = null; G._heroSource = true; try { G.attack(h, o); } finally { G._heroSource = false; } return 100; }
         if (o.kind === 'ally' && !h.status.root) {
           const ox = h.x, oy = h.y;
           o.x = ox; o.y = oy; G.fx.move(o, nx, ny, {});
@@ -395,6 +484,7 @@
       }
       const f = G.featureAt(nx, ny);
       if (f) return G.interact(f);
+      if (G.tileAt(nx, ny) === T.CRACKED) { G.fx.lunge(h, dx, dy); G.hitWall(nx, ny, 1); G.hint('crack', 'I muri incrinati si abbattono a colpi (o con esplosioni e spinte): spesso nascondono tesori!'); return 100; }
       if (h.status.root) { G.log('Sei immobilizzato! (Puoi attaccare o attendere)', 'bad'); return 0; }
       if (!G.canWalk(h, nx, ny)) return 0;
       if (G.isHazardFor(h, nx, ny) && !opts.force) {
@@ -418,12 +508,19 @@
       const R = G.run, h = R.hero, s = h.skills[i];
       if (!s) return 0;
       const d = G.SKILLS[s.id];
-      if (d.ult) { if (h.fury < 100) { G.log('La Furia non è ancora piena (' + Math.floor(h.fury) + '/100).', 'bad'); return 0; } }
+      const cost = G.ultCost(h);
+      if (d.ult) { if (h.fury < cost) { G.log('La Furia non è ancora pronta (' + Math.floor(h.fury) + '/' + cost + ').', 'bad'); return 0; } }
       else if (s.cd > 0) { G.log(d.name + ' è in ricarica (' + s.cd + ').', 'bad'); return 0; }
-      const ok = d.use(h, target);
+      G._heroSource = true; G._inSkill = true;
+      let ok;
+      try { ok = d.use(h, target); } finally { G._heroSource = false; G._inSkill = false; }
       if (!ok) return 0;
       R.stats.skillsUsed = (R.stats.skillsUsed || 0) + 1;
-      if (d.ult) h.fury = 0; else s.cd = G.skillCd(h, s.id);
+      if (d.ult) {
+        h.fury = Math.max(0, h.fury - cost);
+        if (G.synLevel(h, 'furia') >= 2) { h.fury = Math.max(h.fury, 35); G.addStatus(h, 'haste', 3); }
+      } else s.cd = G.skillCd(h, s.id);
+      if (h.heroId === 'elios' && !d.ult) G.addStatus(h, 'haste', 2);
       R.hazardConfirm = null;
       return 100;
     },
@@ -431,9 +528,12 @@
       const R = G.run, h = R.hero, s = h.items[slot];
       if (!s) return 0;
       const d = G.ITEM_BY_ID[s.id];
-      const ok = d.use(h, target);
+      G._heroSource = true;
+      let ok;
+      try { ok = d.use(h, target); } finally { G._heroSource = false; }
       if (!ok) return 0;
-      s.n--; if (s.n <= 0) h.items[slot] = null;
+      if (h.mods.consumeSave && R.rng.chance(h.mods.consumeSave)) G.log('La Moneta di Razzle brilla: l\'oggetto non si consuma!', 'good');
+      else { s.n--; if (s.n <= 0) h.items[slot] = null; }
       R.stats.itemsUsed++;
       G.log('Usi: ' + d.name + '.', 'info');
       return 100;
@@ -442,6 +542,9 @@
       const R = G.run, h = R.hero;
       if (G.tileAt(h.x, h.y) !== T.STAIRS) return 0;
       if (R.sealed) { G.log('Il portale è sigillato! Sconfiggi il guardiano.', 'bad'); return 0; }
+      const p = G.portalAt(h.x, h.y);
+      if (p && p.kind === 'region') R.route[G.regionOf(R.floor) + 1] = p.dest;
+      if (p && p.kind === 'danger') R.nextMods = Object.assign(R.nextMods || {}, { danger: true });
       G.fx.sound('portal');
       G.descend();
       return -1;
@@ -451,7 +554,8 @@
   // ================================================================
   //  SALVATAGGI
   // ================================================================
-  const RUN_KEY = 'gormiti_run_v3', META_KEY = 'gormiti_meta_v1';
+  const RUN_KEY = 'gormiti_run_v4', META_KEY = 'gormiti_meta_v1';
+  G.STORE_KEYS = { run: RUN_KEY, meta: META_KEY };
   const store = (typeof localStorage !== 'undefined') ? localStorage : null;
 
   G.save = function () {
@@ -475,7 +579,7 @@
     if (!s) return false;
     try {
       const R = JSON.parse(s);
-      if (R.version !== 3) { store.removeItem(RUN_KEY); return false; }
+      if (R.version !== 4) { store.removeItem(RUN_KEY); return false; }
       R.rng = new G.RNG(1); R.rng.s = R.rngState >>> 0;
       R.hero = R.ents.find(e => e.kind === 'hero');
       R.vis = new Uint8Array(R.map.w * R.map.h);
@@ -494,9 +598,10 @@
   G.meta = {
     data: null,
     def() {
-      return { unlocked: { gheos: true, tasarau: true, poivrons: true, noctis: true, saggio: false, luminescente: false },
+      return { unlocked: { gheos: true, tasarau: true, poivrons: true, noctis: true, saggio: false, luminescente: false, kolossus: false, carrapax: false, elios: false, barbataus: false },
         maxEclissi: 0, runs: 0, wins: {}, bestFloor: 0, bosses: {}, monsters: {}, relics: {}, history: [], daily: {},
-        settings: { music: 0.5, sfx: 0.7, shake: true }, tutorialSeen: false, totalKills: 0, hints: {} };
+        settings: { music: 0.5, sfx: 0.7, shake: true, keys: null }, tutorialSeen: false, totalKills: 0, hints: {},
+        essence: 0, essenceTotal: 0, purchases: {}, regions: {} };
     },
     load() {
       let d = null;
@@ -507,14 +612,21 @@
     },
     save() { try { store && store.setItem(META_KEY, JSON.stringify(this.data)); } catch (e) { } },
     discoverRelic(id) { if (!this.data) return; this.data.relics[id] = true; },
+    unlockHero(id) {
+      const d = this.data;
+      if (!d || d.unlocked[id]) return;
+      d.unlocked[id] = true;
+      if (G.run) G.run.newUnlocks = (G.run.newUnlocks || []).concat([id]);
+      G.log('SBLOCCATO: ' + G.HEROES[id].name + ' è ora un eroe giocabile!', 'level');
+      G.fx.banner && G.fx.banner('Nuovo eroe!', G.HEROES[id].name + ' — ' + G.HEROES[id].title);
+      this.save();
+    },
     bossDefeated(type) {
       if (!this.data) return;
       this.data.bosses[type] = (this.data.bosses[type] || 0) + 1;
-      if (type === 'obscurio' && !this.data.unlocked.saggio) {
-        this.data.unlocked.saggio = true;
-        G.run && (G.run.newUnlocks = (G.run.newUnlocks || []).concat(['saggio']));
-        G.log('SBLOCCATO: il Vecchio Saggio è ora un eroe giocabile!', 'level');
-      }
+      if (type === 'obscurio') this.unlockHero('saggio');
+      if (type === 'glaciator') this.unlockHero('carrapax');
+      if (type === 'luxalion') this.unlockHero('elios');
       this.save();
     },
     // fine partita
@@ -533,7 +645,13 @@
         if (!d.unlocked.luminescente) { d.unlocked.luminescente = true; R.newUnlocks.push('luminescente'); }
         if (R.eclissi >= d.maxEclissi && d.maxEclissi < 5) { d.maxEclissi = R.eclissi + 1; R.newUnlocks.push('eclissi' + d.maxEclissi); }
       }
-      d.history.unshift({ hero: R.heroId, floor: R.floor, win: !!win, ecl: R.eclissi, kills: R.stats.kills, level: R.hero.level, date: new Date().toISOString().slice(0, 10), daily: R.daily });
+      if (d.totalKills >= 250 && !d.unlocked.barbataus) { d.unlocked.barbataus = true; R.newUnlocks.push('barbataus'); }
+      for (let i = 0; i <= G.regionOf(R.floor) && i < (R.route || []).length; i++) if (R.route[i]) d.regions[R.route[i]] = true;
+      // Essenza per il Santuario del Saggio
+      const ess = R.floor * 2 + R.stats.bosses * 8 + Math.floor(R.stats.kills / 8) + (win ? 30 + R.eclissi * 10 : 0) + (R.daily ? 5 : 0);
+      R.essenceGained = ess;
+      d.essence = (d.essence || 0) + ess; d.essenceTotal = (d.essenceTotal || 0) + ess;
+      d.history.unshift({ hero: R.heroId, floor: R.floor, win: !!win, ecl: R.eclissi, kills: R.stats.kills, level: R.hero.level, date: new Date().toISOString().slice(0, 10), daily: R.daily, route: (R.route || []).filter(Boolean) });
       d.history = d.history.slice(0, 12);
       if (R.daily) {
         const prev = d.daily[R.daily];

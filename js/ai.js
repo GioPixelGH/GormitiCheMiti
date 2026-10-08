@@ -187,7 +187,7 @@
   AI.act = function (m) {
     if (m.dead) return;
     for (const k in m.cds) if (m.cds[k] > 0) m.cds[k]--;
-    if (m.kind === 'ally') return AI.ally(m);
+    if (m.kind === 'ally') return m.ai === 'flower' ? AI.flower(m) : AI.ally(m);
     if (m.st.mode === 'sleep' && m.ai !== 'stone' && m.ai !== 'egg') return;
     if (m.status.confuse && rng().chance(0.5)) { randomStep(m, true); return; }
     const fn = AI[m.ai] || AI.melee;
@@ -205,6 +205,10 @@
     if (s.shape === 'around' && d <= s.r) tiles = SH.square(m.x, m.y, s.r);
     else if (s.shape === 'cross' && (d <= 1 || ((m.x === h.x || m.y === h.y) && d <= s.r))) tiles = SH.cross(m.x, m.y, s.r);
     else if (s.shape === 'target' && d <= 6) tiles = SH.circle(h.x, h.y, s.r);
+    else if (s.shape === 'line' && d <= s.r && d >= 2) {
+      const ddx = h.x - m.x, ddy = h.y - m.y;
+      if (ddx === 0 || ddy === 0 || Math.abs(ddx) === Math.abs(ddy)) tiles = SH.line(m.x, m.y, U.sign(ddx), U.sign(ddy), s.r + 1);
+    }
     if (!tiles) return false;
     tele(m, tiles, { dmg: s.dmg, status: s.status, st: s.st, fire: s.fire, push: s.push, color: s.color, src: s.label }, { label: s.label });
     setCd(m, 'slam', s.cd);
@@ -302,7 +306,21 @@
 
   AI.support = function (m) {
     if (m.st.mode === 'wander') return wander(m);
-    if (ready(m, 'heal')) {
+    const kind = G.MON[m.type].support || 'heal';
+    if (kind !== 'heal' && ready(m, 'heal')) {
+      const allies = G.run.ents.filter(o => !o.dead && o !== m && o.faction === m.faction && o.kind === 'monster' && dist(o, m) <= 5 && G.hasLOS(m.x, m.y, o.x, o.y) && (kind === 'ward' ? !o.status.shield : !o.status.haste))
+        .sort((a, b) => dist(a, G.run.hero) - dist(b, G.run.hero));
+      if (allies.length) {
+        const a = allies[0];
+        if (kind === 'ward') { G.addStatus(a, 'shield', 8, 8 + G.regionOf(G.run.floor) * 4); G.fx.ring(a.x, a.y, 0.8, '#9fd0ff'); }
+        else { G.addStatus(a, 'haste', 3); G.addStatus(a, 'empower', 3); G.fx.ring(a.x, a.y, 0.8, '#ffe27a'); }
+        G.fx.bolt(m.x, m.y, a.x, a.y, kind === 'ward' ? '#bff4ff' : '#ffe27a'); G.fx.sound('shield');
+        if (G.visible(m.x, m.y)) G.log(m.name + (kind === 'ward' ? ' protegge ' : ' incita ') + a.name + '.', 'info');
+        setCd(m, 'heal', 4);
+        return;
+      }
+    }
+    if (kind === 'heal' && ready(m, 'heal')) {
       const ally = G.run.ents.filter(o => !o.dead && o !== m && o.faction === m.faction && o.hp < o.maxHp * 0.7 && dist(o, m) <= 5 && G.hasLOS(m.x, m.y, o.x, o.y))
         .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
       if (ally) {
@@ -396,7 +414,7 @@
     }
     if (ready(m, 'breath') && d <= 5 && G.hasLOS(m.x, m.y, h.x, h.y)) {
       const [dx, dy] = U.dirTo(m.x, m.y, h.x, h.y);
-      tele(m, SH.cone(m.x, m.y, dx, dy, 5), { dmg: [7, 10], elem: 'fuoco', fire: 3, status: 'burn', st: 3, sp: 2, color: '#ff6a2a', src: 'Soffio Infernale' }, { label: 'Soffio Infernale' });
+      tele(m, SH.cone(m.x, m.y, dx, dy, 5), { dmg: [6, 9], elem: 'fuoco', fire: 3, status: 'burn', st: 3, sp: 2, color: '#ff6a2a', src: 'Soffio Infernale' }, { label: 'Soffio Infernale' });
       G.log('Cerbante inspira profondamente... sta per sputare fuoco!', 'bad');
       setCd(m, 'breath', p2 ? 4 : 5);
       return;
@@ -497,6 +515,9 @@
     chase(m);
   };
 
+  // funzioni condivise con i moduli dei nuovi mostri
+  Object.assign(AI, { ready, setCd, dist, summon, countType, shoot, wander, chase, pickTarget, adjacentHostile, slamCheck, bossInit, phaseAnnounce, doMove });
+
   // ---- Devilfenix ----
   G.TELE_FN.dive = function (owner, tiles, p) {
     if (!owner || owner.dead) return;
@@ -528,11 +549,17 @@
   AI.boss_magmion = function (m) {
     const R = G.run, h = R.hero, d = dist(m, h);
     bossInit(m, { pillars: 2, bombs: 5 });
+    const p2 = m.hp < m.maxHp * 0.5;
+    if (p2 && !m.st.p2) {
+      m.st.p2 = true; m.speed = 120;
+      phaseAnnounce(m, 'Magmion erutta! La lava inonda il terreno.', 'Magmion — Eruzione');
+      return;
+    }
     if (ready(m, 'pillars') && d <= 8) {
       let tiles = SH.square(h.x, h.y, 1, true);
-      for (let k = 0; k < 2; k++) tiles = tiles.concat(SH.square(h.x + rng().int(-3, 3), h.y + rng().int(-3, 3), 1, true));
-      tele(m, tiles, { dmg: [10, 14], elem: 'fuoco', fire: 4, color: '#ff6a2a', src: 'Colonne di Magma' }, { label: 'Colonne di Magma' });
-      setCd(m, 'pillars', 4);
+      for (let k = 0; k < (p2 ? 3 : 2); k++) tiles = tiles.concat(SH.square(h.x + rng().int(-3, 3), h.y + rng().int(-3, 3), 1, true));
+      tele(m, tiles, { dmg: [10, 14], elem: 'fuoco', fire: 4, lava: p2, color: '#ff6a2a', src: 'Colonne di Magma' }, { label: 'Colonne di Magma' });
+      setCd(m, 'pillars', p2 ? 3 : 4);
       return;
     }
     if (ready(m, 'bombs') && countType('bombo') < 3) {

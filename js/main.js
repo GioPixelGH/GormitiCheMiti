@@ -28,9 +28,12 @@
 
   async function boot() {
     G.meta.load();
+    G.KEYS.load();
     G.buildSprites();
     G.RD.init(document.getElementById('game'));
     G.Input.bindMouse();
+    G.Touch.init();
+    registerSW();
     try { await Promise.race([Promise.all([document.fonts.load('12px "Press Start 2P"'), document.fonts.load('20px "VT323"')]), new Promise(r => setTimeout(r, 1500))]); } catch (e) { }
     window.addEventListener('beforeunload', () => { if (G.run && !G.run.over && G.UI.state === 'game') { G.run.stats.playMs = Date.now() - G.run.stats.startTime; G.save(); } });
 
@@ -38,7 +41,7 @@
     if (params.get('shot') === 'sprites') return spriteSheet();
     if (params.get('hero')) {
       G.meta.data.tutorialSeen = true;
-      G.newRun(params.get('hero'), { seed: +(params.get('seed') || 7), eclissi: +(params.get('ecl') || 0) });
+      G.newRun(params.get('hero'), { seed: +(params.get('seed') || 7), eclissi: +(params.get('ecl') || 0), route: params.get('route') ? params.get('route').split(',').map(x => x || null) : null });
       const fl = +(params.get('floor') || 1);
       const h = G.run.hero;
       for (let l = 1; l < +(params.get('lvl') || 1); l++) { h.level++; h.maxHp += 3; h.hp = h.maxHp; }
@@ -57,6 +60,13 @@
     } else if (params.get('screen') === 'select') { G.UI.showSelect(); }
     else G.UI.showTitle();
     requestAnimationFrame(loop);
+  }
+
+  // cache offline (solo se servito via http/https: con file:// i service worker non esistono)
+  function registerSW() {
+    // nell'app desktop (host virtuale gormiti.local) i file sono già locali: niente cache
+    if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol) || location.hostname === 'gormiti.local' || params.has('nosw')) return;
+    navigator.serviceWorker.register('sw.js').catch(() => { });
   }
 
   // foglio con tutti gli sprite per controllo visivo
@@ -91,7 +101,7 @@
     }
     s.appendChild(cv);
     // tileset del bioma scelto
-    const b = G.BIOMES[+(params.get('biome') || 0)];
+    const b = G.BIOME_BY_ID[params.get('biome')] || G.BIOMES[0];
     const ts = G.buildTileset(b);
     const tc = document.createElement('canvas');
     const keys = Object.keys(ts);

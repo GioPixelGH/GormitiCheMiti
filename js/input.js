@@ -7,17 +7,13 @@
   const IN = G.Input = { auto: null, lastAct: 0, lastAuto: 0, mouse: [0, 0], mouseTile: null };
   const UI = () => G.UI;
 
-  const DIR_KEYS = {
-    KeyW: [0, -1], ArrowUp: [0, -1], Numpad8: [0, -1],
-    KeyS: [0, 1], ArrowDown: [0, 1], Numpad2: [0, 1],
-    KeyA: [-1, 0], ArrowLeft: [-1, 0], Numpad4: [-1, 0],
-    KeyD: [1, 0], ArrowRight: [1, 0], Numpad6: [1, 0],
-    KeyQ: [-1, -1], Numpad7: [-1, -1], KeyE: [1, -1], Numpad9: [1, -1],
-    KeyZ: [-1, 1], Numpad1: [-1, 1], KeyC: [1, 1], Numpad3: [1, 1],
-    KeyY: [-1, -1], KeyU: [1, -1], KeyB: [-1, 1], KeyN: [1, 1],
-  };
-  const SKILL_KEYS = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3 };
-  const ITEM_KEYS = { Digit5: 0, Digit6: 1, Digit7: 2, Digit8: 3, Digit9: 4, Digit0: 5 };
+  // i tasti passano dalla mappa personalizzabile (keys.js)
+  const DIRV = { move_n: [0, -1], move_s: [0, 1], move_w: [-1, 0], move_e: [1, 0], move_nw: [-1, -1], move_ne: [1, -1], move_sw: [-1, 1], move_se: [1, 1] };
+  const actOf = (code) => G.KEYS.actionOf(code);
+  const dirOf = (code) => DIRV[actOf(code)];
+  const skillOf = (code) => { const a = actOf(code); return a && a.startsWith('skill') ? +a.slice(5) - 1 : undefined; };
+  const itemOf = (code) => { const a = actOf(code); return a && a.startsWith('item') ? +a.slice(4) - 1 : undefined; };
+  IN.dirVec = DIRV;
 
   // ---------------------------------------------------------------- dopo ogni azione
   function post() {
@@ -51,12 +47,14 @@
     if (e.code === 'Tab') e.preventDefault();
     if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
     G.audio.init();
+    if (!ui.keyCapture && actOf(e.code) === 'fullscreen') { e.preventDefault(); return IN.toggleFullscreen(); }
     if (ui.state === 'title') return ui.titleKey(e);
     if (ui.state === 'select') return ui.selectKey(e);
+    if (ui.keyCapture) { e.preventDefault(); ui.keyCapture(e); return; }
     if (ui.state === 'sub') { if (e.code === 'Escape') ui.showTitle(); return; }
     if (ui.isModal()) return modalKey(e);
     if (ui.state !== 'game') return;
-    if (IN.auto) { IN.cancelAuto(); if (!DIR_KEYS[e.code]) return; }
+    if (IN.auto) { IN.cancelAuto(); if (!dirOf(e.code)) return; }
     if (IN.targeting) return targetKey(e);
     gameKey(e);
   }
@@ -67,27 +65,38 @@
     const n = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Numpad1: 0, Numpad2: 1, Numpad3: 2, Numpad4: 3 }[e.code];
     if (n !== undefined && m.pick) m.pick(n);
     if ((e.code === 'KeyH' || e.code === 'Escape') && m.type === 'help') G.UI.closeModal();
+    if (m.type === 'build' && (actOf(e.code) === 'build')) G.UI.closeModal();
   }
   function gameKey(e) {
     if (!canAct()) return;
     const now = performance.now();
-    const dir = DIR_KEYS[e.code];
+    if (e.code === 'Escape') return UI().showPause();
+    const a = actOf(e.code);
+    const dir = DIRV[a];
     if (dir) {
       if (e.repeat && now - IN.lastAct < 95) return;
       if (now - IN.lastAct < 45) return;
       return doAction(G.act.move(dir[0], dir[1]));
     }
-    if (e.code === 'Space' || e.code === 'Numpad5' || e.code === 'Period') { if (e.repeat && now - IN.lastAct < 120) return; return doAction(G.act.wait()); }
-    if (SKILL_KEYS[e.code] !== undefined) return IN.useSkill(SKILL_KEYS[e.code]);
-    if (ITEM_KEYS[e.code] !== undefined) return IN.useItem(ITEM_KEYS[e.code]);
-    if (e.code === 'KeyX') return IN.startExplore();
-    if (e.code === 'Enter' || e.code === 'NumpadEnter' || e.key === '>') return IN.descend();
-    if (e.code === 'Escape') return UI().showPause();
-    if (e.code === 'KeyH' || e.key === '?') return UI().showHelp(true);
-    if (e.code === 'KeyM') { const s = G.meta.data.settings; s.music = s.music > 0 ? 0 : 0.5; G.audio.applyVolumes(); G.meta.save(); G.log('Musica ' + (s.music > 0 ? 'attivata' : 'disattivata') + '.', 'info'); UI().refresh(); return; }
-    if (e.key === '+' || e.code === 'NumpadAdd' || e.key === '=') return G.RD.zoom(1);
-    if (e.key === '-' || e.code === 'NumpadSubtract') return G.RD.zoom(-1);
+    if (a === 'wait') { if (e.repeat && now - IN.lastAct < 120) return; return doAction(G.act.wait()); }
+    if (skillOf(e.code) !== undefined) return IN.useSkill(skillOf(e.code));
+    if (itemOf(e.code) !== undefined) return IN.useItem(itemOf(e.code));
+    if (a === 'explore') return IN.startExplore();
+    if (a === 'descend' || e.key === '>') return IN.descend();
+    if (a === 'help' || e.key === '?') return UI().showHelp(true);
+    if (a === 'build') return UI().showBuild();
+    if (a === 'music') { const s = G.meta.data.settings; s.music = s.music > 0 ? 0 : 0.5; G.audio.applyVolumes(); G.meta.save(); G.log('Musica ' + (s.music > 0 ? 'attivata' : 'disattivata') + '.', 'info'); UI().refresh(); return; }
+    if (a === 'zoomin') return G.RD.zoom(1);
+    if (a === 'zoomout') return G.RD.zoom(-1);
   }
+
+  IN.toggleFullscreen = function () {
+    const d = document;
+    try {
+      if (d.fullscreenElement) d.exitFullscreen();
+      else if (d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(() => { });
+    } catch (err) { }
+  };
 
   IN.descend = function () {
     if (!canAct()) return;
@@ -111,6 +120,8 @@
     if (!canAct()) return;
     if (a === 'wait') return doAction(G.act.wait());
     if (a === 'explore') return IN.startExplore();
+    if (a === 'build') return UI().showBuild();
+    if (a === 'descend') return IN.descend();
   };
 
   // ---------------------------------------------------------------- abilità e oggetti
@@ -118,7 +129,7 @@
     if (!canAct()) return;
     const h = G.run.hero, s = h.skills[i]; if (!s) return;
     const d = G.SKILLS[s.id];
-    if (d.ult && h.fury < 100) { G.log('La Furia non è ancora piena (' + Math.floor(h.fury) + '%).', 'bad'); UI().refresh(); return; }
+    if (d.ult && h.fury < G.ultCost(h)) { G.log('La Furia non è ancora pronta (' + Math.floor(h.fury) + '/' + G.ultCost(h) + ').', 'bad'); UI().refresh(); return; }
     if (!d.ult && s.cd > 0) { G.log(d.name + ' è in ricarica (' + s.cd + ' turni).', 'bad'); UI().refresh(); return; }
     if (IN.targeting && IN.targeting.kind === 'skill' && IN.targeting.index === i) { confirmTarget(); return; }
     beginTarget({ kind: 'skill', index: i, def: d, type: d.target, range: G.skillRange(h, d), name: d.name });
@@ -211,14 +222,15 @@
   function targetKey(e) {
     const tg = IN.targeting;
     if (e.code === 'Escape') { IN.cancelTarget(); return; }
-    const dir = DIR_KEYS[e.code];
+    const dir = dirOf(e.code);
     if (tg.type === 'dir') {
       if (dir) { tg.dir = dir; updatePreview(); execute(tg, dir); }
       return;
     }
     if (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space') { confirmTarget(); return; }
-    if (SKILL_KEYS[e.code] !== undefined && tg.kind === 'skill') { if (SKILL_KEYS[e.code] === tg.index) confirmTarget(); else { endTarget(); IN.useSkill(SKILL_KEYS[e.code]); } return; }
-    if (ITEM_KEYS[e.code] !== undefined && tg.kind === 'item') { if (ITEM_KEYS[e.code] === tg.index) confirmTarget(); else { endTarget(); IN.useItem(ITEM_KEYS[e.code]); } return; }
+    const sk = skillOf(e.code), it = itemOf(e.code);
+    if (sk !== undefined && tg.kind === 'skill') { if (sk === tg.index) confirmTarget(); else { endTarget(); IN.useSkill(sk); } return; }
+    if (it !== undefined && tg.kind === 'item') { if (it === tg.index) confirmTarget(); else { endTarget(); IN.useItem(it); } return; }
     if (tg.type === 'enemy') {
       if (e.code === 'Tab' || dir) {
         const back = e.shiftKey || (dir && (dir[0] < 0 || (dir[0] === 0 && dir[1] < 0)));
@@ -235,9 +247,11 @@
   // ---------------------------------------------------------------- mouse
   function bindMouse() {
     const cv = document.getElementById('game');
-    cv.addEventListener('mousemove', (e) => {
+    cv.addEventListener('pointermove', (e) => {
       IN.mouse = [e.clientX, e.clientY];
       if (!G.run || UI().state !== 'game') return;
+      if (e.pointerType === 'touch' && IN.touch && Math.hypot(e.clientX - IN.touch.x, e.clientY - IN.touch.y) > 12) { clearTimeout(IN.touch.timer); IN.touch.moved = true; }
+      if (e.pointerType === 'touch' && !IN.targeting) return;
       const t = G.RD.screenToTile(e.clientX, e.clientY);
       IN.mouseTile = t;
       G.RD.hover = t;
@@ -258,10 +272,33 @@
       const html = UI().isModal() ? null : UI().tileTip(t[0], t[1]);
       if (html) UI().showTip(html, e.clientX, e.clientY); else UI().hideTip();
     });
-    cv.addEventListener('mouseleave', () => { G.RD.hover = null; UI().hideTip(); });
+    cv.addEventListener('pointerleave', () => { G.RD.hover = null; UI().hideTip(); });
     cv.addEventListener('contextmenu', (e) => { e.preventDefault(); if (IN.targeting) IN.cancelTarget(); IN.cancelAuto(); });
-    cv.addEventListener('mousedown', (e) => {
+    // tocco: tocco breve = clic, pressione lunga = informazioni sulla casella
+    cv.addEventListener('pointerdown', (e) => {
       G.audio.init();
+      if (e.pointerType === 'touch') {
+        IN.touch = { x: e.clientX, y: e.clientY, moved: false, long: false };
+        IN.touch.timer = setTimeout(() => {
+          if (!IN.touch || IN.touch.moved || !G.run) return;
+          IN.touch.long = true;
+          const t = G.RD.screenToTile(IN.touch.x, IN.touch.y);
+          G.RD.hover = t;
+          const html = UI().tileTip(t[0], t[1]);
+          if (html) UI().showTip(html, IN.touch.x, IN.touch.y - 60);
+        }, 450);
+        return;
+      }
+      pointerClick(e);
+    });
+    cv.addEventListener('pointerup', (e) => {
+      if (e.pointerType !== 'touch' || !IN.touch) return;
+      clearTimeout(IN.touch.timer);
+      const tc = IN.touch; IN.touch = null;
+      if (tc.long) { setTimeout(() => UI().hideTip(), 1800); return; }
+      if (!tc.moved) pointerClick({ clientX: tc.x, clientY: tc.y, button: 0 });
+    });
+    function pointerClick(e) {
       if (e.button !== 0 || !canAct()) return;
       const t = G.RD.screenToTile(e.clientX, e.clientY);
       if (IN.auto) { IN.cancelAuto(); return; }
@@ -274,7 +311,8 @@
         return;
       }
       clickTile(t[0], t[1]);
-    });
+    }
+    IN.pointerClick = pointerClick;
     // tooltip DOM (HUD)
     document.addEventListener('mouseover', (e) => {
       const el = e.target.closest && e.target.closest('[data-skill],[data-item],[data-relic],[data-status],[data-tip]');

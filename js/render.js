@@ -47,7 +47,7 @@
   const hashXY = (x, y) => ((x * 73856093) ^ (y * 19349663)) >>> 0;
   RD.buildMap = function () {
     const R = G.run, m = R.map;
-    const biome = G.BIOMES[G.regionOf(R.floor)];
+    const biome = G.biomeOf(R.floor);
     if (RD.biomeId !== biome.id || !RD.tileset) { RD.tileset = G.buildTileset(biome); RD.biomeId = biome.id; }
     if (!RD.mapLayer || RD.mapLayer.width !== m.w * TS || RD.mapLayer.height !== m.h * TS) {
       RD.mapLayer = document.createElement('canvas'); RD.mapLayer.width = m.w * TS; RD.mapLayer.height = m.h * TS;
@@ -77,6 +77,8 @@
         if (!G.TILE[G.tileAt(x + 1, y)].solid) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(px + TS - 1, py, 1, TS); }
         break;
       case T.CRYSTAL: ctx.drawImage(southSolid ? ts.crystalTop[v % 2] : ts.crystalFace[v % 2], px, py); break;
+      case T.CRACKED: ctx.drawImage(southSolid ? ts.crackedTop[0] : ts.crackedFace[0], px, py); break;
+      case T.ICE: ctx.drawImage(ts.ice[v], px, py); break;
       case T.PILLAR: floorBase(); ctx.drawImage(ts.pillar[0], px, py); break;
       case T.TREE: ctx.drawImage(ts.grass[v], px, py); ctx.drawImage(ts.tree[v % 2], px, py); break;
       case T.FLOOR: floorBase(); break;
@@ -175,7 +177,7 @@
       else if (t === T.DEEP) ctx.drawImage(RD.tileset.deep[fr], px, py, TS * S, TS * S);
       else if (t === T.LAVA) ctx.drawImage(RD.tileset.lava[fr], px, py, TS * S, TS * S);
       else if (t === T.TALL && R.vis[i]) ctx.drawImage(RD.tileset.tall[(Math.floor(RD.time * 1.5 + x * 0.3) % 2)], px, py, TS * S, TS * S);
-      else if (t === T.STAIRS) drawPortal(ctx, px, py, S, R.sealed);
+      else if (t === T.STAIRS) drawPortal(ctx, px, py, S, R.sealed, G.portalAt(x, y));
       if (m.fire[i] > 0) drawFire(ctx, px, py, S, x, y);
     }
     // trappole
@@ -194,13 +196,19 @@
     for (const f of R.features) {
       if (f.gone || !m.seen[f.y * m.w + f.x]) continue;
       const [px, py] = W2S(f.x * TS, f.y * TS);
-      let spr = f.type === 'chest' ? (f.rare ? G.SPR.chest_rare : G.SPR.chest) : f.type === 'merchant' ? G.SPR.merchant : G.SPR['shrine_' + f.kind];
+      let spr = f.type === 'chest' ? (f.rare ? G.SPR.chest_rare : G.SPR.chest) : f.type === 'merchant' ? G.SPR.merchant : f.type === 'event' ? G.SPR.event : G.SPR['shrine_' + f.kind];
       if (!spr) continue;
-      ctx.globalAlpha = f.used ? 0.5 : 1;
+      ctx.globalAlpha = f.used ? 0.45 : 1;
+      if (f.type === 'event' && !f.used) {
+        const cx = px + 8 * S, cy = py + 8 * S, g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 11 * S);
+        g.addColorStop(0, 'rgba(160,230,255,' + (0.35 + 0.15 * Math.sin(RD.time * 3)) + ')'); g.addColorStop(1, 'rgba(160,230,255,0)');
+        ctx.fillStyle = g; ctx.fillRect(px - 4 * S, py - 4 * S, 24 * S, 24 * S);
+      }
       shadow(ctx, px, py, S, 0.8);
       const bob = f.type === 'merchant' ? Math.round(Math.sin(RD.time * 2) * 0.6) : 0;
       ctx.drawImage(spr.img, px, py + bob * S, TS * S, TS * S);
       if (f.rare && !f.gone) sparkle(ctx, px, py, S, '#ffe27a');
+      if (f.type === 'event' && !f.used) sparkle(ctx, px, py, S, '#d8f8ff');
       ctx.globalAlpha = 1;
     }
     // telegrafi: riempimento del colore dell'attacco + bordo rosso di pericolo
@@ -279,13 +287,15 @@
     }
     ctx.globalAlpha = 1;
   }
-  function drawPortal(ctx, px, py, S, sealed) {
+  function drawPortal(ctx, px, py, S, sealed, portal) {
     const t = RD.time;
     const cx = px + 8 * S, cy = py + 9 * S;
-    const col = sealed ? '#5a3a3a' : '#a070ff';
+    let col = sealed ? '#5a3a3a' : '#a070ff';
+    if (portal && portal.kind === 'danger') col = '#ff3a3a';
+    if (portal && portal.kind === 'region') col = G.BIOME_BY_ID[portal.dest].colors.accent;
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 8 * S);
-    g.addColorStop(0, sealed ? 'rgba(80,40,40,0.9)' : 'rgba(230,200,255,0.95)');
-    g.addColorStop(0.5, sealed ? 'rgba(60,20,20,0.7)' : 'rgba(140,80,255,0.7)');
+    g.addColorStop(0, sealed ? 'rgba(80,40,40,0.9)' : 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.5, sealed ? 'rgba(60,20,20,0.7)' : hexA(col, 0.7));
     g.addColorStop(1, 'rgba(40,10,80,0)');
     ctx.fillStyle = g; ctx.fillRect(px - 2 * S, py - 2 * S, 20 * S, 20 * S);
     ctx.strokeStyle = col; ctx.lineWidth = S;
@@ -343,7 +353,7 @@
 
   const STATUS_ICON = { burn: '#ff7a2a', poison: '#9be35a', wet: '#5ab0ff', stun: '#ffe066', freeze: '#bff4ff', root: '#5fbf3a', slow: '#8899bb', confuse: '#ff9ef0', blind: '#dddddd', weak: '#bb8866', vuln: '#ff4466', haste: '#ffffff', rage: '#ff3030', thorns: '#7be04a', shield: '#9fd0ff', regen: '#6effa0', primed: '#ff2020' };
   function drawEntity(ctx, e, S, W2S) {
-    const a = A(e), spr = G.SPR[e.type] || G.SPR.golem;
+    const a = A(e), spr = G.SPR[e.sprite || e.type] || G.SPR.golem;
     let wx = a.x * TS, wy = a.y * TS;
     if (a.lunge) { const p = Math.sin((a.lunge.t / 0.14) * Math.PI); wx += a.lunge.dx * 5 * p; wy += a.lunge.dy * 5 * p; }
     const fly = e.flags.fly && e.kind !== 'hero' || e.type === 'noctis';
@@ -351,9 +361,18 @@
     const stunned = e.status.stun || e.status.freeze;
     const [px, py] = W2S(wx, wy);
     const big = spr.w > TS;
+    // aura delle varianti
+    if (e.affixes && e.affixes.length && !e.flags.champion) {
+      const col = G.AFFIXES[e.affixes[0]].color, cx = px + 8 * S, cy = py + 10 * S, rr = 9 * S;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      g.addColorStop(0, hexA(col, 0.3 + 0.1 * Math.sin(RD.time * 5 + e.id))); g.addColorStop(1, hexA(col, 0));
+      ctx.fillStyle = g; ctx.fillRect(cx - rr, cy - rr, rr * 2, rr * 2);
+    }
     // aura élite/boss
     if (e.flags.elite || e.flags.boss) {
-      const col = (G.ELEMS[e.elem] || G.ELEMS.neutro).color;
+      let col = (G.ELEMS[e.elem] || G.ELEMS.neutro).color;
+      if (e.flags.champion) col = '#ffd23a';
+      if (e.flags.boss && e.st.p2) col = '#ff3a3a';
       const cx = px + 8 * S, cy = py + 10 * S;
       const rr = (big ? 16 : 11) * S;
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
@@ -374,7 +393,10 @@
     if (born < 0.3) alpha *= born / 0.3;
     ctx.globalAlpha = alpha;
     const img = (a.face < 0) ? spr.flip : spr.img;
+    if (e.type === 'riflesso') ctx.filter = 'brightness(0.45) saturate(0.5) hue-rotate(250deg)';
     ctx.drawImage(img, dx, dy, spr.w * P, spr.h * P);
+    if (e.type === 'riflesso') ctx.filter = 'none';
+    if (e.flags.champion) { ctx.fillStyle = '#ffd23a'; for (const k of [-3, 0, 3]) ctx.fillRect(px + (7 + k) * S, dy - (k === 0 ? 4 : 3) * S, 2 * S, 2 * S); }
     if (e.kind === 'monster' && e.flags.stoneForm && e.st.stone) { ctx.globalAlpha = 0.3; ctx.drawImage(spr.flash, dx, dy, spr.w * P, spr.h * P); }
     if (a.flash > 0) { ctx.globalAlpha = Math.min(1, a.flash / 0.12); ctx.drawImage(spr.flash, dx, dy, spr.w * P, spr.h * P); }
     if (e.status.freeze) { ctx.globalAlpha = 0.45; ctx.fillStyle = '#bff4ff'; ctx.fillRect(dx + 2 * P, dy + 2 * P, (spr.w - 4) * P, (spr.h - 3) * P); }
@@ -467,6 +489,22 @@
         ctx.lineWidth = S * 5 * (1 - k); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
         ctx.strokeStyle = '#ffffff'; ctx.lineWidth = S * 2 * (1 - k); ctx.stroke();
         ctx.globalAlpha = 1;
+      } else if (f.kind === 'slash') {
+        const [sx, sy] = W2S(f.x, f.y);
+        const ang = Math.atan2(f.dy, f.dx), r = (f.big ? 9 : 7) * S;
+        ctx.globalAlpha = 1 - k;
+        ctx.strokeStyle = f.c; ctx.lineWidth = S * (f.big ? 3 : 2) * (1 - k * 0.6);
+        ctx.lineCap = 'round';
+        if (f.style === 'claw') {
+          for (const o of [-2, 2]) { ctx.beginPath(); ctx.moveTo(sx - 5 * S + o * S, sy - 5 * S); ctx.lineTo(sx + 5 * S + o * S, sy + 5 * S); ctx.stroke(); }
+        } else if (f.style === 'smash') {
+          ctx.beginPath(); ctx.arc(sx, sy, r * (0.5 + k), 0, Math.PI * 2); ctx.stroke();
+        } else if (f.style === 'arcane' || f.style === 'light') {
+          for (let i = 0; i < 4; i++) { const aa = i * Math.PI / 2 + k * 2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + Math.cos(aa) * r, sy + Math.sin(aa) * r); ctx.stroke(); }
+        } else {
+          ctx.beginPath(); ctx.arc(sx - f.dx * 3 * S, sy - f.dy * 3 * S, r, ang - 1.1 + k * 0.6, ang + 1.1 + k * 0.6); ctx.stroke();
+        }
+        ctx.lineCap = 'butt'; ctx.globalAlpha = 1;
       } else if (f.kind === 'tiles') {
         ctx.fillStyle = f.color; ctx.globalAlpha = (1 - k) * 0.6;
         for (const [x, y] of f.tiles) { const [sx, sy] = W2S(x * TS, y * TS); ctx.fillRect(sx, sy, TS * S, TS * S); }
@@ -517,7 +555,14 @@
     ctx.fillRect(sx - s * S, sy - s * S, s * 2 * S, s * 2 * S);
     ctx.fillStyle = '#ffffff'; ctx.fillRect(sx - S, sy - S, S, S);
   }
+  const SLASH = {
+    gheos: { c: '#e0a050', p: '#a08a6a', k: 'smash' }, tasarau: { c: '#6ee05a', p: '#4a8a2a', k: 'vine' }, poivrons: { c: '#5ab0ff', p: '#a8e8ff', k: 'splash' },
+    noctis: { c: '#e8f8ff', p: '#ffffff', k: 'wind' }, saggio: { c: '#d8b0ff', p: '#f0e0ff', k: 'arcane' }, luminescente: { c: '#ffe27a', p: '#fff6c8', k: 'light' },
+    kolossus: { c: '#c8a070', p: '#8a7a6a', k: 'smash' }, carrapax: { c: '#ff8a4a', p: '#7ac0e0', k: 'claw' }, elios: { c: '#ffd84a', p: '#e8f8ff', k: 'wind' },
+    barbataus: { c: '#7ac04a', p: '#ffd23a', k: 'vine' },
+  };
   const PROJ = {
+    light: { color: '#fff3a0', trail: '#ffffff', speed: 260 },
     water: { color: '#5ab0ff', trail: '#a8e8ff', speed: 220 }, spore: { color: '#9be35a', trail: '#c8ff9a', speed: 140, arc: 6 },
     ink: { color: '#3a2a5a', trail: '#6a4a9a', speed: 180 }, rock: { color: '#a08a70', trail: '#7a6a5a', speed: 180, arc: 8 },
     wind: { color: '#e8f8ff', trail: '#ffffff', speed: 240 }, fire: { color: '#ff7a2a', trail: '#ffd23a', speed: 200 },
@@ -528,14 +573,14 @@
   // ---------------------------------------------------------------- ambiente
   function drawAmbient(ctx, dt, S) {
     const R = G.run; if (!R) return;
-    const b = G.BIOMES[G.regionOf(R.floor)].ambient;
+    const b = G.biomeOf(R.floor).ambient;
     const n = 26;
     while (RD.ambient.length < n) RD.ambient.push(newAmb(b, true));
     for (let i = 0; i < RD.ambient.length; i++) {
       const p = RD.ambient[i];
       p.t += dt;
       p.x += p.vx * dt; p.y += p.vy * dt;
-      if (b === 'leaves') p.x += Math.sin(p.t * 2 + i) * 12 * dt;
+      if (b === 'leaves' || b === 'snow') p.x += Math.sin(p.t * 2 + i) * 12 * dt;
       if (p.x < -20 || p.x > RD.W + 20 || p.y < -20 || p.y > RD.H + 20 || p.t > p.life) { RD.ambient[i] = newAmb(b, false); continue; }
       ctx.globalAlpha = p.a * Math.min(1, p.t, p.life - p.t);
       ctx.fillStyle = p.c;
@@ -552,6 +597,8 @@
       case 'dust': return { x: r() * W, y: r() * H, vx: (r() - 0.5) * 6, vy: (r() - 0.5) * 6, c: '#e0c890', s: Math.max(2, S - 1), a: 0.3, t: 0, life: 6 + r() * 4 };
       case 'wind': return { x: init ? r() * W : -40, y: r() * H, vx: 160 + r() * 120, vy: 10, c: '#ffffff', s: Math.max(1, S - 2), a: 0.25, t: 0, life: 8 };
       case 'embers': return { x: r() * W, y: init ? r() * H : H + 10, vx: (r() - 0.5) * 20, vy: -(25 + r() * 35), c: r() < 0.5 ? '#ff8a2a' : '#ffd23a', s: Math.max(2, S - 1), a: 0.7, t: 0, life: 10 };
+      case 'snow': return { x: r() * W, y: init ? r() * H : -10, vx: -8 + r() * 16, vy: 18 + r() * 22, c: '#ffffff', s: Math.max(2, S - 1), a: 0.75, t: 0, life: 14 };
+      case 'motes': return { x: r() * W, y: init ? r() * H : H + 10, vx: (r() - 0.5) * 10, vy: -(8 + r() * 12), c: r() < 0.5 ? '#fff3a0' : '#ffffff', s: Math.max(2, S - 1), a: 0.5, t: 0, life: 12 };
     }
     return { x: 0, y: 0, vx: 0, vy: 0, c: '#fff', s: 1, a: 0, t: 0, life: 1 };
   }
@@ -618,8 +665,14 @@
     burst(x, y, color, n, delay) { for (let k = 0; k < (n || 12); k++) RD.addPart(C(x), C(y), color, { spread: 70, life: 0.5, delay: (delay || 0) / 1000 }); },
     shake(n) { RD.shakeAmt = Math.max(RD.shakeAmt, n * 1.6); },
     sound(name) { G.audio && G.audio.play(name); },
+    slash(a, d, crit) {
+      const st = SLASH[a.heroId] || SLASH.gheos;
+      const dx = U.sign(d.x - a.x), dy = U.sign(d.y - a.y);
+      RD.fxs.push({ kind: 'slash', x: C(d.x), y: C(d.y), dx, dy, c: st.c, style: st.k, t: 0, dur: 0.22, big: crit });
+      for (let k = 0; k < (st.k === 'smash' ? 10 : 6); k++) RD.addPart(C(d.x), C(d.y), k % 2 ? st.c : st.p, { spread: st.k === 'smash' ? 60 : 40, life: 0.35, grav: st.k === 'splash' ? 120 : st.k === 'smash' ? 80 : 0, up: st.k === 'vine' ? 20 : 0 });
+    },
     death(e, opts) {
-      const spr = G.SPR[e.type]; if (!spr) return;
+      const spr = G.SPR[e.sprite || e.type]; if (!spr) return;
       const a = A(e);
       if (!(opts && opts.vanish && e.kind === 'ally')) RD.dying.push({ spr, x: a.x, y: a.y, t: 0, dur: 0.45, flip: a.face < 0 });
       const col = (G.ELEMS[e.elem] || G.ELEMS.neutro).color;

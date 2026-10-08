@@ -111,7 +111,7 @@ button { font-family: 'Press Start 2P', monospace; }
 
 /* ---------------- banner ---------------- */
 #banner { position: fixed; left: 0; right: 0; top: 13%; text-align: center; pointer-events: none; animation: bannerIn 2.6s forwards; }
-#banner .bt { font-family: 'Press Start 2P'; font-size: clamp(22px, 3.2vw, 44px); color: #ffe27a; text-shadow: 4px 4px 0 #3a1a00, 0 0 24px rgba(255, 180, 60, 0.6); }
+#banner .bt { max-width: 58vw; margin: 0 auto; line-height: 1.35; font-family: 'Press Start 2P'; font-size: clamp(22px, 3.2vw, 44px); color: #ffe27a; text-shadow: 4px 4px 0 #3a1a00, 0 0 24px rgba(255, 180, 60, 0.6); }
 #banner .bs { margin-top: 14px; font-size: clamp(22px, 2vw, 32px); color: #f2e8d8; text-shadow: 2px 2px 0 #000; }
 @keyframes bannerIn { 0% { opacity: 0; transform: scale(1.3); } 10% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -140,6 +140,13 @@ button { font-family: 'Press Start 2P', monospace; }
 .btn.gold { background: linear-gradient(#c08a1a, #7a4a0a); color: #fff; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .title-foot { margin-top: 30px; color: var(--dim); font-size: 19px; }
+.title-wrap .menu .btn { width: 360px; max-width: 90vw; }
+@media (max-height: 820px) {
+  .logo-sub { margin-top: 14px; }
+  .menu { margin-top: 20px; gap: 7px; }
+  .title-wrap .menu .btn { padding: 11px 20px; }
+  .title-foot { margin-top: 14px; }
+}
 
 /* selezione eroe */
 .select-wrap { width: min(1280px, 96vw); padding: 20px; z-index: 2; }
@@ -217,3 +224,126 @@ button { font-family: 'Press Start 2P', monospace; }
 
 /* sfondo animato dei menu */
 .menu-bg { position: fixed; inset: 0; z-index: 1; background: radial-gradient(ellipse at 50% 120%, #4a1a0a 0%, #1a0a14 45%, #05040a 80%); }
+
+/* ---------------- risonanze (HUD) ---------------- */
+#synergies { padding: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+.syn { font-size: 18px; padding: 0 6px; border: 2px solid; border-radius: 3px; background: rgba(0, 0, 0, 0.55); cursor: help; opacity: 0.6; }
+.syn.lv1 { opacity: 1; }
+.syn.lv2 { opacity: 1; box-shadow: 0 0 8px currentColor; animation: pulse 1.2s infinite alternate; }
+
+/* icone abilità in pixel art */
+.slot.skill canvas, .skill-row .g canvas { image-rendering: pixelated; }
+.slot.skill canvas { width: 40px; height: 40px; }
+.skill-row .g canvas { width: 28px; height: 28px; margin-top: 1px; }
+
+/* ---------------- eventi narrativi ---------------- */
+.evtext { text-align: left; font-size: 22px; line-height: 1.2; max-width: 680px; margin: 10px auto 18px; color: #efe6d6; }
+.evtext p { margin: 6px 0; }
+.evtext i, .evtext em { color: #ffe9a0; font-style: normal; }
+.menu.ev { margin: 10px auto 0; gap: 8px; align-items: stretch; max-width: 780px; }
+.menu.ev .btn { min-width: 0; width: 100%; text-align: left; line-height: 1.6; font-size: 11px; white-space: normal; }
+
+/* ---------------- schermata build ---------------- */
+.build { display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 18px; text-align: left; }
+.build h3 { font-family: 'Press Start 2P'; font-size: 10px; color: var(--gold); margin: 10px 0 6px; }
+.mbox:has(.build) { max-width: min(1320px, 97vw); width: min(1320px, 97vw); }
+.bstats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 16px; font-size: 19px; }
+.bstats div { display: flex; justify-content: space-between; border-bottom: 1px dotted #3a2a50; }
+.bstats b { color: #ffe9a0; font-weight: normal; }
+.bl { padding: 4px 6px; margin: 3px 0; background: #1a1228; border: 1px solid #3a2a50; border-radius: 3px; font-size: 19px; line-height: 1.05; }
+.bl b { color: #ffe9a0; font-weight: normal; }
+.bl small { color: var(--dim); font-size: 17px; }
+.synrow small.on { color: #8af07a; }
+.synrow.lv0 { opacity: 0.55; }
+.synrow.lv2 { border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 200, 80, 0.25); }
+
+/* ---------------- santuario ---------------- */
+.sanc-ic { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #d8b0ff; background: #1e1430; border: 2px solid #5a3a80; border-radius: 4px; text-shadow: 0 0 8px #b77cff; }
+.sitem.sold .sanc-ic { color: #8af07a; border-color: #3a6a3a; text-shadow: none; }
+
+/* ---------------- comandi ---------------- */
+.keys { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; text-align: left; margin-top: 8px; }
+.keyrow { display: grid; grid-template-columns: 1fr 150px 90px; gap: 8px; align-items: center; font-size: 19px; }
+.keyrow .btn { min-width: 0; padding: 6px 8px; font-size: 9px; }
+.keyrow .sub { margin: 0; font-size: 16px; }
+
+/* ---------------- codex: imprese e regioni ---------------- */
+.cx.unknown2 { opacity: 0.7; }
+.cx.unknown2 canvas { filter: grayscale(1) brightness(0.45); }
+.regs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.regchip { padding: 2px 10px; border: 2px solid; border-radius: 3px; color: var(--dim); background: #120c1c; opacity: 0.6; }
+.regchip.on { color: #ffe9a0; opacity: 1; }
+
+/* ---------------- selezione eroe (10 eroi) ---------------- */
+.heroes { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.hcard { grid-template-columns: 1fr; text-align: center; padding: 10px 8px; gap: 4px; }
+.hcard .cv { display: flex; justify-content: center; }
+.hcard canvas { width: 80px; height: 80px; }
+.hcard .nm { font-size: 10px; margin-top: 4px; }
+.hcard .tt { font-size: 17px; line-height: 1; }
+.hcard .st { font-size: 16px; line-height: 1; }
+.hcard .diff { right: 6px; top: 6px; font-size: 14px; }
+
+/* ---------------- controlli touch ---------------- */
+.touch-only { display: none !important; }
+body.touch .touch-only { display: flex !important; }
+#dpad { position: absolute; right: 12px; bottom: 96px; display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; opacity: 0.85; touch-action: none; }
+.dbtn { background: rgba(30, 20, 46, 0.85); border: 2px solid var(--gold2); border-radius: 8px; color: #ffe9a0; font-family: 'VT323'; font-size: 30px; touch-action: none; padding: 0; }
+.dbtn:active { background: rgba(90, 58, 138, 0.95); border-color: var(--gold); }
+body.touch #game { cursor: default; touch-action: none; }
+body.touch #hud-right { width: 200px; }
+body.touch #minimap { width: 178px; height: 125px; }
+
+/* ---------------- schermi piccoli ---------------- */
+@media (max-width: 1100px) {
+  .heroes { grid-template-columns: repeat(3, 1fr); }
+  .build { grid-template-columns: 1fr 1fr; }
+  .build > div:last-child { grid-column: 1 / 3; }
+  .keys { grid-template-columns: 1fr; }
+  .help { columns: 1; }
+}
+@media (max-width: 760px), (max-height: 560px) {
+  html, body { font-size: 18px; }
+  #hud-hero { width: 270px; padding: 6px 8px; left: 6px; top: 6px; }
+  .portrait-wrap { width: 52px; height: 52px; }
+  #portrait { width: 46px; height: 46px; }
+  #hero-stats { font-size: 16px; gap: 8px; }
+  #hud-right { right: 6px; top: 6px; width: 170px; }
+  #minimap, body.touch #minimap { width: 150px; height: 96px; }
+  body.touch #hud-right { width: 170px; }
+  body.touch .qbtn small { display: none; }
+  #log div:nth-last-child(n+4) { display: none; }
+  #relics { max-height: 22vh; }
+  .relic { width: 26px; height: 26px; }
+  .relic canvas { width: 22px; height: 22px; }
+  #actionbar { bottom: 6px; padding: 4px 6px; gap: 4px; max-width: 98vw; overflow-x: auto; }
+  .slot { width: 44px; height: 44px; }
+  .slot.skill canvas { width: 30px; height: 30px; }
+  .slot.item canvas { width: 34px; height: 34px; }
+  .qbtn { width: 36px; height: 44px; font-size: 16px; }
+  #log { bottom: 64px; width: 60vw; }
+  #log div { font-size: 16px; line-height: 17px; }
+  #dpad { right: 6px; bottom: 60px; grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(3, 42px); gap: 3px; }
+  .dbtn { font-size: 24px; }
+  #gold-line { font-size: 16px; }
+  .select-wrap { padding: 8px; }
+  .select-wrap h2 { font-size: 13px; margin: 2px 0 8px; }
+  .heroes { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .hcard { padding: 6px 4px; }
+  .hcard canvas { width: 48px; height: 48px; }
+  .hcard .nm { font-size: 8px; }
+  .hcard .tt, .hcard .st { font-size: 14px; }
+  .hcard .el { font-size: 14px; }
+  .hcard .diff { font-size: 11px; }
+  .hero-detail { grid-template-columns: 1fr; min-height: 0; }
+  .build { grid-template-columns: 1fr; }
+  .build > div:last-child { grid-column: auto; }
+  .bstats { grid-template-columns: 1fr; }
+  .btn { min-width: 220px; padding: 10px 14px; font-size: 11px; }
+  .card { width: 170px; }
+  .keyrow { grid-template-columns: 1fr 120px; }
+  .keyrow .sub { display: none; }
+}
+@media (max-width: 600px) {
+  .heroes { grid-template-columns: repeat(3, 1fr); }
+}

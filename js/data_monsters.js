@@ -39,7 +39,7 @@
       desc: 'ÉLITE. Un antico albero piegato dal male. I suoi rami schiantano tutto intorno.',
     },
     cerbante: {
-      name: 'Cerbante', title: 'La Belva dalle Tre Teste', elem: 'tenebre', hp: 135, atk: [4, 7], def: 2, speed: 100, xp: 40, ai: 'boss_cerbante',
+      name: 'Cerbante', title: 'La Belva dalle Tre Teste', elem: 'tenebre', hp: 125, atk: [4, 7], def: 2, speed: 100, xp: 40, ai: 'boss_cerbante',
       flags: { boss: true, noKnock: true, fireImmune: true, alwaysAwake: true }, big: true,
       desc: 'BOSS. Il guardiano della Foresta Silente. Sputa fuoco dalle sue tre fauci ed evoca il branco.',
     },

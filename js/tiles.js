@@ -16,6 +16,8 @@
     roscamar: { grass: ['#3a4a2a', '#4a5a30', '#5a7040', '#708a50'], sand: '#7a6a50', water: '#2a5a7a', deep: '#14304a', chasm: 'void' },
     cieli: { grass: ['#4a6a4a', '#5a8a5a', '#7ab07a', '#a0d0a0'], sand: '#a09a8a', water: '#4a8ac0', deep: '#2a5a9a', chasm: 'sky' },
     vulcano: { grass: ['#4a3a2a', '#5a4a30', '#6a5a3a', '#7a6a4a'], sand: '#5a4a40', water: '#3a5a6a', deep: '#1a2a3a', chasm: 'void' },
+    ghiaccio: { grass: ['#8aa0b4', '#9ab4c8', '#b4cadc', '#d8e8f4'], sand: '#c8d8e4', water: '#5a9ac8', deep: '#2a5a8a', chasm: 'void', snow: true },
+    luce: { grass: ['#8a7a4a', '#a08a50', '#c0a860', '#e0c870'], sand: '#c8b080', water: '#6ab0d0', deep: '#2a6a9a', chasm: 'sky', mosaic: true },
   };
 
   G.buildTileset = function (biome) {
@@ -173,6 +175,23 @@
       ctx.fillStyle = '#1a1028'; ctx.beginPath(); ctx.ellipse(8, 9, 7, 6, 0, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#6a6a7a'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(8, 9, 7, 6, 0, 0, Math.PI * 2); ctx.stroke();
     });
+    // ---- ghiaccio scivoloso ----
+    set.ice = variants(4, (ctx, v) => {
+      rect(ctx, 0, 0, TS, TS, '#a8d8f0');
+      for (let i = 0; i < 14; i++) px(ctx, (r() * TS) | 0, (r() * TS) | 0, '#d8f4ff');
+      for (let k = 0; k < 2; k++) { const x = (r() * 10) | 0, y = (r() * 12 + 2) | 0; for (let j = 0; j < 5; j++) px(ctx, x + j, y - (j >> 1), '#ffffff'); }
+      if (v === 1) { let x = (r() * 8 + 4) | 0, y = 3; for (let k = 0; k < 8; k++) { px(ctx, x, y, '#7ab0d0'); x += r() < 0.5 ? 1 : -1; y++; } }
+      rect(ctx, 0, 15, TS, 1, '#8ac0e0');
+    });
+    // ---- muri incrinati ----
+    const crack = (ctx) => {
+      let x = 5 + ((r() * 6) | 0), y = 2;
+      ctx.fillStyle = '#120d18';
+      for (let k = 0; k < 12; k++) { ctx.fillRect(x, y, 1, 1); if (r() < 0.3) ctx.fillRect(x + 1, y, 1, 1); x += r() < 0.5 ? 1 : -1; y++; if (y > 14) break; }
+      ctx.fillRect(3, 9, 3, 1); ctx.fillRect(10, 6, 3, 1);
+    };
+    set.crackedTop = variants(1, (ctx) => { wallTopFn(ctx, 0); crack(ctx); });
+    set.crackedFace = variants(1, (ctx) => { ctx.drawImage(set.wallFace[0], 0, 0); crack(ctx); });
     return set;
   };
 })();

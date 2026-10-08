@@ -1,0 +1,16 @@
+{
+  "name": "GORMITI — Le Pietre di Gorm",
+  "short_name": "Gormiti",
+  "description": "Roguelike a turni sull'isola di Gorm: scendi nei cinque regni, raccogli reliquie e sconfiggi Magor.",
+  "lang": "it",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#05040a",
+  "theme_color": "#120d18",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

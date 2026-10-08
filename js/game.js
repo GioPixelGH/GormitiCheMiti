@@ -71,13 +71,14 @@
     if (!d) throw new Error('Mostro sconosciuto: ' + type);
     const fl = G.floorInRegion(R.floor), ecl = R.eclissi;
     const isBoss = d.flags && d.flags.boss;
-    let hpMul = (isBoss ? 1 : 1 + 0.12 * (fl - 1)) * 1.2, dmgMul = (isBoss ? 1 : 1 + 0.06 * (fl - 1)) * 1.18;
+    const reg = G.regionOf(R.floor);
+    // i guardiani delle regioni più profonde sono più duri
+    let hpMul = isBoss ? 1.15 + 0.08 * reg : (1 + 0.12 * (fl - 1)) * 1.3, dmgMul = isBoss ? 1.1 + 0.04 * reg : (1 + 0.06 * (fl - 1)) * 1.2;
     if (ecl >= 1) hpMul *= 1.2;
     if (ecl >= 2) dmgMul *= 1.1;
     if (ecl >= 3) dmgMul *= 1.15;
     if (d.flags && d.flags.boss && ecl >= 5) { hpMul *= 1.3; dmgMul *= 1.1; }
-    const reg = G.regionOf(R.floor);
-    if (!isBoss && reg >= 2) { hpMul *= 1 + 0.1 * (reg - 1); dmgMul *= 1 + 0.07 * (reg - 1); }
+    if (!isBoss && reg >= 1) { hpMul *= 1 + 0.15 * reg; dmgMul *= 1 + 0.1 * reg; }
     if (opts.summon) { hpMul = 1; dmgMul = ecl >= 3 ? 1.15 : 1; }
     const e = G.newEntityBase();
     Object.assign(e, {
@@ -122,11 +123,52 @@
   };
 
   G.moveTo = function (e, x, y, opts) {
+    opts = opts || {};
     const ox = e.x, oy = e.y;
     e.x = x; e.y = y;
-    G.fx.move(e, ox, oy, opts || {});
+    G.fx.move(e, ox, oy, opts);
     if (e.kind === 'hero') G.run.distMapsDirty = true;
-    G.onEnter(e, opts || {});
+    G.onEnter(e, opts);
+    // sul ghiaccio si continua a scivolare nella stessa direzione
+    if (!opts.sliding && !opts.slide && !e.dead && !G.run.pendingDescend) G.slideOnIce(e, U.sign(x - ox), U.sign(y - oy));
+  };
+  G.slideOnIce = function (e, dx, dy) {
+    if ((!dx && !dy) || e.flags.fly || e.flags.iceWalk) return;
+    let n = 0;
+    while (n++ < 8 && !e.dead && G.tileAt(e.x, e.y) === T.ICE && !G.run.pendingDescend) {
+      const nx = e.x + dx, ny = e.y + dy;
+      if (!G.canEnter(e, nx, ny)) break;
+      if (n === 1 && e.kind === 'hero') G.log('Scivoli sul ghiaccio!', 'info');
+      G.moveTo(e, nx, ny, { sliding: true });
+    }
+  };
+  // muri incrinati
+  G.breakWall = function (x, y, quiet) {
+    const R = G.run;
+    if (G.tileAt(x, y) !== T.CRACKED) return false;
+    G.setTile(x, y, T.RUBBLE);
+    if (R.map.cracked) delete R.map.cracked[G.idx(x, y)];
+    G.fx.dust(x, y, 1); G.fx.sound('stone'); G.fx.shake(4);
+    R.distMapsDirty = true;
+    if (!quiet) G.log('Il muro crolla! Dietro c\'è un passaggio nascosto.', 'good');
+    R.stats.secrets = (R.stats.secrets || 0) + 1;
+    return true;
+  };
+  G.hitWall = function (x, y, dmg) {
+    const R = G.run, i = G.idx(x, y);
+    if (G.tileAt(x, y) !== T.CRACKED) return false;
+    R.map.cracked = R.map.cracked || {};
+    const hp = (R.map.cracked[i] == null ? 3 : R.map.cracked[i]) - (dmg || 1);
+    R.map.cracked[i] = hp;
+    G.fx.dust(x, y, 0); G.fx.sound('dig');
+    if (hp <= 0) G.breakWall(x, y);
+    else G.fx.float(x, y, 'crack!', '#c8a070', { small: true });
+    return true;
+  };
+  G.breakWallsAround = function (x, y, r) {
+    let any = false;
+    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) if (G.breakWall(x + dx, y + dy, true)) any = true;
+    if (any) G.log('Un muro incrinato va in frantumi!', 'good');
   };
 
   G.onEnter = function (e, opts) {
@@ -179,12 +221,34 @@
   G.randomFreeTile = function (e, nearR) {
     const R = G.run;
     const cands = [];
+    // l'eroe non deve mai finire in una sacca separata dal portale da lava o baratri
+    const safe = e.kind === 'hero' ? G.safeRegion() : null;
     for (let y = 1; y < R.map.h - 1; y++) for (let x = 1; x < R.map.w - 1; x++) {
       if (nearR && U.cheb(x, y, e.x, e.y) > nearR) continue;
+      if (safe && !safe[y * R.map.w + x]) continue;
       if (G.canEnter(e, x, y) && !G.isHazardFor(e, x, y) && G.tileAt(x, y) !== T.CHASM && G.tileAt(x, y) !== T.LAVA) cands.push([x, y]);
     }
     if (!cands.length) return nearR ? G.randomFreeTile(e, 0) : null;
     return R.rng.pick(cands);
+  };
+  // caselle raggiungibili a piedi dal portale senza attraversare pericoli (porte comprese)
+  G.safeRegion = function () {
+    const R = G.run, m = R.map, from = m.stairs || [R.hero.x, R.hero.y];
+    const seen = new Uint8Array(m.w * m.h), q = [from];
+    seen[from[1] * m.w + from[0]] = 1;
+    while (q.length) {
+      const [x, y] = q.pop();
+      for (const [dx, dy] of U.DIRS8) {
+        const nx = x + dx, ny = y + dy;
+        if (!G.inb(nx, ny)) continue;
+        const i = ny * m.w + nx;
+        if (seen[i]) continue;
+        const t = G.tileAt(nx, ny);
+        if (t !== T.DOOR && (!G.TILE[t].walk || G.TILE[t].hazard)) continue;
+        seen[i] = 1; q.push([nx, ny]);
+      }
+    }
+    return seen;
   };
 
   // ---------------- Stati alterati ----------------
@@ -212,6 +276,8 @@
     summon: { name: 'Evocato', color: '#a0ffa0', desc: 'Svanirà dopo alcuni turni.' },
     primed: { name: 'Innescato', color: '#ff2020', desc: 'Sta per esplodere!' },
     tenacity: { name: 'Tenacia', color: '#ffd080', desc: 'Immune a stordimento e congelamento.' },
+    empower: { name: 'Potenziato', color: '#ffb04a', desc: 'Infligge il 25% di danni in più.' },
+    shell: { name: 'Guscio', color: '#7ac0e0', desc: 'Rinchiuso nel guscio: rimanda metà dei danni in mischia.' },
   };
 
   G.addStatus = function (e, name, t, p) {
@@ -225,6 +291,10 @@
       if (e.mods.statusResist) t = Math.max(1, Math.ceil(t * (1 - e.mods.statusResist)));
     }
     if (e.flags.boss && ['stun', 'freeze', 'root', 'confuse'].includes(name)) t = Math.max(1, Math.floor(t / 2));
+    if (G._heroSource && e.kind !== 'hero' && h) {
+      if (name === 'poison') p = (p || 1) + (G.synLevel(h, 'veleno') >= 1 ? 1 : 0);
+      if (name === 'burn') { t += (G.synLevel(h, 'fuoco') >= 1 ? 2 : 0) + (h.mods.burnExtra ? 2 : 0); p = (p || 2) + (h.mods.burnExtra ? 1 : 0); }
+    }
     const cur = e.status[name];
     if (name === 'poison') {
       // il veleno si accumula
@@ -282,6 +352,7 @@
   };
   G.effDef = function (e) {
     let d = e.def;
+    if (e.kind === 'hero' && G.synLevel(e, 'difesa') >= 1) d += 1;
     if (e.status.stoneskin) d += e.status.stoneskin.p || 4;
     if (e.kind === 'hero' && e.mods.lastStand && e.hp < e.maxHp * 0.3) d += 3;
     if (e.flags.stoneForm && e.st.stone) d += 8;
@@ -303,22 +374,36 @@
     if (d.dead || a.dead) return false;
     G.fx.lunge(a, d.x - a.x, d.y - a.y);
     const sneak = d.kind === 'monster' && d.st.mode === 'sleep';
-    let acc = a.acc - d.eva;
+    let acc = a.acc - d.eva - (d.kind === 'hero' && G.synLevel(d, 'tempesta') >= 1 ? 5 : 0);
     if (a.status.blind) acc -= 40;
     if (d.status.stun || d.status.freeze || d.status.root) acc += 20;
+    if (a.kind === 'hero') G.fx.slash(a, d);
     if (!sneak && !opts.sure && R.rng.int(1, 100) > U.clamp(acc, 10, 98)) {
       G.fx.float(d.x, d.y, 'mancato', '#cccccc');
       G.fx.sound('miss');
       if (d.kind === 'monster') G.alert(d, a);
+      // Risonanza Tempesta: chi ti manca viene fulminato
+      if (d.kind === 'hero' && G.synLevel(d, 'tempesta') >= 2 && !a.dead) { G.fx.bolt(d.x, d.y, a.x, a.y, '#bfe8ff'); G.dealDamage(d, a, G.rollDmg(d), { elem: 'aria', noFury: true }); }
       return false;
     }
-    let crit = sneak || R.rng.int(1, 100) <= a.crit;
+    const critBonus = a.kind === 'hero' && G.synLevel(a, 'critico') >= 1 ? 6 : 0;
+    let crit = sneak || R.rng.int(1, 100) <= a.crit + critBonus;
     const base = G.rollDmg(a) * (opts.mult || 1);
     if (sneak && a.kind === 'hero') G.log('Colpo a sorpresa!', 'good');
-    const dealt = G.dealDamage(a, d, base, { crit, melee: true, elem: a.elem });
+    const dealt = G.dealDamage(a, d, base, { crit, melee: true, elem: a.elem, counter: opts.counter });
     // effetti al colpo
     if (!d.dead && dealt > 0) G.onHitEffects(a, d, dealt);
+    if (crit && a.kind === 'hero') G.onHeroCrit(a, d);
     return true;
+  };
+  // critici dell'eroe: reliquie e risonanza Critico
+  G.onHeroCrit = function (h, d) {
+    if (h.mods.critHeal) G.heal(h, h.mods.critHeal, true);
+    if (G.synLevel(h, 'critico') >= 2) {
+      if (!d.dead && !d.flags.boss) G.addStatus(d, 'stun', 1);
+      const cds = h.skills.filter(s => s.cd > 0);
+      if (cds.length) G.run.rng.pick(cds).cd--;
+    }
   };
 
   G.onHitEffects = function (a, d, dealt) {
@@ -326,6 +411,7 @@
     if (a.kind === 'monster') {
       const md = G.MON[a.type];
       if (md && md.onHit) md.onHit(a, d, dealt);
+      if (a.affixes && a.affixes.includes('gelido')) G.addStatus(d, 'slow', 2);
     } else if (a.kind === 'hero') {
       const m = a.mods;
       if (m.poisonOnHit) G.addStatus(d, 'poison', 4, m.poisonOnHit);
@@ -363,8 +449,12 @@
       if (m.eliteDmg && (tgt.flags.elite || tgt.flags.boss)) dmg *= 1 + m.eliteDmg;
       if (src.heroId === 'poivrons' && tgt.status.wet) dmg *= 1.25 + (m.wetBonus || 0);
       if (m.lightBonus && tgt.elem === 'tenebre') dmg *= 1.2;
+      if (tgt.status.poison) dmg *= 1 + (m.poisonedBonus || 0) + (G.synLevel(src, 'veleno') >= 1 ? 0.1 : 0);
+      if (tgt.status.burn && G.synLevel(src, 'fuoco') >= 2) dmg *= 1.25;
+      if (tgt.status.wet && m.wetAll) dmg *= 1 + m.wetAll;
     }
-    if (src && src.kind === 'ally' && hero) dmg *= hero.mods.dmgMul;
+    if (src && src.status.empower) dmg *= 1.25;
+    if (src && src.kind === 'ally' && hero) dmg *= hero.mods.dmgMul * (1 + (hero.mods.allyDmg || 0));
     if (src && src.status.rage) dmg *= 1.5;
     if (src && src.status.weak) dmg *= 0.7;
     if (tgt.status.vuln) dmg *= 1.4;
@@ -415,6 +505,12 @@
       if (tgt.kind === 'hero' && tgt.mods.thorns) G.dealDamage(tgt, src, tgt.mods.thorns, { pierce: true, thorns: true, color: '#7be04a', noFury: true });
       if (tgt.kind === 'hero' && tgt.mods.reflectShield && (tgt.status.shield || absorbed)) G.dealDamage(tgt, src, Math.max(1, Math.round(total * 0.4)), { pierce: true, thorns: true, color: '#c8a070', noFury: true });
       if (tgt.kind === 'monster' && G.MON[tgt.type].thorns) G.dealDamage(tgt, src, G.MON[tgt.type].thorns, { pierce: true, thorns: true, color: '#7be04a' });
+      if (tgt.kind === 'monster' && tgt.affixes && tgt.affixes.includes('spinoso') && !src.dead) G.dealDamage(tgt, src, 3 + G.regionOf(R.floor), { pierce: true, thorns: true, color: '#7be04a' });
+      if (tgt.status.shell && !src.dead) G.dealDamage(tgt, src, Math.max(1, Math.round(total * 0.5)), { pierce: true, thorns: true, color: '#7ac0e0', noFury: true });
+      if (tgt.kind === 'hero' && tgt.heroId === 'carrapax' && tgt.hp > 0 && !src.dead && !opts.counter && U.cheb(src.x, src.y, tgt.x, tgt.y) <= 1 && R.rng.chance(0.2)) {
+        G.fx.float(tgt.x, tgt.y, 'Contrattacco!', '#7ac0e0', { small: true });
+        G.attack(tgt, src, { counter: true, sure: true });
+      }
     }
     if (tgt.hp <= 0) {
       // ultima speranza (reliquie)
@@ -437,6 +533,11 @@
       R.lastHopeUsed = true; G.heal(tgt, tgt.maxHp * 0.3);
       G.log('La Linfa Eterna si risveglia e ti cura!', 'good');
     }
+    // reliquie che fanno avvelenare/ustionare le abilità
+    if (src && src.kind === 'hero' && G._inSkill && !opts.dot && !tgt.dead && tgt.kind !== 'hero') {
+      if (src.mods.skillPoison) G.addStatus(tgt, 'poison', 4, src.mods.skillPoison);
+      if (src.mods.skillBurn && R.rng.chance(src.mods.skillBurn)) G.addStatus(tgt, 'burn', 3, 2 + G.regionOf(R.floor));
+    }
     return total;
   };
 
@@ -447,7 +548,15 @@
       e.st.lsAcc = (e.st.lsAcc || 0) + amt;
       amt = Math.floor(e.st.lsAcc); e.st.lsAcc -= amt;
     } else amt = Math.round(amt);
+    if (e.kind === 'hero' && G.synLevel(e, 'vita') >= 1) amt = Math.round(amt * 1.2);
     const before = e.hp;
+    // Risonanza Vita: la cura in eccesso diventa scudo
+    if (e.kind === 'hero' && G.synLevel(e, 'vita') >= 2 && before + amt > e.maxHp) {
+      const over = before + amt - e.maxHp, cap = Math.round(e.maxHp * 0.2);
+      const cur = e.status.shield ? e.status.shield.p : 0;
+      const add = Math.min(over, Math.max(0, cap - cur));
+      if (add > 0) G.addStatus(e, 'shield', 20, add);
+    }
     e.hp = Math.min(e.maxHp, e.hp + amt);
     const got = e.hp - before;
     if (got > 0 && (!quiet || got >= 3)) G.fx.float(e.x, e.y, '+' + got, '#6eff8a');
@@ -457,8 +566,9 @@
   G.addFury = function (h, v) {
     if (h.kind !== 'hero') return;
     const before = h.fury;
-    h.fury = Math.min(100, h.fury + v * h.mods.furyMul);
-    if (before < 100 && h.fury >= 100) { G.log('La tua Furia è al massimo! Premi 4 per scatenare il Potere Supremo.', 'level'); G.fx.sound('ready'); }
+    h.fury = Math.min(100, h.fury + v * h.mods.furyMul * (G.synLevel(h, 'furia') >= 1 ? 1.2 : 1));
+    const need = G.ultCost(h);
+    if (before < need && h.fury >= need) { G.log('La tua Furia è pronta! Premi 4 per scatenare il Potere Supremo.', 'level'); G.fx.sound('ready'); }
   };
 
   G.kill = function (e, src, opts) {
@@ -481,6 +591,7 @@
         R.stats.kills++;
         R.seenMonsters[e.type] = true;
         if (!opts.vanish && md.onDeath) md.onDeath(e, src);
+        G.onMonsterDeath(e, src, opts);
         if (!opts.noXp && !e.flags.noXp) G.gainXp(h, e.xp);
         if (!opts.vanish && !e.flags.summoned) {
           if (h.mods.killHeal) G.heal(h, h.mods.killHeal, true);
@@ -499,8 +610,33 @@
     R.tele = R.tele.filter(t => !(t.owner === e.id && t.cancelOnDeath !== false));
   };
 
+  // effetti alla morte comuni: varianti dei nemici e risonanze dell'eroe
+  G.onMonsterDeath = function (e, src, opts) {
+    const R = G.run, h = R.hero, reg = G.regionOf(R.floor);
+    if (e.flags.champion) { R.stats.champions = (R.stats.champions || 0) + 1; G.log('Hai sconfitto il Campione ' + e.name.split(',')[0] + '!', 'level'); }
+    if (e.affixes && e.affixes.includes('esplosivo') && !opts.fell) {
+      const tiles = [];
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (!G.isSolid(e.x + dx, e.y + dy)) tiles.push([e.x + dx, e.y + dy]);
+      G.telegraph(null, tiles, { k: 'blast', dmg: [5 + reg * 3, 8 + reg * 4], elem: 'fuoco', fire: 2, friendly: true, src: 'un\'esplosione', color: '#ff8a2a' }, { color: '#ff8a2a', label: 'Esplosione', cancelOnDeath: false });
+      G.log('Il corpo di ' + e.name + ' sta per esplodere!', 'bad');
+    }
+    if (G.synLevel(h, 'veleno') >= 2 && e.status.poison) {
+      for (const o of R.ents) if (!o.dead && o !== e && o.faction === 'enemy' && U.cheb(o.x, o.y, e.x, e.y) <= 2) { G.addStatus(o, 'poison', 4, e.status.poison.p + 2); G.fx.burst(o.x, o.y, '#9be35a', 6); }
+    }
+    if (G.synLevel(h, 'fuoco') >= 2 && e.status.burn) {
+      G.fx.burst(e.x, e.y, '#ff7a2a', 18); G.fx.sound('boom');
+      for (const o of R.ents) if (!o.dead && o !== e && o.faction === 'enemy' && U.cheb(o.x, o.y, e.x, e.y) <= 1) G.dealDamage(h, o, 6 + reg * 3, { elem: 'fuoco', noFury: true });
+    }
+  };
+
   G.monsterDrop = function (e) {
     const R = G.run, rng = R.rng, reg = G.regionOf(R.floor);
+    if (e.flags.golden) G.dropItem(e.x, e.y, { kind: 'gold', n: rng.int(25, 40) + reg * 15 });
+    if (e.flags.champion) {
+      G.dropItem(e.x, e.y, { kind: 'relic', id: G.randomRelicId(rng, rng.chance(0.25) ? 'rara' : 'comune') });
+      G.dropItem(e.x, e.y, { kind: 'gold', n: rng.int(10, 20) * (1 + reg) });
+      return;
+    }
     if (e.flags.elite) {
       G.dropItem(e.x, e.y, { kind: 'gold', n: rng.int(15, 25) * (1 + reg) });
       if (rng.chance(0.6)) G.dropItem(e.x, e.y, { kind: 'item', id: G.randomItemId(rng) });
@@ -543,10 +679,10 @@
   };
 
   // ---------------- Esperienza e livelli ----------------
-  G.xpForLevel = (lvl) => 10 + lvl * 8;
+  G.xpForLevel = (lvl) => 10 + lvl * 8 + Math.floor(lvl * lvl / 5);
   G.gainXp = function (h, xp) {
     const R = G.run;
-    h.xp += xp * h.mods.xpMul * (R.eclissi >= 4 ? 0.85 : 1);
+    h.xp += xp * h.mods.xpMul * (R.eclissi >= 4 ? 0.85 : 1) * (G.synLevel(h, 'saggezza') >= 1 ? 1.15 : 1);
     while (h.xp >= h.xpNext) {
       h.xp -= h.xpNext;
       h.level++;
@@ -578,22 +714,26 @@
 
   G.applyPerk = function (h, id) {
     const p = G.PERK_BY_ID[id];
+    const before = G.synSnapshot(h);
     h.perks[id] = (h.perks[id] || 0) + 1;
     p.apply(h);
     G.log('Dono ottenuto: ' + p.name, 'good');
     G.fx.sound('pickup');
+    G.synAnnounce(h, before);
   };
 
   // ---------------- Reliquie e oggetti ----------------
   G.gainRelic = function (h, id) {
     const r = G.RELIC_BY_ID[id];
     if (!r) return;
+    const before = G.synSnapshot(h);
     h.relics.push(id);
     if (r.apply) r.apply(h);
     G.meta && G.meta.discoverRelic && G.meta.discoverRelic(id);
     G.log('Reliquia ottenuta: ' + r.name + ' — ' + r.desc, 'loot');
     G.fx.sound('relic');
     G.fx.float(h.x, h.y, r.name, '#ffcf4a', { big: true });
+    G.synAnnounce(h, before);
   };
 
   G.addItem = function (h, id, n) {
@@ -614,8 +754,8 @@
   };
   G.randomRelicId = function (rng, rarity) {
     const h = G.run.hero;
-    let pool = G.RELICS.filter(r => !h.relics.includes(r.id) && !G.run.relicsSeen.includes(r.id) && (!rarity || r.rarity === rarity) && r.rarity !== 'boss');
-    if (!pool.length) pool = G.RELICS.filter(r => !h.relics.includes(r.id) && r.rarity !== 'boss');
+    let pool = G.RELICS.filter(r => G.relicAvailable(r) && !h.relics.includes(r.id) && !G.run.relicsSeen.includes(r.id) && (!rarity || r.rarity === rarity) && r.rarity !== 'boss');
+    if (!pool.length) pool = G.RELICS.filter(r => G.relicAvailable(r) && !h.relics.includes(r.id) && r.rarity !== 'boss');
     if (!pool.length) return 'radice_antica';
     const r = rng.pick(pool);
     G.run.relicsSeen.push(r.id);
@@ -623,7 +763,7 @@
   };
   G.relicChoices = function (rng, n, rarities) {
     const h = G.run.hero, out = [];
-    let pool = G.RELICS.filter(r => !h.relics.includes(r.id) && rarities.includes(r.rarity));
+    let pool = G.RELICS.filter(r => G.relicAvailable(r) && !h.relics.includes(r.id) && rarities.includes(r.rarity));
     rng.shuffle(pool);
     for (const r of pool) { if (out.length >= n) break; out.push(r.id); }
     return out;
@@ -637,7 +777,7 @@
       const it = R.items[i];
       if (it.x !== h.x || it.y !== h.y) continue;
       if (it.kind === 'gold') {
-        const n = Math.round(it.n * h.mods.goldMul);
+        const n = Math.round(it.n * h.mods.goldMul * (G.synLevel(h, 'fortuna') >= 1 ? 1.25 : 1));
         h.gold += n; R.stats.gold += n;
         G.fx.float(h.x, h.y, '+' + n + ' ◆', '#7fe8ff', { small: true });
         G.fx.sound('coin');
@@ -793,6 +933,9 @@
         if (!e.dead && p.status) G.addStatus(e, p.status, p.st || 2, p.sp || 2);
         if (!e.dead && p.push && owner) G.knockback(owner, e, p.push);
       }
+      if (p.sound !== 'thunder') for (const [x, y] of tiles) for (const [dx, dy] of U.DIRS4) if (G.tileAt(x + dx, y + dy) === T.CRACKED) G.breakWall(x + dx, y + dy, true);
+      if (p.lava) for (const [x, y] of tiles) { const t = G.tileAt(x, y); const nearPortal = (G.run.portals || []).some(q => U.cheb(q.x, q.y, x, y) <= 2) || (G.run.map.stairs && U.cheb(G.run.map.stairs[0], G.run.map.stairs[1], x, y) <= 2); if ((t === T.FLOOR || t === T.ASH) && !nearPortal && !G.entityAt(x, y) && G.run.rng.chance(0.35)) { G.setTile(x, y, T.LAVA); R.tempTiles.push({ x, y, orig: t, tile: T.LAVA, t: 16 }); } }
+      if (p.ice) for (const [x, y] of tiles) { const t = G.tileAt(x, y); if (t === T.FLOOR || t === T.SHALLOW || t === T.SAND) G.setTile(x, y, T.ICE); }
       G.fx.shake(p.shake || 4);
       G.fx.sound(p.sound || 'boom');
     },
@@ -815,7 +958,8 @@
       const other = G.entityAt(nx, ny);
       const blocked = G.TILE[t].solid || (t === T.DEEP && !tgt.flags.swim && !tgt.flags.fly) || other || G.featureAt(nx, ny);
       if (blocked) {
-        // impatto
+        // impatto (abbatte i muri incrinati)
+        if (t === T.CRACKED) G.breakWall(nx, ny);
         const reg = G.regionOf(G.run.floor);
         G.dealDamage(src, tgt, 3 + reg * 2, { pierce: true, src: 'impatto', noFury: false });
         if (!tgt.dead) G.addStatus(tgt, 'stun', 1);
@@ -827,6 +971,7 @@
       if (tgt.dead || G.run.pendingDescend) return;
       if (t === T.CHASM || t === T.LAVA) return;
     }
+    if (!tgt.dead) G.slideOnIce(tgt, dx, dy);
   };
   G.pull = function (src, tgt, n) {
     if (tgt.dead) return;
@@ -876,7 +1021,7 @@
   // ---------------- Campo visivo ----------------
   G.heroSight = function (h) {
     const R = G.run;
-    let r = G.BIOMES[G.regionOf(R.floor)].sight + h.mods.sight;
+    let r = G.biomeOf(R.floor).sight + h.mods.sight;
     if (h.status.darkness) r = Math.min(r, 2);
     if (h.status.blind) r = Math.min(r, 1);
     return Math.max(1, r);
@@ -968,6 +1113,9 @@
     const R = G.run;
     // ricariche abilità
     for (const s of h.skills) if (s.cd > 0) s.cd--;
+    h.st.turnCount = (h.st.turnCount || 0) + 1;
+    if (G.synLevel(h, 'saggezza') >= 2 && h.st.turnCount % 4 === 0) for (const s of h.skills) if (s.cd > 0) s.cd--;
+    if (G.synLevel(h, 'difesa') >= 2) { const cur = h.status.shield ? h.status.shield.p : 0; if (cur < 12) G.addStatus(h, 'shield', 3, Math.min(2, 12 - cur)); }
     // rigenerazione passiva
     let regen = h.mods.regen;
     if (h.heroId === 'tasarau') {
@@ -978,6 +1126,7 @@
       const t = G.tileAt(h.x, h.y);
       if (t === T.SHALLOW || t === T.DEEP) regen += 1;
     }
+    if (h.mods.lowHpRegen && h.hp < h.maxHp * 0.5) regen += h.mods.lowHpRegen;
     if (regen > 0 && h.hp < h.maxHp) {
       h.st.regenAcc = (h.st.regenAcc || 0) + regen;
       if (h.st.regenAcc >= 1) { const n = Math.floor(h.st.regenAcc); h.st.regenAcc -= n; h.hp = Math.min(h.maxHp, h.hp + n); }
@@ -996,6 +1145,11 @@
     R.turn++;
     G.updateFire();
     G.resolveTelegraphs();
+    if (R.tempTiles && R.tempTiles.length) {
+      for (const tt of R.tempTiles) { tt.t--; if (tt.t <= 0 && G.tileAt(tt.x, tt.y) === tt.tile) { G.setTile(tt.x, tt.y, tt.orig); G.fx.dust(tt.x, tt.y, 0); } }
+      R.tempTiles = R.tempTiles.filter(tt => tt.t > 0);
+      R.distMapsDirty = true;
+    }
     // acqua profonda: chi non sa nuotare e ci finisce dentro (es. spinto) soffre
     for (const e of R.ents) {
       if (e.dead) continue;
