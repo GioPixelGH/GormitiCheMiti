@@ -2,8 +2,11 @@
 
 Un roguelike a turni ambientato sull'isola di Gorm. Scegli uno dei Signori della Natura e attraversa 5 regioni e 15 piani generati proceduralmente, fino al cuore del Monte Vulcano, dove ti aspetta Magor, il Signore del Male.
 
+**▶ Gioca online: https://giopixelgh.github.io/GormitiCheMiti/** (PC, tablet e telefono, anche offline dopo la prima visita)
+
 ## Come si avvia
 
+- **Online**: apri il link qui sopra. Da Chrome/Edge puoi anche installarlo come app (icona "Installa" nella barra degli indirizzi).
 - **Doppio clic su `GIOCA.bat`**: apre il gioco in una finestra dedicata di Microsoft Edge.
 - In alternativa, apri `index.html` con Edge, Chrome o Firefox.
 - **App per Windows** (facoltativa): vedi [App desktop](#app-desktop).
@@ -73,9 +76,9 @@ Serve il *Microsoft Edge WebView2 Runtime* (già presente su Windows 10/11 aggio
 
 ## Versione web / PWA
 
-Il gioco è anche una PWA: se viene servito da un sito `https` (o da `localhost`) si può installare come app da Chrome/Edge su PC e Android e funziona offline grazie al service worker (`sw.js`, `manifest.webmanifest`). Aperto come file locale (`file://`) funziona normalmente, solo senza installazione.
+Il gioco è pubblicato con GitHub Pages ed è una PWA: dal sito `https` si può installare come app da Chrome/Edge su PC e Android e funziona offline grazie al service worker (`sw.js`, `manifest.webmanifest`). Aperto come file locale (`file://`) funziona normalmente, solo senza installazione. I salvataggi della versione online sono separati da quelli della versione locale: per spostarli usa Esporta/Importa.
 
-> **Nota**: Gormiti è un marchio registrato. Questo progetto è un fan game privato: non pubblicarlo su siti pubblici o store senza aver chiarito i diritti.
+> **Nota**: Gormiti è un marchio registrato di Giochi Preziosi. Questo è un fan game gratuito, non ufficiale e senza scopo di lucro; se i titolari dei diritti lo chiedono, verrà rimosso.
 
 ## Consigli
 
