@@ -28,12 +28,15 @@
     if (R.pending.length) { IN.cancelAuto(); UI().processPending(); }
   }
   IN.post = post;
+  // `cost` è il risultato di un'azione GIÀ eseguita: se quell'azione ha chiuso
+  // la partita (es. il colpo finale a Magor) bisogna comunque passare da post()
+  // per mostrare la schermata finale, altrimenti l'input resta bloccato.
   function doAction(cost) {
     const R = G.run;
-    if (!R || R.over) return false;
+    if (!R) return false;
     IN.lastAct = performance.now();
-    if (cost > 0) G.endTurn(cost);
-    if (cost !== 0) post(); else UI().refresh();
+    if (cost > 0 && !R.over) G.endTurn(cost);
+    if (cost !== 0 || R.over) post(); else UI().refresh();
     return cost !== 0;
   }
   IN.doAction = doAction;

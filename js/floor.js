@@ -457,6 +457,7 @@
   G.save = function () {
     const R = G.run;
     if (!R || R.over || !store) return;
+    R.stats.playMs = Date.now() - R.stats.startTime;
     try {
       const data = JSON.stringify(R, (k, v) => {
         if (k === 'hero' || k === 'vis' || k === '_dm' || k === 'rng' || k === 'distMapsDirty') return undefined;
