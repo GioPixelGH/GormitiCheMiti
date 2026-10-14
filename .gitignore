@@ -11,3 +11,7 @@ desktop.ini
 # Build dell'app desktop
 dist/
 desktop/.cache/
+# Archivio locale delle immagini di riferimento (carte e statuine originali): mai pubblicare
+riferimenti/
+# Risultati delle simulazioni di bilanciamento
+tools/out/

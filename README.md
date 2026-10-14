@@ -89,6 +89,10 @@ Il gioco è pubblicato con GitHub Pages ed è una PWA: dal sito `https` si può 
 - Passa il mouse (o tieni premuto) su un nemico per vedere elemento, statistiche e debolezze.
 - Premi `I` per controllare le Risonanze: due reliquie della stessa affinità valgono più di una reliquia rara isolata.
 
+## Sviluppo
+
+Nella cartella `tools/` ci sono gli strumenti di bilanciamento: un simulatore che fa giocare migliaia di partite a un bot (`node tools/verifica.js` per la mini-verifica di 8 minuti). Istruzioni in [tools/README.md](tools/README.md). In `docs/` ci sono il catalogo della storia originale e il piano di sviluppo.
+
 ## Crediti
 
 - Gioco, codice, grafica pixel-art procedurale, effetti sonori e musica sintetizzata: creati appositamente per questo progetto.
