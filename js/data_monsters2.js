@@ -17,7 +17,7 @@
     // ================= GHIACCIAI ETERNI =================
     lupoghiaccio: {
       name: 'Lupo dei Ghiacci', elem: 'mare', hp: 14, atk: [3, 5], eva: 8, speed: 120, xp: 5, ai: 'melee', pack: [2, 3], flags: { iceWalk: true },
-      onHit: st('slow', 2, 0, 0.25), desc: 'Corre sul ghiaccio senza scivolare. Il suo morso gela le membra.',
+      onHit: st('slow', 2, 0, 0.25), desc: 'Corre sul ghiaccio senza rallentare. Il suo morso gela le membra.',
     },
     spiritogelido: {
       name: 'Spirito Gelido', elem: 'aria', hp: 12, atk: [2, 4], eva: 15, speed: 100, xp: 6, ai: 'ranged', flags: { fly: true, kiter: true },
@@ -46,12 +46,12 @@
     glaciator: {
       name: 'Glaciator', title: 'Il Re dei Ghiacci', elem: 'mare', hp: 240, atk: [6, 9], def: 4, speed: 90, xp: 60, ai: 'boss_glaciator',
       flags: { boss: true, noKnock: true, iceWalk: true, alwaysAwake: true }, big: true,
-      desc: 'BOSS. Signore dei Ghiacciai Eterni. Lance di ghiaccio, bufere e un\'arena che diventa una lastra scivolosa.',
+      desc: 'BOSS. Signore dei Ghiacciai Eterni. Lance di ghiaccio, bufere e un\'arena che diventa una lastra gelata.',
     },
     frammento: {
       name: 'Frammento di Ghiaccio', elem: 'mare', hp: 14, atk: [1, 2], def: 2, speed: 100, xp: 2, ai: 'turret',
       flags: { stationary: true, noKnock: true, alwaysAwake: true },
-      ranged: { range: 6, cd: 3, dmg: [4, 6], elem: 'mare', proj: 'ice', status: ['freeze', 1, 0] },
+      ranged: { range: 6, cd: 3, dmg: [4, 6], elem: 'mare', proj: 'ice' },
       desc: 'Una torretta di ghiaccio evocata da Glaciator.',
     },
     // ================= TEMPIO DELLA LUCE INFRANTA =================
@@ -87,7 +87,7 @@
       desc: 'ÉLITE. Un giudice di luce corrotta. Il suo Giudizio indebolisce chi colpisce.',
     },
     luxalion: {
-      name: 'Luxalion Corrotto', title: 'Il Prisma Infranto', elem: 'luce', hp: 460, atk: [9, 13], def: 3, speed: 110, xp: 60, ai: 'boss_luxalion',
+      name: 'Luxalion Corrotto', title: 'Il Prisma Infranto', elem: 'luce', hp: 560, atk: [9, 13], def: 3, speed: 110, xp: 60, ai: 'boss_luxalion',
       flags: { boss: true, noKnock: true, alwaysAwake: true }, big: true,
       desc: 'BOSS. Il campione del Popolo della Luce, corrotto da Magor. I Piloni Prismatici lo curano: distruggili!',
     },
@@ -150,7 +150,7 @@
     const R = G.run;
     const b = R.ents.find(e => !e.dead && (e.type === 'luxalion'));
     if (!b || b.hp >= b.maxHp) return;
-    const amt = 9 + (R.eclissi || 0) * 2;
+    const amt = 11 + (R.eclissi || 0) * 2;
     G.heal(b, amt, true);
     if (G.visible(m.x, m.y) || G.visible(b.x, b.y)) { G.fx.bolt(m.x, m.y, b.x, b.y, '#fff3a0'); G.fx.float(b.x, b.y, '+' + amt, '#fff3a0', { small: true }); }
   };

@@ -61,7 +61,8 @@
         </div>
         <div class="title-foot">Partite: ${meta.runs} · Vittorie: ${Object.values(meta.wins).reduce((a, b) => a + b, 0)} · Piano più profondo: ${meta.bestFloor} · Eroi: ${G.HERO_ORDER.filter(id => meta.unlocked[id]).length}/${G.HERO_ORDER.length}${meta.maxEclissi ? ' · Eclissi sbloccata: ' + meta.maxEclissi : ''}<br>
         <span style="font-size:16px;opacity:.7">Fan game non ufficiale · Gormiti © Giochi Preziosi</span></div>
-      </div>`;
+      </div>
+      <div class="version" title="Versione del gioco">v${G.VERSION}</div>`;
     UI.menuIdx = 0;
     const btns = [...s.querySelectorAll('#title-menu .btn')];
     btns.forEach((b, i) => {
@@ -577,8 +578,12 @@
     const opts = G.eventOptions(f);
     let btns = '';
     opts.forEach((o, i) => { btns += `<button class="btn ${i === 0 ? 'gold' : ''}" data-o="${i}" ${o.ok ? '' : 'disabled'}>${i + 1}. ${esc(o.label)}${o.ok ? '' : ' — ' + esc(o.reason)}</button>`; });
-    const m = openModal(`<h2>${ev.title}</h2><div class="evtext">${ev.text(R, h, f)}</div><div class="menu ev">${btns}</div>`,
-      { type: 'choice', pick: (i) => choose(i) });
+    // "ci penso dopo": l'evento resta lì e si può riaprire urtandolo di nuovo
+    const later = () => { G.audio.play('click'); G.log('Ti allontani: potrai tornare qui più tardi.', 'info'); afterModal(); };
+    const m = openModal(`<h2>${ev.title}</h2><div class="evtext">${ev.text(R, h, f)}</div><div class="menu ev">${btns}</div>
+      <div class="mfoot"><button class="btn small" id="evlater">Ci penso dopo (Esc)</button></div>`,
+      { type: 'choice', pick: (i) => choose(i), esc: later });
+    $('#evlater').onclick = later;
     const choose = (i) => {
       if (!opts[i] || !opts[i].ok) { G.audio.play('miss'); return; }
       G.audio.play('click');

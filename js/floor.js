@@ -445,14 +445,15 @@
       if (G.synLevel(h, 'fortuna') >= 2) G.dropItem(f.x, f.y, { kind: 'item', id: G.randomItemId(rng) });
       return 100;
     }
+    const ask = (type) => { if (!R.pending.some(p => p.fid === f.id)) R.pending.push({ type, fid: f.id }); return 0; };
     if (f.type === 'event') {
       if (f.used) { G.log('Non c\'è più nulla qui.', 'info'); return 0; }
-      R.pending.push({ type: 'event', fid: f.id }); return 0;
+      return ask('event');
     }
-    if (f.type === 'merchant') { G.ensureStockRelics(f); R.pending.push({ type: 'shop', fid: f.id }); return 0; }
+    if (f.type === 'merchant') { G.ensureStockRelics(f); return ask('shop'); }
     if (f.type === 'shrine') {
       if (f.used) { G.log('Il santuario ha esaurito il suo potere.', 'info'); return 0; }
-      R.pending.push({ type: 'shrine', fid: f.id }); return 0;
+      return ask('shrine');
     }
     return 0;
   };

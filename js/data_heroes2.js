@@ -9,7 +9,7 @@
   Object.assign(G.HEROES, {
     kolossus: {
       name: 'Kolossus', title: 'Campione della Terra', elem: 'terra',
-      hp: 44, atk: [4, 7], def: 2, eva: 0, crit: 5, critMul: 1.75,
+      hp: 40, atk: [4, 7], def: 2, eva: 0, crit: 5, critMul: 1.75,
       passive: 'Inarrestabile', passiveDesc: 'Lento (velocità 90), ma immune a stordimento, congelamento e spinte. Ogni nemico abbattuto gli dà 2 di Scudo.',
       desc: 'Il guerriero più massiccio del Popolo della Terra. Plasma il campo di battaglia con muraglie di roccia.',
       skills: ['martello', 'muraglia', 'sfida', 'valanga'], difficulty: 2,
@@ -92,12 +92,12 @@
     },
     sfida: {
       name: 'Grido di Sfida', glyph: '❗', icon: 'shout', elem: 'terra', cd: 8, target: 'self',
-      desc: (h) => `Attira di 2 caselle i nemici entro 5, li Indebolisce per 3 turni e ti dà uno Scudo di ${6 + h.level}.${h.up.sfida_up ? ' Ottieni anche +3 armatura per 4 turni.' : ''}`,
+      desc: (h) => `Attira di 2 caselle i nemici entro 5, li Indebolisce per 3 turni e ti dà uno Scudo di ${4 + Math.ceil(h.level / 2)}.${h.up.sfida_up ? ' Ottieni anche +3 armatura per 4 turni.' : ''}`,
       use(h) {
         const vs = G.run.ents.filter(o => !o.dead && G.hostile(o, h) && U.inRadius(h.x, h.y, o.x, o.y, 5) && G.visible(o.x, o.y))
           .sort((a, b) => U.cheb(a.x, a.y, h.x, h.y) - U.cheb(b.x, b.y, h.x, h.y));
         for (const o of vs) { G.pull(h, o, 2); if (!o.dead) { G.addStatus(o, 'weak', 3); G.alert(o, h); } }
-        G.addStatus(h, 'shield', 8, 6 + h.level);
+        G.addStatus(h, 'shield', 8, 4 + Math.ceil(h.level / 2));
         if (h.up.sfida_up) G.addStatus(h, 'stoneskin', 4, 3);
         G.fx.ring(h.x, h.y, 5, '#e0a050'); G.fx.sound('roar'); G.fx.shake(4);
         return true;

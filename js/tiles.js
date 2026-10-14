@@ -175,7 +175,7 @@
       ctx.fillStyle = '#1a1028'; ctx.beginPath(); ctx.ellipse(8, 9, 7, 6, 0, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#6a6a7a'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(8, 9, 7, 6, 0, 0, Math.PI * 2); ctx.stroke();
     });
-    // ---- ghiaccio scivoloso ----
+    // ---- ghiaccio ----
     set.ice = variants(4, (ctx, v) => {
       rect(ctx, 0, 0, TS, TS, '#a8d8f0');
       for (let i = 0; i < 14; i++) px(ctx, (r() * TS) | 0, (r() * TS) | 0, '#d8f4ff');

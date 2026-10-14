@@ -85,7 +85,7 @@ Il gioco è pubblicato con GitHub Pages ed è una PWA: dal sito `https` si può 
 - I PV non si rigenerano da soli: le pozioni sono preziose.
 - Colpisci i nemici addormentati (zZ) per un critico garantito.
 - Le caselle con il bordo rosso annunciano un attacco potente: spostati!
-- Spingi i nemici nella lava, nei baratri o contro i muri. Sul ghiaccio si scivola: vale anche per loro.
+- Spingi i nemici nella lava, nei baratri o contro i muri. Il ghiaccio rallenta chi non è del Mare: vale anche per i nemici.
 - Passa il mouse (o tieni premuto) su un nemico per vedere elemento, statistiche e debolezze.
 - Premi `I` per controllare le Risonanze: due reliquie della stessa affinità valgono più di una reliquia rara isolata.
 

@@ -5,7 +5,7 @@
 //  cache come riserva quando si gioca senza connessione.
 //  Aggiorna VERSION quando cambi l'elenco dei file.
 // ============================================================
-const VERSION = 'gormiti-v5';
+const VERSION = 'gormiti-1.2.0';
 const FILES = [
   './',
   'index.html',

@@ -110,7 +110,7 @@
       desc: 'ÉLITE. Un gigante di cristallo vivente. Proietta lance in quattro direzioni.',
     },
     obscurio: {
-      name: 'Obscurio', title: 'Signore delle Tenebre', elem: 'tenebre', hp: 380, atk: [8, 12], def: 3, speed: 100, xp: 90, ai: 'boss_obscurio',
+      name: 'Obscurio', title: 'Signore delle Tenebre', elem: 'tenebre', hp: 470, atk: [8, 12], def: 3, speed: 100, xp: 90, ai: 'boss_obscurio',
       flags: { boss: true, noKnock: true, alwaysAwake: true }, big: true,
       desc: 'BOSS. L\'antico nemico della luce. Si teletrasporta, evoca ombre e spegne la tua vista.',
     },

@@ -32,7 +32,8 @@
     if (!R) return false;
     IN.lastAct = performance.now();
     if (cost > 0 && !R.over) G.endTurn(cost);
-    if (cost !== 0 || R.over) post(); else UI().refresh();
+    // anche le azioni gratuite (urtare un mercante, un evento, un santuario) aprono subito la loro finestra
+    if (cost !== 0 || R.over || R.pending.length) post(); else UI().refresh();
     return cost !== 0;
   }
   IN.doAction = doAction;

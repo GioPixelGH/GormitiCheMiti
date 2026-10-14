@@ -10,6 +10,13 @@
   const hasItem = (h, id) => h.items.findIndex(s => s && s.id === id);
   const takeItem = (h, id) => { const i = hasItem(h, id); if (i < 0) return false; h.items[i].n--; if (h.items[i].n <= 0) h.items[i] = null; return true; };
   const freeSlot = (h, id) => h.items.some(s => !s || (s.id === id && s.n < 9));
+  // dà un oggetto; se lo zaino è pieno lo posa a terra accanto all'eroe (non si perde mai)
+  const giveItem = (h, id, n) => {
+    let dropped = 0;
+    for (let k = 0; k < (n || 1); k++) if (!G.addItem(h, id, 1)) { G.dropItem(h.x, h.y, { kind: 'item', id }); dropped++; }
+    if (dropped) G.log('Zaino pieno: ' + G.ITEM_BY_ID[id].name + ' resta a terra accanto a te.', 'loot');
+    return !dropped;
+  };
 
   // crea mostri vicino a una posizione
   G.spawnNear = function (type, x, y, n, opts) {
@@ -87,7 +94,7 @@
       options: [
         { label: 'Calati a recuperarlo (−10% dei PV attuali)', run(R, h) { h.hp = Math.max(1, h.hp - Math.round(h.hp * 0.1)); h.mods.shopDiscount += 0.2; return 'Razzle ti abbraccia: "Per te sconto del 20% per tutto il viaggio!"'; } },
         { label: 'Frugagli nello zaino (2 oggetti, ma Razzle si ricorderà di te)',
-          run(R, h) { const a = G.randomItemId(R.rng), b = G.randomItemId(R.rng); const ok1 = G.addItem(h, a), ok2 = G.addItem(h, b); h.mods.shopDiscount -= 0.25; return `Prendi ${G.ITEM_BY_ID[a].name}${ok1 ? '' : ' (zaino pieno!)'} e ${G.ITEM_BY_ID[b].name}${ok2 ? '' : ' (zaino pieno!)'}. Razzle ti guarda male: i suoi prezzi saliranno.`; } },
+          run(R, h) { const a = G.randomItemId(R.rng), b = G.randomItemId(R.rng); const ok1 = giveItem(h, a), ok2 = giveItem(h, b); h.mods.shopDiscount -= 0.25; return `Prendi ${G.ITEM_BY_ID[a].name}${ok1 ? '' : ' (a terra: zaino pieno)'} e ${G.ITEM_BY_ID[b].name}${ok2 ? '' : ' (a terra: zaino pieno)'}. Razzle ti guarda male: i suoi prezzi saliranno.`; } },
         { label: 'Salutalo e prosegui', run: () => '"Ehi! Non lasciarmi qui!"' },
       ] },
     { id: 'specchio', title: 'Lo Specchio di Obscurio',
@@ -127,7 +134,7 @@
           const opts = R.rng.shuffle(hp.slice()).slice(0, 3).map(p => p.id);
           R.pending.push({ type: 'levelup', opts: opts.length ? opts : G.rollPerks(h, 3), title: 'Tecniche antiche' });
           return 'Tra le pagine scopri come potenziare i tuoi poteri.'; } },
-        { label: 'Prendi una pergamena', cond: (h) => freeSlot(h, 'mappatura') || 'Zaino pieno', run(R, h) { const id = R.rng.chance(0.5) ? 'mappatura' : 'vento'; G.addItem(h, id); return `Trovi una ${G.ITEM_BY_ID[id].name}.`; } },
+        { label: 'Prendi una pergamena', run(R, h) { const id = R.rng.chance(0.5) ? 'mappatura' : 'vento'; const ok = giveItem(h, id); return `Trovi una ${G.ITEM_BY_ID[id].name}${ok ? '' : ' (zaino pieno: la lasci a terra)'}.`; } },
       ] },
     { id: 'branco', title: 'Il branco affamato',
       text: () => 'Occhi che brillano nell\'ombra: un branco affamato ti circonda lentamente...',
@@ -156,8 +163,8 @@
     { id: 'nido', title: 'Il nido abbandonato', pack: 'racconti',
       text: () => 'In un nido enorme brilla un uovo dorato. Nessuna traccia della madre... per ora.',
       options: [
-        { label: 'Prendi l\'uovo (Frutto di Gorm, ma la madre potrebbe tornare)', cond: (h) => freeSlot(h, 'frutto') || 'Zaino pieno', run(R, h, f) {
-          G.addItem(h, 'frutto');
+        { label: 'Prendi l\'uovo (Frutto di Gorm, ma la madre potrebbe tornare)', run(R, h, f) {
+          giveItem(h, 'frutto');
           if (R.rng.chance(0.5)) { const m = G.spawnNear(packType(), f.x, f.y, 1)[0]; if (m) G.makeChampion(m, R.rng), m.st.mode = 'hunt'; return 'Prendi l\'uovo... e un ruggito furioso rimbomba alle tue spalle!'; }
           return 'Prendi l\'uovo: si trasforma in un Frutto di Gorm.'; } },
         { label: 'Lascialo', run: () => 'Il nido resta in pace.' },
@@ -165,7 +172,7 @@
     { id: 'viandante', title: 'Il viandante', pack: 'racconti',
       text: () => `Un viandante del Popolo ${people()} propone uno scambio.`,
       options: [
-        { label: '30 ◆ per 2 Pozioni di Linfa', cond: (h) => (h.gold >= 30 && freeSlot(h, 'pozione')) || 'Servono 30 Frammenti e spazio', run(R, h) { h.gold -= 30; G.addItem(h, 'pozione', 2); return 'Affare fatto!'; } },
+        { label: '30 ◆ per 2 Pozioni di Linfa', cond: (h) => h.gold >= 30 || 'Servono 30 Frammenti', run(R, h) { h.gold -= 30; const ok = giveItem(h, 'pozione', 2); return 'Affare fatto!' + (ok ? '' : ' (zaino pieno: le pozioni in più restano a terra)'); } },
         { label: 'Una Pozione di Linfa per 45 ◆', cond: (h) => hasItem(h, 'pozione') >= 0 || 'Non hai pozioni', run(R, h) { takeItem(h, 'pozione'); h.gold += 45; return 'Il viandante beve avidamente e ti paga.'; } },
         { label: 'Nessuno scambio', run: () => 'Vi salutate con un cenno.' },
       ] },

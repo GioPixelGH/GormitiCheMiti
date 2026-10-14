@@ -129,18 +129,15 @@
     G.fx.move(e, ox, oy, opts);
     if (e.kind === 'hero') G.run.distMapsDirty = true;
     G.onEnter(e, opts);
-    // sul ghiaccio si continua a scivolare nella stessa direzione
-    if (!opts.sliding && !opts.slide && !e.dead && !G.run.pendingDescend) G.slideOnIce(e, U.sign(x - ox), U.sign(y - oy));
+    G.iceCheck(e);
   };
-  G.slideOnIce = function (e, dx, dy) {
-    if ((!dx && !dy) || e.flags.fly || e.flags.iceWalk) return;
-    let n = 0;
-    while (n++ < 8 && !e.dead && G.tileAt(e.x, e.y) === T.ICE && !G.run.pendingDescend) {
-      const nx = e.x + dx, ny = e.y + dy;
-      if (!G.canEnter(e, nx, ny)) break;
-      if (n === 1 && e.kind === 'hero') G.log('Scivoli sul ghiaccio!', 'info');
-      G.moveTo(e, nx, ny, { sliding: true });
-    }
+  // il ghiaccio rallenta chi ci sta sopra, tranne le creature del Mare, quelle volanti e quelle dei ghiacci
+  G.iceProof = (e) => e.elem === 'mare' || !!e.flags.fly || !!e.flags.iceWalk;
+  G.iceCheck = function (e) {
+    if (e.dead || G.tileAt(e.x, e.y) !== T.ICE || G.iceProof(e)) return;
+    const had = e.status.icy;
+    if (!had || had.t < 2) e.status.icy = { t: 2, p: 0 };
+    if (e.kind === 'hero' && !had) G.hint('ice', 'Il ghiaccio ti rallenta (−30% velocità) finché ci cammini sopra. Le creature del Mare e quelle volanti non ne risentono.');
   };
   // muri incrinati
   G.breakWall = function (x, y, quiet) {
@@ -261,6 +258,7 @@
     freeze: { name: 'Congelato', color: '#bff4ff', desc: 'Intrappolato nel ghiaccio: salta il turno.' },
     root: { name: 'Radicato', color: '#5fbf3a', desc: 'Non può muoversi.' },
     slow: { name: 'Rallentato', color: '#8899bb', desc: 'Agisce a metà velocità.' },
+    icy: { name: 'Sul ghiaccio', color: '#bfe8ff', desc: 'Il ghiaccio rallenta: velocità −30%. Non colpisce le creature del Mare e quelle volanti.' },
     haste: { name: 'Rapido', color: '#ffffff', desc: 'Agisce più velocemente.' },
     confuse: { name: 'Confuso', color: '#ff9ef0', desc: 'Si muove a caso.' },
     blind: { name: 'Accecato', color: '#dddddd', desc: 'Precisione e vista ridotte.' },
@@ -346,6 +344,7 @@
   G.effSpeed = function (e) {
     let sp = e.speed;
     if (e.status.slow) sp *= 0.5;
+    if (e.status.icy) sp *= 0.7;
     if (e.status.haste) sp *= 1.5;
     if (e.flags.waterFast) { const t = G.tileAt(e.x, e.y); if (t === T.SHALLOW || t === T.DEEP) sp *= 1.6; }
     return sp;
@@ -971,7 +970,6 @@
       if (tgt.dead || G.run.pendingDescend) return;
       if (t === T.CHASM || t === T.LAVA) return;
     }
-    if (!tgt.dead) G.slideOnIce(tgt, dx, dy);
   };
   G.pull = function (src, tgt, n) {
     if (tgt.dead) return;
@@ -1153,6 +1151,7 @@
     // acqua profonda: chi non sa nuotare e ci finisce dentro (es. spinto) soffre
     for (const e of R.ents) {
       if (e.dead) continue;
+      G.iceCheck(e);
       if (G.tileAt(e.x, e.y) === T.LAVA && !e.flags.fly && !e.flags.fireImmune) {
         G.dealDamage(null, e, 4 + 3 * G.regionOf(R.floor), { elem: 'fuoco', pierce: true, src: 'lava' });
       }

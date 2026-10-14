@@ -268,7 +268,7 @@
         sprinkle(m, rng, [T.FLOOR, T.GRASS], [[8, 4], [1, 4], [2, 2], [4, 1]], 0.06);
         break;
       case 'ghiaccio':
-        // lastre di ghiaccio scivoloso e pozze gelide
+        // lastre di ghiaccio (rallentano) e pozze gelide
         for (const [x, y] of floorCells) { const n = nz[I(m, x, y)]; if (n > 0.56) set(m, x, y, T.ICE); }
         pools(m, rng, 2, T.DEEP, T.ICE);
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {

@@ -29,7 +29,7 @@ G.TILE = [];
   D(T.SAND,      { name: 'Sabbia' });
   D(T.ASH,       { name: 'Cenere' });
   D(T.PILLAR,    { name: 'Colonna', walk: false, opaque: true, solid: true });
-  D(T.ICE,       { name: 'Ghiaccio', slippery: true, desc: 'Scivoloso: chi ci cammina sopra continua a scivolare finché non urta qualcosa.' });
+  D(T.ICE,       { name: 'Ghiaccio', desc: 'Rallenta chi ci cammina sopra (velocità −30%), tranne le creature del Mare e quelle volanti.' });
   D(T.CRACKED,   { name: 'Muro incrinato', walk: false, opaque: true, solid: true, cracked: true, desc: 'Si può abbattere: colpiscilo, fallo esplodere o scaraventaci contro un nemico. Spesso nasconde qualcosa.' });
 })();
 
@@ -58,7 +58,7 @@ G.BIOMES = [
     intro: 'Un gelo innaturale ha imprigionato il nord di Gorm. Attento: il ghiaccio non perdona.',
     monsters: [['lupoghiaccio', 4], ['spiritogelido', 3], ['golemghiaccio', 2], ['tricheco', 2], ['sciamano', 2]],
     elites: ['yeti'], boss: 'glaciator', ambient: 'snow', music: 'ghiaccio', stone: 'Pietra del Ghiaccio',
-    pitch: 'Laghi ghiacciati e scivolosi, branchi di lupi e Glaciator, il Re dei Ghiacci.',
+    pitch: 'Laghi ghiacciati che rallentano il passo, branchi di lupi e Glaciator, il Re dei Ghiacci.',
     colors: { floor: '#9ab4c8', floor2: '#b4cadc', wall: '#5a7a96', wallTop: '#d8e8f4', wallFace: '#6a8aa8', accent: '#e0f6ff' },
   },
   {
