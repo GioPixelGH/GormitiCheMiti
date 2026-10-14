@@ -47,11 +47,15 @@
     { q: 'Quale elemento abbatte il Vento con le sue montagne?', a: ['Terra', 'Foresta', 'Mare'] },
     { q: 'Le tempeste sconvolgono gli oceani: quale elemento vince sul Mare?', a: ['Aria', 'Fuoco', 'Terra'] },
     { q: 'Il fuoco divora i boschi: quale elemento batte la Foresta?', a: ['Fuoco', 'Aria', 'Mare'] },
-    { q: 'Chi si è risvegliato nel cuore del Monte Vulcano?', a: ['Magor', 'Obscurio', 'Razzle'] },
-    { q: 'Con quale potere il Vecchio Saggio creò i Popoli della Natura?', a: ['L\'Occhio della Vita', 'La Pietra Focaia', 'Il Corno di Cerbante'] },
+    { q: 'Chi si è risvegliato nel cuore del Monte Vulcano?', a: ['Magor', 'Obscurio', 'Armageddon'] },
+    { q: 'Con quale potere il Vecchio Saggio creò i Popoli della Natura?', a: ['L\'Occhio della Vita', 'La Pietra Focaia', 'Il Pungiglione di Skorpios'] },
+    { q: 'Quale Signore della Natura è chiamato "il Primogenito"?', a: ['Gheos', 'Tasarau', 'Poivrons'] },
+    { q: 'Chi è il braccio destro di Elios?', a: ['Falcosilente', 'Magicorvo', 'Cavarex'] },
+    { q: 'Le cui profezie si avverano sempre: chi è la Veggente del Popolo del Mare?', a: ['Tartantica', 'Medusantica', 'Murena'] },
+    { q: 'Chi è l\'amico fidato di Magmion, secondo solo a lui per crudeltà?', a: ['Aracno', 'Sparafuoco', 'Electricon'] },
     { q: 'Quale Signore della Natura guida il Popolo della Foresta?', a: ['Tasarau', 'Noctis', 'Gheos'] },
     { q: 'Quale Signore della Natura guida il Popolo dell\'Aria?', a: ['Noctis', 'Poivrons', 'Gheos'] },
-    { q: 'Chi è l\'antico nemico della Luce?', a: ['Obscurio', 'Glaciator', 'Crabs'] },
+    { q: 'Chi è l\'antico nemico del Sommo Luminescente?', a: ['Obscurio', 'Devilfenix', 'Lavion'] },
   ];
 
   G.EVENTS = [
@@ -78,24 +82,24 @@
       options: [
         { label: 'Accetta: −12 PV massimi per una reliquia leggendaria', cond: (h) => h.maxHp > 34 || 'Sei troppo debole',
           run(R, h) { h.maxHp -= 12; h.hp = Math.min(h.hp, h.maxHp); const id = G.randomRelicId(R.rng, 'leggendaria'); G.gainRelic(h, id); return `Senti la vita scivolare via... ma ora possiedi ${G.RELIC_BY_ID[id].name}.`; } },
-        { label: 'Accetta: tutti i tuoi Frammenti (almeno 60) per una reliquia rara', cond: (h) => h.gold >= 60 || 'Servono almeno 60 Frammenti',
+        { label: 'Accetta: tutte le tue Schegge (almeno 60) per una reliquia rara', cond: (h) => h.gold >= 60 || 'Servono almeno 60 Schegge',
           run(R, h) { h.gold = 0; const id = G.randomRelicId(R.rng, 'rara'); G.gainRelic(h, id); return `Il mercante sorride e ti consegna ${G.RELIC_BY_ID[id].name}.`; } },
         { label: 'Rifiuta', run: () => 'La figura svanisce con una risata.' },
       ] },
     { id: 'tesoro', title: 'Il tesoro maledetto',
-      text: () => 'Un forziere avvolto da catene di tenebra. Il metallo è freddo come il ghiaccio, ma da una fessura brillano molti Frammenti.',
+      text: () => 'Un forziere avvolto da catene di tenebra. Il metallo è freddo come il ghiaccio, ma da una fessura brillano molte Schegge.',
       options: [
-        { label: 'Spezza le catene (molti Frammenti, ma il prossimo piano sarà maledetto)',
-          run(R, h) { const n = 70 + reg() * 35; h.gold += n; R.stats.gold += n; R.nextMods = Object.assign(R.nextMods || {}, { cursed: true }); G.fx.sound('dark'); return `Ottieni ${n} Frammenti. Una voce sussurra: "Il prossimo passo sarà più oscuro..."`; } },
+        { label: 'Spezza le catene (molte Schegge, ma il prossimo piano sarà maledetto)',
+          run(R, h) { const n = 70 + reg() * 35; h.gold += n; R.stats.gold += n; R.nextMods = Object.assign(R.nextMods || {}, { cursed: true }); G.fx.sound('dark'); return `Ottieni ${n} Schegge. Una voce sussurra: "Il prossimo passo sarà più oscuro..."`; } },
         { label: 'Lascialo', run: () => 'Meglio non sfidare la sorte.' },
       ] },
-    { id: 'razzle', title: 'Razzle nei guai',
-      text: () => 'Razzle il mercante è disperato: il suo zaino è scivolato in un crepaccio! "Aiutami, ti prego!"',
+    { id: 'tartantica', title: 'Tartantica in pericolo',
+      text: () => 'Tartantica la Veggente è rimasta intrappolata sotto una frana, con le sue sacche di mercanzie. "Sapevo che saresti passato di qui... l\'avevo visto."',
       options: [
-        { label: 'Calati a recuperarlo (−10% dei PV attuali)', run(R, h) { h.hp = Math.max(1, h.hp - Math.round(h.hp * 0.1)); h.mods.shopDiscount += 0.2; return 'Razzle ti abbraccia: "Per te sconto del 20% per tutto il viaggio!"'; } },
-        { label: 'Frugagli nello zaino (2 oggetti, ma Razzle si ricorderà di te)',
-          run(R, h) { const a = G.randomItemId(R.rng), b = G.randomItemId(R.rng); const ok1 = giveItem(h, a), ok2 = giveItem(h, b); h.mods.shopDiscount -= 0.25; return `Prendi ${G.ITEM_BY_ID[a].name}${ok1 ? '' : ' (a terra: zaino pieno)'} e ${G.ITEM_BY_ID[b].name}${ok2 ? '' : ' (a terra: zaino pieno)'}. Razzle ti guarda male: i suoi prezzi saliranno.`; } },
-        { label: 'Salutalo e prosegui', run: () => '"Ehi! Non lasciarmi qui!"' },
+        { label: 'Liberala (−10% dei PV attuali)', run(R, h) { h.hp = Math.max(1, h.hp - Math.round(h.hp * 0.1)); h.mods.shopDiscount += 0.2; return 'Tartantica ti ringrazia: "Ho visto che ci rivedremo. Per te, sconto del 20% per tutto il viaggio!"'; } },
+        { label: 'Fruga nelle sue sacche (2 oggetti, ma lei se lo ricorderà)',
+          run(R, h) { const a = G.randomItemId(R.rng), b = G.randomItemId(R.rng); const ok1 = giveItem(h, a), ok2 = giveItem(h, b); h.mods.shopDiscount -= 0.25; return `Prendi ${G.ITEM_BY_ID[a].name}${ok1 ? '' : ' (a terra: zaino pieno)'} e ${G.ITEM_BY_ID[b].name}${ok2 ? '' : ' (a terra: zaino pieno)'}. Tartantica ti fissa con occhi antichi: i suoi prezzi saliranno.`; } },
+        { label: 'Prosegui', run: () => '"Avevo previsto anche questo..." mormora Tartantica.' },
       ] },
     { id: 'specchio', title: 'Lo Specchio di Obscurio',
       text: () => 'Uno specchio d\'ossidiana. Il tuo riflesso ti sorride... con occhi rossi come la brace.',
@@ -116,8 +120,8 @@
     { id: 'forgia', title: 'La Forgia Antica',
       text: () => 'Un\'incudine ancora calda, coperta di rune dei fabbri di Roscamar. Puoi temprare il tuo equipaggiamento... a pagamento.',
       options: [
-        { label: () => `Affila le armi: +2 danni (${50 + reg() * 20} ◆)`, cond: (h) => h.gold >= 50 + reg() * 20 || 'Frammenti insufficienti', run(R, h) { h.gold -= 50 + reg() * 20; h.mods.dmg += 2; G.fx.sound('stone'); return 'Le scintille volano: i tuoi colpi sono più letali (+2 danni).'; } },
-        { label: () => `Rinforza la corazza: +1 armatura (${50 + reg() * 20} ◆)`, cond: (h) => h.gold >= 50 + reg() * 20 || 'Frammenti insufficienti', run(R, h) { h.gold -= 50 + reg() * 20; h.def += 1; G.fx.sound('stone'); return 'La tua pelle è dura come la roccia (+1 armatura).'; } },
+        { label: () => `Affila le armi: +2 danni (${50 + reg() * 20} ◆)`, cond: (h) => h.gold >= 50 + reg() * 20 || 'Schegge insufficienti', run(R, h) { h.gold -= 50 + reg() * 20; h.mods.dmg += 2; G.fx.sound('stone'); return 'Le scintille volano: i tuoi colpi sono più letali (+2 danni).'; } },
+        { label: () => `Rinforza la corazza: +1 armatura (${50 + reg() * 20} ◆)`, cond: (h) => h.gold >= 50 + reg() * 20 || 'Schegge insufficienti', run(R, h) { h.gold -= 50 + reg() * 20; h.def += 1; G.fx.sound('stone'); return 'La tua pelle è dura come la roccia (+1 armatura).'; } },
         { label: 'Vattene', run: () => 'Il fuoco della forgia si spegne lentamente.' },
       ] },
     { id: 'fonte_furia', title: 'La Fonte della Furia',
@@ -140,14 +144,14 @@
       text: () => 'Occhi che brillano nell\'ombra: un branco affamato ti circonda lentamente...',
       options: [
         { label: 'Lancia una Pozione come diversivo', cond: (h) => hasItem(h, 'pozione') >= 0 || 'Non hai pozioni', run(R, h) { takeItem(h, 'pozione'); return 'Le bestie si azzuffano per la pozione e tu sgusci via.'; } },
-        { label: 'Combatti! (esperienza e Frammenti)', run(R, h, f) {
+        { label: 'Combatti! (esperienza e Schegge)', run(R, h, f) {
           const ms = G.spawnNear(packType(), f.x, f.y, 3);
           for (const m of ms) m.flags.golden = true;
           return 'Il branco attacca!'; } },
       ] },
     // --- eventi del pacchetto "Racconti di Gorm" ---
     { id: 'altare', title: 'L\'Altare degli Elementi', pack: 'racconti',
-      text: () => 'Cinque incavi intagliati nella pietra, uno per ogni Pietra di Gorm. L\'altare chiede un sacrificio.',
+      text: () => 'Cinque incavi intagliati nella pietra, uno per ogni Frammento dell\'Occhio della Vita. L\'altare chiede un sacrificio.',
       options: [
         { label: 'Sacrifica una pozione e 8 PV massimi: reliquia rara', cond: (h) => (hasItem(h, 'pozione') >= 0 && h.maxHp > 30) || 'Serve una Pozione di Linfa', run(R, h) { takeItem(h, 'pozione'); h.maxHp -= 8; h.hp = Math.min(h.hp, h.maxHp); const id = G.randomRelicId(R.rng, 'rara'); G.gainRelic(h, id); return `L'altare si illumina e ti dona ${G.RELIC_BY_ID[id].name}.`; } },
         { label: 'Prega: +4 armatura per 40 turni', run(R, h) { G.addStatus(h, 'stoneskin', 40, 4); G.fx.sound('shield'); return 'La pietra dell\'altare ti protegge.'; } },
@@ -172,7 +176,7 @@
     { id: 'viandante', title: 'Il viandante', pack: 'racconti',
       text: () => `Un viandante del Popolo ${people()} propone uno scambio.`,
       options: [
-        { label: '30 ◆ per 2 Pozioni di Linfa', cond: (h) => h.gold >= 30 || 'Servono 30 Frammenti', run(R, h) { h.gold -= 30; const ok = giveItem(h, 'pozione', 2); return 'Affare fatto!' + (ok ? '' : ' (zaino pieno: le pozioni in più restano a terra)'); } },
+        { label: '30 ◆ per 2 Pozioni di Linfa', cond: (h) => h.gold >= 30 || 'Servono 30 Schegge', run(R, h) { h.gold -= 30; const ok = giveItem(h, 'pozione', 2); return 'Affare fatto!' + (ok ? '' : ' (zaino pieno: le pozioni in più restano a terra)'); } },
         { label: 'Una Pozione di Linfa per 45 ◆', cond: (h) => hasItem(h, 'pozione') >= 0 || 'Non hai pozioni', run(R, h) { takeItem(h, 'pozione'); h.gold += 45; return 'Il viandante beve avidamente e ti paga.'; } },
         { label: 'Nessuno scambio', run: () => 'Vi salutate con un cenno.' },
       ] },

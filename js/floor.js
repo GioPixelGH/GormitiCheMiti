@@ -33,7 +33,7 @@
     opts = opts || {};
     const seed = opts.seed != null ? opts.seed >>> 0 : ((Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0);
     G.run = {
-      version: 4, seed, rng: new G.RNG(seed), heroId, eclissi: opts.eclissi || 0, daily: opts.daily || null,
+      version: G.RUN_VERSION, seed, rng: new G.RNG(seed), heroId, eclissi: opts.eclissi || 0, daily: opts.daily || null,
       floor: 0, map: null, ents: [], items: [], features: [], traps: [], tele: [], log: [], pending: [],
       turn: 0, tick: 0, nextId: 1, over: null, sealed: false, bossId: 0, bossIntro: false,
       stats: { kills: 0, dmgDealt: 0, dmgTaken: 0, gold: 0, actions: 0, floors: 0, startTime: Date.now(), playMs: 0, bosses: 0, elites: 0, itemsUsed: 0, champions: 0, secrets: 0, events: 0 },
@@ -52,7 +52,7 @@
     if (buy.reroll) G.run.rerolls = 1;
     G.enterFloor(1);
     if (buy.primo_dono) G.run.pending.push({ type: 'levelup', opts: G.rollPerks(h, 3), title: 'Il Primo Dono del Saggio' });
-    G.log('Il Vecchio Saggio ti ha scelto, ' + h.name + '. Riporta le Pietre di Gorm e sconfiggi Magor!', 'level');
+    G.say('Ti ho scelto, ' + h.name + '. Magor ha frantumato l\'Occhio della Vita: strappa i Frammenti ai Signori del male e fermalo nel Monte Vulcano.');
     return G.run;
   };
 
@@ -91,7 +91,7 @@
     if (h.mods.floorFury) G.addFury(h, h.mods.floorFury / Math.max(0.1, h.mods.furyMul));
     G.computeFOV();
     const biome = G.biomeOf(n);
-    if (G.floorInRegion(n) === 1) G.log(biome.intro, 'boss');
+    if (G.floorInRegion(n) === 1) G.say(biome.intro);
     G.log('Piano ' + n + ' — ' + biome.name + (boss ? ' (Arena del Guardiano)' : ''), 'info');
     if (R.floorMods.danger) G.log('Hai preso il Sentiero Pericoloso: più nemici, ma tesori migliori.', 'bad');
     if (R.floorMods.cursed) G.log('La maledizione del tesoro grava su questo piano: i nemici sono più forti.', 'bad');
@@ -312,17 +312,17 @@
       R.portals.push({ x: px, y: py, kind: 'region', dest });
     });
     R.map.stairs = [R.portals[0].x, R.portals[0].y];
-    const stone = G.biomeOf(R.floor).stone;
-    G.dropItem(e.x, e.y, { kind: 'pietra', name: stone });
+    const frag = G.fragmentName(reg);
+    G.dropItem(e.x, e.y, { kind: 'frammento', name: frag });
     G.dropItem(e.x, e.y, { kind: 'gold', n: 40 + reg * 25 });
-    G.fx.banner(e.name + ' è sconfitto!', 'Raccogli la ' + stone);
+    G.fx.banner(e.name + ' è sconfitto!', 'Raccogli il ' + frag);
     G.log('Hai sconfitto ' + e.name + '! ' + (opts.length > 1 ? 'Si aprono due portali: scegli la tua strada.' : 'Il portale si è aperto.'), 'level');
     G.fx.sound('victory');
   };
   G.portalAt = function (x, y) { return (G.run.portals || []).find(p => p.x === x && p.y === y) || null; };
   G.portalInfo = function (p) {
     if (!p) return { name: 'Portale', desc: 'Conduce al piano successivo.' };
-    if (p.kind === 'danger') return { name: 'Portale Cremisi', desc: 'Il Sentiero Pericoloso: il prossimo piano avrà più nemici, un\'élite e un Campione, ma anche uno Scrigno Antico e più Frammenti.' };
+    if (p.kind === 'danger') return { name: 'Portale Cremisi', desc: 'Il Sentiero Pericoloso: il prossimo piano avrà più nemici, un\'élite e un Campione, ma anche uno Scrigno Antico e più Schegge.' };
     if (p.kind === 'safe') return { name: 'Portale', desc: 'Il Sentiero Sicuro verso il piano successivo.' };
     const b = G.BIOME_BY_ID[p.dest];
     return { name: 'Portale: ' + b.name, desc: (b.pitch || b.intro) };
@@ -344,7 +344,11 @@
     }
   };
 
-  // ---------------- Mercante (Razzle) ----------------
+  // i cinque Frammenti dell'Occhio della Vita, uno per tappa del viaggio (il quinto lo custodisce Magor)
+  const ORDINALI = ['Primo', 'Secondo', 'Terzo', 'Quarto', 'Quinto'];
+  G.fragmentName = (slot) => (ORDINALI[slot] || 'Ultimo') + ' Frammento dell\'Occhio della Vita';
+
+  // ---------------- Mercante (Tartantica la Veggente) ----------------
   G.makeStock = function (rng, reg) {
     const mul = 1 + reg * 0.25;
     const stock = [];
@@ -365,7 +369,7 @@
     const R = G.run, h = R.hero, s = f.stock[idx];
     if (!s || s.sold) return false;
     const price = G.shopPrice(s);
-    if (h.gold < price) { G.log('Non hai abbastanza Frammenti.', 'bad'); return false; }
+    if (h.gold < price) { G.log('Non hai abbastanza Schegge.', 'bad'); return false; }
     if (s.kind === 'item') {
       if (!G.addItem(h, s.id, 1)) { G.log('Zaino pieno!', 'bad'); return false; }
       G.log('Hai comprato: ' + G.ITEM_BY_ID[s.id].name + '.', 'loot');
@@ -373,7 +377,7 @@
       G.gainRelic(h, s.id);
     } else if (s.kind === 'heal') {
       G.heal(h, h.maxHp * 0.5); G.cleanse(h);
-      G.log('Razzle ti medica le ferite.', 'good');
+      G.log('Tartantica ti medica le ferite.', 'good');
     }
     h.gold -= price; s.sold = true;
     G.fx.sound('coin');
@@ -387,7 +391,7 @@
     sangue: { name: 'Altare di Sangue', desc: 'Un altare oscuro reclama un tributo di vita in cambio di potere.',
       options: [{ label: 'Offri il 15% dei PV massimi (ottieni una reliquia rara)', id: 'blood' }, { label: 'Allontanati', id: 'leave' }] },
     saggio: { name: 'Statua del Vecchio Saggio', desc: 'Il Saggio di pietra sembra osservarti. Ai suoi piedi, una ciotola per le offerte.',
-      options: [{ label: 'Offri 40 Frammenti (ottieni un Dono)', id: 'offer', cost: 40 }, { label: 'Prega (rimuove stati, +20% PV)', id: 'pray' }] },
+      options: [{ label: 'Offri 40 Schegge (ottieni un Dono)', id: 'offer', cost: 40 }, { label: 'Prega (rimuove stati, +20% PV)', id: 'pray' }] },
     totem: { name: 'Totem Elementale', desc: 'Un totem pulsa di energia instabile. Toccarlo è un azzardo.',
       options: [{ label: 'Tocca il totem (reliquia... o maledizione)', id: 'gamble' }, { label: 'Allontanati', id: 'leave' }] },
   };
@@ -405,7 +409,7 @@
         break;
       }
       case 'offer':
-        if (h.gold < 40) { G.log('Non hai abbastanza Frammenti.', 'bad'); return false; }
+        if (h.gold < 40) { G.log('Non hai abbastanza Schegge.', 'bad'); return false; }
         h.gold -= 40;
         R.pending.push({ type: 'levelup', opts: G.rollPerks(h, h.mods.extraChoice ? 4 : 3), title: 'Dono della Statua' });
         break;
@@ -533,7 +537,7 @@
       let ok;
       try { ok = d.use(h, target); } finally { G._heroSource = false; }
       if (!ok) return 0;
-      if (h.mods.consumeSave && R.rng.chance(h.mods.consumeSave)) G.log('La Moneta di Razzle brilla: l\'oggetto non si consuma!', 'good');
+      if (h.mods.consumeSave && R.rng.chance(h.mods.consumeSave)) G.log('Il Guscio di Tartantica brilla: l\'oggetto non si consuma!', 'good');
       else { s.n--; if (s.n <= 0) h.items[slot] = null; }
       R.stats.itemsUsed++;
       G.log('Usi: ' + d.name + '.', 'info');
@@ -557,6 +561,54 @@
   // ================================================================
   const RUN_KEY = 'gormiti_run_v4', META_KEY = 'gormiti_meta_v1';
   G.STORE_KEYS = { run: RUN_KEY, meta: META_KEY };
+  // formato della partita salvata: le versioni precedenti vengono convertite, non cancellate
+  G.RUN_VERSION = 5;
+
+  // ---------------- conversione dei salvataggi delle versioni precedenti ----------------
+  // v1.3.0 (storia originale): identificativi di reliquie, eventi e acquisti del Santuario cambiati
+  G.RENAMED_IDS = { cuore_gorm: 'nucleo_occhio', corno_cerbante: 'pungiglione_skorpios', guscio_crabs: 'chela_grankios', moneta: 'guscio_tartantica', razzle: 'tartantica', pack_razzle: 'pack_tartantica' };
+  // nemici tolti dal gioco: in una partita salvata vengono sostituiti da un guerriero dell'era
+  G.REPLACED_MONSTERS = { crabs: ['geyser', 'Crabs il Vendicatore'], mystral: ['crudelion', 'Mystral Corrotto'] };
+  function renameIds(v) {
+    const M = G.RENAMED_IDS;
+    if (Array.isArray(v)) {
+      for (let i = 0; i < v.length; i++) {
+        if (typeof v[i] === 'string') { if (M[v[i]]) v[i] = M[v[i]]; }
+        else if (v[i] && typeof v[i] === 'object') renameIds(v[i]);
+      }
+    } else if (v && typeof v === 'object') {
+      for (const k of Object.keys(v)) {
+        const x = v[k];
+        if (typeof x === 'string') { if (M[x]) v[k] = M[x]; }
+        else if (x && typeof x === 'object') renameIds(x);
+        if (M[k] && !(M[k] in v)) { v[M[k]] = v[k]; delete v[k]; }
+      }
+    }
+    return v;
+  }
+  G.migrateMeta = function (d) {
+    renameIds(d);
+    for (const t in G.REPLACED_MONSTERS) if (d.monsters) delete d.monsters[t];
+    return d;
+  };
+  G.migrateRun = function (R) {
+    if (R.version === 4) {
+      renameIds(R);
+      for (const e of R.ents || []) {
+        const rep = G.REPLACED_MONSTERS[e.type];
+        if (!rep) continue;
+        const nd = G.MON[rep[0]];
+        e.name = (e.name || rep[1]).replace(rep[1], nd.name);
+        e.type = rep[0]; e.elem = nd.elem; e.ai = nd.ai;
+        Object.assign(e.flags, nd.flags);
+        if (!nd.flags.swim) delete e.flags.swim;
+      }
+      for (const t in G.REPLACED_MONSTERS) if (R.seenMonsters) delete R.seenMonsters[t];
+      for (const it of R.items || []) if (it.kind === 'pietra') { it.kind = 'frammento'; it.name = G.fragmentName(G.regionOf(R.floor)); }
+      R.version = 5;
+    }
+    return R;
+  };
   const store = (typeof localStorage !== 'undefined') ? localStorage : null;
 
   G.save = function () {
@@ -579,8 +631,8 @@
     const s = store.getItem(RUN_KEY);
     if (!s) return false;
     try {
-      const R = JSON.parse(s);
-      if (R.version !== 4) { store.removeItem(RUN_KEY); return false; }
+      const R = G.migrateRun(JSON.parse(s));
+      if (R.version !== G.RUN_VERSION) { store.removeItem(RUN_KEY); return false; }
       R.rng = new G.RNG(1); R.rng.s = R.rngState >>> 0;
       R.hero = R.ents.find(e => e.kind === 'hero');
       R.vis = new Uint8Array(R.map.w * R.map.h);
@@ -609,6 +661,7 @@
       try { d = store && JSON.parse(store.getItem(META_KEY)); } catch (e) { d = null; }
       const base = this.def();
       this.data = d ? Object.assign(base, d, { unlocked: Object.assign(base.unlocked, d.unlocked || {}), settings: Object.assign(base.settings, d.settings || {}) }) : base;
+      G.migrateMeta(this.data);
       return this.data;
     },
     save() { try { store && store.setItem(META_KEY, JSON.stringify(this.data)); } catch (e) { } },
@@ -626,8 +679,8 @@
       if (!this.data) return;
       this.data.bosses[type] = (this.data.bosses[type] || 0) + 1;
       if (type === 'obscurio') this.unlockHero('saggio');
-      if (type === 'glaciator') this.unlockHero('carrapax');
-      if (type === 'luxalion') this.unlockHero('elios');
+      if (type === 'orrore') this.unlockHero('carrapax');
+      if (type === 'devilfenix') this.unlockHero('elios');
       this.save();
     },
     // fine partita

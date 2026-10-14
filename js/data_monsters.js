@@ -66,15 +66,15 @@
       name: 'Spirito Annegato', elem: 'tenebre', hp: 12, atk: [3, 5], eva: 10, speed: 90, xp: 6, ai: 'melee', flags: { phase: true, drain: true, fly: true },
       desc: 'Un fantasma che attraversa la roccia e si nutre della tua vita.',
     },
-    crabs: {
-      name: 'Crabs il Vendicatore', elem: 'mare', hp: 70, atk: [5, 8], def: 6, speed: 90, xp: 25, ai: 'melee',
-      flags: { elite: true, noKnock: true, swim: true }, slam: { cd: 5, shape: 'cross', r: 3, dmg: [8, 12], status: 'stun', st: 1, color: '#4aa0ff', label: 'Chele Tonanti' },
-      desc: 'ÉLITE. Un granchio gigante dalle chele devastanti. Colpisce in croce.',
+    geyser: {
+      name: 'Geyser l\'Iroso', elem: 'fuoco', hp: 70, atk: [5, 8], def: 5, speed: 90, xp: 25, ai: 'melee',
+      flags: { elite: true, noKnock: true, fireImmune: true }, slam: { cd: 5, shape: 'around', r: 2, dmg: [8, 12], fire: 2, color: '#ffb070', label: 'Getti di Vapore' },
+      desc: 'ÉLITE. Guerriero di Orrore Profondo (Seconda Serie): una bomba ad orologeria. Quando si arrabbia, getti di vapore incandescente escono da tutto il suo corpo.',
     },
     orrore: {
-      name: 'Orrore Profondo', title: 'Il Terrore degli Abissi', elem: 'mare', hp: 230, atk: [6, 9], def: 3, speed: 80, xp: 60, ai: 'boss_orrore',
-      flags: { boss: true, noKnock: true, swim: true, alwaysAwake: true }, big: true,
-      desc: 'BOSS. Una creatura antica emersa dalla Fossa. I suoi tentacoli sono ovunque.',
+      name: 'Orrore Profondo', title: 'Il Signore di Vulcano', elem: 'fuoco', hp: 230, atk: [6, 9], def: 3, speed: 80, xp: 60, ai: 'boss_orrore',
+      flags: { boss: true, noKnock: true, swim: true, fireImmune: true, alwaysAwake: true }, big: true,
+      desc: 'BOSS. Nato dagli incubi più crudeli di Vulcano: ali d\'ossa magiche, Magia Nera e lava che erutta dal braccio. Si è annidato nella Fossa e comanda le sue creature.',
     },
     tentacolo: {
       name: 'Tentacolo Abissale', elem: 'mare', hp: 18, atk: [5, 8], def: 1, speed: 100, xp: 2, ai: 'melee',
@@ -142,10 +142,10 @@
       name: 'Grifone', elem: 'aria', hp: 32, atk: [6, 9], def: 1, speed: 130, xp: 11, ai: 'melee', flags: { fly: true },
       desc: 'Metà aquila e metà leone. Veloce e feroce.',
     },
-    mystral: {
-      name: 'Mystral Corrotto', elem: 'aria', hp: 140, atk: [8, 12], def: 3, speed: 110, xp: 45, ai: 'melee',
-      flags: { elite: true, fly: true, noKnock: true }, slam: { cd: 4, shape: 'target', r: 1, dmg: [10, 14], push: 2, color: '#a8ecff', label: 'Tornado' },
-      desc: 'ÉLITE. Un signore del vento caduto. Scatena tornado sotto i tuoi piedi.',
+    crudelion: {
+      name: 'Crudelion il Maledetto', elem: 'aria', hp: 140, atk: [8, 12], def: 3, speed: 115, xp: 45, ai: 'melee',
+      flags: { elite: true, fly: true, noKnock: true }, slam: { cd: 4, shape: 'target', r: 1, dmg: [10, 14], status: 'vuln', st: 2, color: '#c04ae0', label: 'Balzo Uncinato' },
+      desc: 'ÉLITE. L\'anima nera del Popolo dell\'Aria (Terza Serie): con salti lunghissimi piomba sui nemici e li dilania con gli uncini delle braccia.',
     },
     devilfenix: {
       name: 'Devilfenix', title: 'La Fenice Infernale', elem: 'aria', hp: 480, atk: [9, 13], def: 3, speed: 110, xp: 60, ai: 'boss_devilfenix',

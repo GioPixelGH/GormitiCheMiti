@@ -31,7 +31,7 @@
       t1: '+15% esperienza.',
       t2: 'Illuminazione: ogni 4 turni tutte le ricariche scendono di 1 in più.' },
     fortuna:  { name: 'Fortuna',  color: '#7fe8ff', glyph: '◆',
-      t1: '+25% Frammenti raccolti.',
+      t1: '+25% Schegge raccolte.',
       t2: 'Tocco d\'Oro: mercanti scontati del 20% e i forzieri contengono un oggetto in più.' },
   };
   G.SYN_ORDER = ['veleno', 'fuoco', 'critico', 'vita', 'difesa', 'furia', 'tempesta', 'saggezza', 'fortuna'];
@@ -43,8 +43,8 @@
     scudo_corallo: 'difesa', bussola: 'saggezza', collana_spine: 'veleno', spora: 'veleno', clessidra: 'saggezza',
     mappa_gorm: 'saggezza', dente_squalo: 'critico', tamburo: 'furia', gemma: 'tempesta', amuleto_neutro: 'difesa',
     pietra_focaia: 'fuoco', anello_tempesta: 'tempesta', cristallo_vamp: 'vita', mantello: 'tempesta', elmo_kolossus: 'difesa',
-    lente: 'saggezza', libro_saggio: 'saggezza', calice: 'fortuna', cuore_gorm: 'vita', linfa_eterna: 'vita',
-    occhio_vita: 'saggezza', corona: 'furia', corno_cerbante: 'fuoco', perla_abissi: 'vita', mantello_obscurio: 'critico',
+    lente: 'saggezza', libro_saggio: 'saggezza', calice: 'fortuna', nucleo_occhio: 'vita', linfa_eterna: 'vita',
+    occhio_vita: 'saggezza', corona: 'furia', pungiglione_skorpios: 'fuoco', perla_abissi: 'vita', mantello_obscurio: 'critico',
     piuma_fenice: 'tempesta', cuore_magma: 'fuoco',
   };
   const PT = {
@@ -67,13 +67,13 @@
     R('linfa_grand', 'Linfa di Grandalbero', 'rara', 'heart', '#4ac04a', 'vita', 'Sotto il 50% dei PV rigeneri 1 PV a turno.', h => { h.mods.lowHpRegen = (h.mods.lowHpRegen || 0) + 1; }),
     R('brace', 'Brace Eterna', 'comune', 'gem', '#ff8a3a', 'fuoco', 'Le ustioni che infliggi durano 2 turni in più e fanno +1 danno.', h => { h.mods.burnExtra = true; h.mods.burnOnHit += 0.1; }, 'pack_roscamar'),
     R('lanterna_lavion', 'Lanterna di Lavion', 'rara', 'flask', '#ff5a1a', 'fuoco', 'Le tue abilità hanno il 40% di probabilità di ustionare.', h => { h.mods.skillBurn = (h.mods.skillBurn || 0) + 0.4; }, 'pack_roscamar'),
-    R('guscio_crabs', 'Guscio di Crabs', 'comune', 'shell', '#4a8ac0', 'difesa', '+2 armatura, ma −5 schivata.', h => { h.def += 2; h.eva -= 5; }, 'pack_roscamar'),
+    R('chela_grankios', 'Chela di Grankios', 'comune', 'claw', '#4a8ac0', 'difesa', '+2 armatura, ma −5 schivata.', h => { h.def += 2; h.eva -= 5; }, 'pack_roscamar'),
     R('lama_vento', 'Lama del Vento', 'comune', 'claw', '#e8f8ff', 'critico', 'I critici ti curano di 3 PV.', h => { h.mods.critHeal = (h.mods.critHeal || 0) + 3; }, 'pack_tempesta'),
     R('sigillo_predatore', 'Sigillo del Predatore', 'rara', 'amulet', '#ffb83a', 'critico', '+5% critico e +0,3 al moltiplicatore dei critici.', h => { h.crit += 5; h.critMul += 0.3; }, 'pack_tempesta'),
     R('ampolla_fulmine', 'Ampolla del Fulmine', 'rara', 'flask', '#bfe8ff', 'tempesta', '+30% danni ai nemici Bagnati.', h => { h.mods.wetAll = (h.mods.wetAll || 0) + 0.3; }, 'pack_tempesta'),
-    R('corno_guerra', 'Corno di Guerra', 'comune', 'claw', '#d08a4a', 'furia', 'Inizi ogni piano con 30 di Furia.', h => { h.mods.floorFury = (h.mods.floorFury || 0) + 30; }, 'pack_razzle'),
-    R('moneta', 'Moneta di Razzle', 'comune', 'ring', '#ffd23a', 'fortuna', '15% di probabilità di non consumare un oggetto usato.', h => { h.mods.consumeSave = (h.mods.consumeSave || 0) + 0.15; }, 'pack_razzle'),
-    R('clessidra_rotta', 'Clessidra Spezzata', 'leggendaria', 'flask', '#d8b0ff', 'saggezza', 'Il Potere Supremo richiede solo 70 di Furia.', h => { h.mods.ultCost = 70; }, 'pack_razzle'),
+    R('corno_guerra', 'Corno di Guerra', 'comune', 'claw', '#d08a4a', 'furia', 'Inizi ogni piano con 30 di Furia.', h => { h.mods.floorFury = (h.mods.floorFury || 0) + 30; }, 'pack_tartantica'),
+    R('guscio_tartantica', 'Guscio di Tartantica', 'comune', 'shell', '#3a8a9a', 'fortuna', '15% di probabilità di non consumare un oggetto usato.', h => { h.mods.consumeSave = (h.mods.consumeSave || 0) + 0.15; }, 'pack_tartantica'),
+    R('clessidra_rotta', 'Clessidra Spezzata', 'leggendaria', 'flask', '#d8b0ff', 'saggezza', 'Il Potere Supremo richiede solo 70 di Furia.', h => { h.mods.ultCost = 70; }, 'pack_tartantica'),
   ];
   for (const r of NEW) { G.RELICS.push(r); G.RELIC_BY_ID[r.id] = r; }
   for (const r of G.RELICS) if (!r.tag && RT[r.id]) r.tag = RT[r.id];

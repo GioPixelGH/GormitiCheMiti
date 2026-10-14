@@ -22,7 +22,7 @@
       passive: 'Corazza Riflettente', passiveDesc: 'Nuota nell\'acqua profonda. Quando viene colpito in mischia ha il 20% di probabilità di contrattaccare.',
       desc: 'Il cavaliere-granchio del Popolo del Mare. Incassa, risponde colpo su colpo e trascina le maree.',
       skills: ['chela', 'guscio', 'marea', 'tsunami'], difficulty: 2,
-      unlock: 'Sconfiggi Glaciator, il Re dei Ghiacci.',
+      unlock: 'Sconfiggi Orrore Profondo, il Signore di Vulcano.',
       setup(h) { h.flags.swim = true; },
     },
     elios: {
@@ -31,7 +31,7 @@
       passive: 'Vento in Poppa', passiveDesc: 'Vede 2 caselle più lontano. Dopo ogni abilità diventa Rapido per un breve momento.',
       desc: 'L\'arciere dei venti, figlio del sole. Colpisce da lontano e non si fa mai raggiungere.',
       skills: ['freccia', 'ventaglio', 'corrente', 'sole'], difficulty: 3,
-      unlock: 'Sconfiggi Luxalion Corrotto.',
+      unlock: 'Sconfiggi Devilfenix, Signore dell\'Aria.',
       setup(h) { h.mods.sight += 2; },
     },
     barbataus: {

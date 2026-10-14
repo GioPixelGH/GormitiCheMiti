@@ -33,9 +33,11 @@
     md.hints = md.hints || {};
     if (md.hints[key]) return;
     md.hints[key] = true;
-    G.log('💡 ' + text, 'level');
+    G.say(text);
     G.meta.save();
   };
+  // il Vecchio Saggio è la voce del gioco: introduce le regioni, commenta e consiglia
+  G.say = function (text) { G.log('Il Vecchio Saggio: «' + text + '»', 'saggio'); };
 
   // ---------------- Entità ----------------
   G.entityAt = function (x, y) {
@@ -519,10 +521,10 @@
           G.log('La Linfa Eterna ti rianima!', 'good'); G.fx.ring(tgt.x, tgt.y, 3, '#6effa0'); G.fx.sound('heal');
           return total;
         }
-        const ri = tgt.relics.indexOf('cuore_gorm');
+        const ri = tgt.relics.indexOf('nucleo_occhio');
         if (ri >= 0) {
           tgt.relics.splice(ri, 1); tgt.hp = Math.round(tgt.maxHp * 0.5); G.cleanse(tgt);
-          G.log('Il Frammento del Cuore di Gorm si spezza e ti riporta in vita!', 'good');
+          G.log('Il Nucleo dell\'Occhio della Vita si accende e ti riporta in vita!', 'good');
           G.fx.ring(tgt.x, tgt.y, 4, '#ffe66a'); G.fx.sound('levelup'); G.fx.shake(6);
           return total;
         }
@@ -792,9 +794,9 @@
       } else if (it.kind === 'relic') {
         R.items.splice(i, 1);
         G.gainRelic(h, it.id);
-      } else if (it.kind === 'pietra') {
+      } else if (it.kind === 'frammento') {
         R.items.splice(i, 1);
-        G.collectGormStone(h, it);
+        G.collectEyeFragment(h, it);
       }
     }
     if (G.tileAt(h.x, h.y) === T.STAIRS) {
@@ -803,12 +805,20 @@
     }
   };
 
-  G.collectGormStone = function (h, it) {
+  // Frammenti dell'Occhio della Vita: uno per ogni guardiano, l'ultimo lo custodisce Magor
+  const FRAGMENT_LINES = [
+    'Il primo Frammento è tuo. Lo sento pulsare: l\'Occhio della Vita ricorda chi lo ha creato.',
+    'Due Frammenti. La loro luce comincia a sciogliere la maledizione di Magor da queste terre.',
+    'Tre Frammenti... Magor ti ha sentito arrivare. Non temere: i Popoli della Natura sono con te.',
+    'Quattro Frammenti. L\'ultimo è nelle mani di Magor, nel cuore del Monte Vulcano. Vai, e torna vincitore.',
+  ];
+  G.collectEyeFragment = function (h, it) {
     const R = G.run;
     h.hp = h.maxHp; G.cleanse(h);
     h.maxHp += 5; h.hp += 5;
     R.stones = (R.stones || 0) + 1;
-    G.log('Hai recuperato la ' + it.name + '! Sei completamente guarito (+5 PV max).', 'level');
+    G.log('Hai recuperato il ' + it.name + ' (' + R.stones + '/' + G.SLOTS.length + ')! Sei completamente guarito (+5 PV max).', 'level');
+    G.say(FRAGMENT_LINES[Math.min(R.stones, FRAGMENT_LINES.length) - 1]);
     G.fx.ring(h.x, h.y, 5, '#ffe66a');
     G.fx.sound('levelup');
     R.pending.push({ type: 'relic', title: 'Ricompensa del Guardiano', opts: G.relicChoices(R.rng, 3, ['rara', 'leggendaria', 'boss']) });

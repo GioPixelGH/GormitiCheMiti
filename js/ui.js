@@ -48,7 +48,7 @@
     s.innerHTML = `<div class="menu-bg"><canvas id="title-bg"></canvas></div>
       <div class="title-wrap">
         <h1 class="logo">GORMITI</h1>
-        <div class="logo-sub">LE PIETRE DI GORM</div>
+        <div class="logo-sub">L'OCCHIO DELLA VITA</div>
         <div class="tagline">Un roguelike nell'isola dei Signori della Natura</div>
         <div class="menu" id="title-menu">
           ${has ? '<button class="btn gold" data-a="continue">Continua partita</button>' : ''}
@@ -373,7 +373,7 @@
       sy.innerHTML = G.SYN_ORDER.filter(t => c[t]).map(t => { const S = G.SYNERGIES[t], lv = G.synLevel(h, t); return `<span class="syn lv${lv}" data-syn="${t}" style="color:${S.color};border-color:${S.color}${lv ? '' : '55'}">${S.glyph} ${c[t]}</span>`; }).join('');
       sy.classList.toggle('hidden', !sy.innerHTML);
     }
-    $('#gold-line').innerHTML = `<span class="g">◆ ${h.gold} Frammenti</span><span>Turno ${R.turn}</span>`;
+    $('#gold-line').innerHTML = `<span class="g">◆ ${h.gold} Schegge</span><span>Turno ${R.turn}</span>`;
     // reliquie
     const rel = $('#relics');
     if (rel.dataset.n !== String(h.relics.length)) {
@@ -424,7 +424,7 @@
       else c = v ? '#4a4258' : '#2a2434';
       ctx.fillStyle = c; ctx.fillRect(x * sc, y * sc, sc, sc);
     }
-    for (const it of R.items) if (m.seen[it.y * m.w + it.x]) { ctx.fillStyle = it.kind === 'relic' || it.kind === 'pietra' ? '#ffd23a' : it.kind === 'gold' ? '#7fe8ff' : '#7fffb0'; ctx.fillRect(it.x * sc + 1, it.y * sc + 1, 2, 2); }
+    for (const it of R.items) if (m.seen[it.y * m.w + it.x]) { ctx.fillStyle = it.kind === 'relic' || it.kind === 'frammento' ? '#ffd23a' : it.kind === 'gold' ? '#7fe8ff' : '#7fffb0'; ctx.fillRect(it.x * sc + 1, it.y * sc + 1, 2, 2); }
     for (const f of R.features) if (!f.gone && m.seen[f.y * m.w + f.x]) { ctx.fillStyle = f.type === 'chest' ? '#ffb83a' : f.type === 'merchant' ? '#6ee05a' : f.type === 'event' ? (f.used ? '#5a6a7a' : '#a0f0ff') : '#ff9ad0'; ctx.fillRect(f.x * sc, f.y * sc, sc, sc); }
     if (showStairs) { ctx.fillStyle = '#e0b0ff'; ctx.fillRect(m.stairs[0] * sc - 1, m.stairs[1] * sc - 1, sc + 2, sc + 2); }
     for (const e of R.ents) {
@@ -518,15 +518,15 @@
     const f = G.featureAt(x, y);
     if (f) {
       if (f.type === 'event') { const ev = G.EVENT_BY_ID[f.ev]; return `<h4>${ev.title}</h4>${f.used ? 'Hai già fatto la tua scelta.' : 'Qualcosa ti attende qui. Urtalo per scoprirlo.'}`; }
-      if (f.type === 'chest') return `<h4>${f.rare ? 'Scrigno Antico' : 'Forziere'}</h4>${f.rare ? 'Contiene una reliquia.' : 'Frammenti e forse un oggetto.'} Urtalo per aprirlo.`;
-      if (f.type === 'merchant') return `<h4>Razzle il Mercante</h4>Il dinosauro viaggiatore vende pozioni e reliquie. Urtalo per commerciare.`;
+      if (f.type === 'chest') return `<h4>${f.rare ? 'Scrigno Antico' : 'Forziere'}</h4>${f.rare ? 'Contiene una reliquia.' : 'Schegge e forse un oggetto.'} Urtalo per aprirlo.`;
+      if (f.type === 'merchant') return `<h4>Tartantica la Veggente</h4>L'antica tartaruga del Popolo del Mare vende pozioni e reliquie: sa sempre cosa ti servirà. Urtala per commerciare.`;
       if (f.type === 'shrine') { const s = G.SHRINES[f.kind]; return `<h4>${s.name}</h4>${esc(s.desc)}${f.used ? '<div class="sub">Già usato.</div>' : '<div class="sub">Urtalo per interagire.</div>'}`; }
     }
     const it = R.items.find(o => o.x === x && o.y === y);
     if (it) {
-      if (it.kind === 'gold') return `<h4>Frammenti di Gorm</h4>${it.n} frammenti: la valuta dei mercanti.`;
+      if (it.kind === 'gold') return `<h4>Schegge di Gorm</h4>${it.n} schegge di cristallo: la valuta dei mercanti.`;
       if (it.kind === 'relic') { const r = G.RELIC_BY_ID[it.id]; return `<h4 style="color:${G.RARITY[r.rarity].color}">${r.name}</h4>${esc(r.desc)}`; }
-      if (it.kind === 'pietra') return `<h4>${it.name}</h4>Una delle Pietre di Gorm! Raccoglila.`;
+      if (it.kind === 'frammento') return `<h4>${it.name}</h4>Un pezzo dell'Occhio della Vita, strappato a un Signore del male. Raccoglilo!`;
       const d = G.ITEM_BY_ID[it.id]; return `<h4>${d.name}</h4>${esc(d.desc)}`;
     }
     const tr = R.traps.find(o => o.x === x && o.y === y && !o.gone);
@@ -601,14 +601,22 @@
   };
   function afterModal() { closeModal(); UI.refresh(); G.save(); setTimeout(UI.processPending, 60); }
 
+  // il Vecchio Saggio che parla, con il suo ritratto (introduzione, finali, Santuario)
+  function saggio(text) {
+    return `<div class="narratore"><div data-spr="saggio"></div><div><div class="chi">Il Vecchio Saggio</div><div class="parola">«${text}»</div></div></div>`;
+  }
+  function ritratti(root) { root.querySelectorAll('.narratore [data-spr]').forEach(el => el.replaceWith(spriteCanvas(el.dataset.spr, 56))); }
+  UI.saggio = saggio;
+
   UI.showIntro = function () {
     const h = G.run.hero;
-    const m = openModal(`<h2>L'isola di Gorm è in pericolo</h2>
-      <div style="max-width:720px;text-align:left;font-size:22px;line-height:1.2">
-      <p>Magor, il Signore del Male, si è risvegliato nelle viscere del <b style="color:#ff9a2a">Monte Vulcano</b>. Il suo potere ha corrotto le cinque <b style="color:#ffd23a">Pietre di Gorm</b>, e i guardiani di ogni regione sono caduti sotto il suo controllo.</p>
-      <p>Il <b style="color:#b0e0ff">Vecchio Saggio</b> ha scelto te, <b style="color:#ffe9a0">${h.name}</b>, per attraversare l'isola: la Foresta Silente, la Fossa degli Antichi Spiriti, la Caverna di Roscamar, i Picchi della Valle del Destino... fino al cuore del vulcano.</p>
+    const m = openModal(`<h2>L'Occhio della Vita è in frantumi</h2>
+      <div style="max-width:760px;text-align:left;font-size:22px;line-height:1.2">
+      ${saggio(`Ascoltami, <b style="color:#ffe9a0">${h.name}</b>. Con l'<b style="color:#8affc8">Occhio della Vita</b> ho fatto nascere i Popoli della Natura e li ho protetti per generazioni. Ora <b style="color:#ff9a2a">Magor</b> si è risvegliato nelle viscere del Monte Vulcano e lo ha frantumato: i suoi Frammenti sono nelle mani dei Signori del male, e senza di essi Gorm appassisce.`)}
+      ${saggio('Attraversa l\'isola: la Foresta Silente, la Fossa degli Antichi Spiriti, la Caverna di Roscamar, la Valle del Destino. Strappa i Frammenti ai loro guardiani e affronta Magor. Io sarò con te a ogni passo.')}
       <p style="color:#a89cb8">Muoviti con <span class="k">WASD</span>/frecce (diagonali con <span class="k">Q E Z C</span>), attacca urtando i nemici, usa le abilità con <span class="k">1-4</span>. Premi <span class="k">H</span> per la guida completa in qualsiasi momento. Se muori, ricominci da capo: ogni partita è diversa.</p></div>
       <div class="mfoot"><button class="btn gold" id="go">Che la Natura sia con te ▶</button></div>`, { type: 'intro', enter: () => $('#go').click() });
+    ritratti(m);
     $('#go').onclick = () => { G.meta.data.tutorialSeen = true; G.meta.save(); G.audio.play('click'); afterModal(); };
   };
 
@@ -662,10 +670,10 @@
         let nm, ds, img;
         if (s.kind === 'item') { const d = G.ITEM_BY_ID[s.id]; nm = d.name; ds = d.desc; img = itemImg(s.id); }
         else if (s.kind === 'relic') { const r = G.RELIC_BY_ID[s.id]; nm = `<span style="color:${G.RARITY[r.rarity].color}">${r.name}</span>`; ds = r.desc; img = relicImg(s.id); }
-        else { nm = 'Cure di Razzle'; ds = 'Recuperi il 50% dei PV e rimuovi gli stati negativi.'; img = itemImg('grande_pozione'); }
+        else { nm = 'Cure di Tartantica'; ds = 'Recuperi il 50% dei PV e rimuovi gli stati negativi.'; img = itemImg('grande_pozione'); }
         items += `<div class="sitem ${s.sold ? 'sold' : ''} ${h.gold < price ? 'poor' : ''}" data-i="${i}"><div data-ic="${i}"></div><div><div class="nm">${nm}</div><div class="ds">${esc(ds)}</div></div><div class="price">${s.sold ? 'VENDUTO' : price + ' ◆'}</div></div>`;
       });
-      const m = openModal(`<h2>Razzle il Mercante</h2><div class="sub">"Ehi, Signore della Natura! Merce rara da tutta Gorm!" — Hai <b style="color:#7fe8ff">${h.gold} ◆</b></div>
+      const m = openModal(`<h2>Tartantica la Veggente</h2><div class="sub">"Sapevo che saresti arrivato, Signore della Natura. Ho già messo da parte ciò che ti servirà." — Hai <b style="color:#7fe8ff">${h.gold} ◆</b></div>
         <div class="shop">${items}</div><div class="mfoot"><button class="btn" id="leave">Arrivederci (Esc)</button></div>`, { type: 'shop', esc: () => afterModal() });
       m.querySelectorAll('[data-ic]').forEach(el => {
         const s = f.stock[+el.dataset.ic];
@@ -725,6 +733,8 @@
   UI.showHelp = function (inGame) {
     const wheel = ['mare', 'fuoco', 'foresta', 'terra', 'aria'].map(k => `<span style="background:${G.ELEMS[k].color}22;border:1px solid ${G.ELEMS[k].color};color:${G.ELEMS[k].color}">${G.ELEMS[k].name}</span>`).join(' ▶ ') + ' ▶ <span style="color:#4aa0ff">Mare</span>';
     const html = `<h2>Come si gioca</h2><div class="help">
+      <h3>La storia</h3>
+      <p>Magor, il Signore del Male, si è risvegliato nel Monte Vulcano e ha frantumato l'Occhio della Vita, con cui il Vecchio Saggio creò i Popoli della Natura. Ogni guardiano custodisce un Frammento: recuperali tutti e sconfiggi Magor. Il Vecchio Saggio ti accompagna e ti consiglia lungo il viaggio.</p>
       <h3>Movimento e azioni</h3>
       <p><span class="k">W A S D</span> o <span class="k">frecce</span>: muoviti · <span class="k">Q E Z C</span>: diagonali (anche tastierino numerico)</p>
       <p>Urta un nemico per attaccarlo. Urta forzieri, mercanti e santuari per interagire.</p>
@@ -745,7 +755,7 @@
       <p>Infliggere e subire danni carica la Furia. Salendo di livello scegli un Dono del Saggio: potenzia le tue abilità o le tue statistiche. Le reliquie danno poteri passivi permanenti.</p>
       <h3>Esplorazione</h3>
       <p>I PV non si rigenerano da soli: gestisci pozioni e risorse. I nemici addormentati subiscono un colpo critico a sorpresa. Erba alta e porte bloccano la vista. Lava, baratri e fuoco sono pericolosi... anche per i nemici: spingili dentro!</p>
-      <p>Ogni regione ha 3 piani: al terzo ti attende il suo Guardiano. Il mercante Razzle si trova al secondo piano di ogni regione.</p>
+      <p>Ogni regione ha 3 piani: al terzo ti attende il suo Guardiano, che custodisce un Frammento dell'Occhio della Vita. Tartantica la Veggente, la mercante, si trova al secondo piano di ogni regione.</p>
       <h3>Risonanze</h3>
       <p>Ogni reliquia e Dono ha un'affinità (Veleno, Fuoco, Critico, Vita, Difesa, Furia, Tempesta, Saggezza, Fortuna). Con 2 elementi della stessa affinità si attiva un bonus; con 4 un potere che cambia il tuo stile di gioco. Premi <span class="k">I</span> per la Scheda dell'eroe.</p>
       <h3>Bivi e regioni</h3>
@@ -834,6 +844,16 @@
   };
 
   // ---------------------------------------------------------------- fine partita
+  // commento del Vecchio Saggio alla fine della partita
+  UI.endLine = function (R, win) {
+    const h = R.hero, n = R.stones || 0, cause = (R.over && R.over.cause) || '';
+    if (win) return `Hai strappato a Magor l'ultimo Frammento: l'Occhio della Vita è di nuovo intero. Gorm non dimenticherà il nome di ${h.name}.`;
+    const boss = Object.values(G.MON).find(d => d.flags && d.flags.boss && cause.indexOf(d.name) >= 0);
+    if (boss) return `${boss.name} è ancora troppo forte per te. Osserva i suoi attacchi: le caselle rosse non mentono mai. Riprova, ${h.name}.`;
+    if (!n) return `Il viaggio è appena cominciato e già ti è costato caro. Rialzati, ${h.name}: l'Occhio della Vita ti aspetta.`;
+    return `Hai recuperato ${n} ${n === 1 ? 'Frammento' : 'Frammenti'} su ${G.SLOTS.length} prima di cadere. Ogni Signore della Natura cade, prima o poi: conta solo rialzarsi.`;
+  };
+
   UI.showEnd = function () {
     const R = G.run; if (!R || UI.state === 'end') return;
     UI.state = 'end';
@@ -853,18 +873,21 @@
     setTimeout(() => {
       const m = openModal(`<div class="endbox">
         <div class="big" style="color:${win ? '#ffe27a' : '#ff6a5a'}">${win ? 'GORM È SALVA!' : 'SEI CADUTO'}</div>
-        <div style="font-size:22px;color:#d8d0e0">${win ? `${h.name} ha sconfitto Magor e restituito le Pietre di Gorm ai Popoli della Natura.` : `${h.name} è stato sconfitto da ${esc(R.over.cause || '???')} — ${G.biomeOf(R.floor).name}, piano ${R.floor}.`}</div>
+        <div style="font-size:22px;color:#d8d0e0">${win ? `${h.name} ha sconfitto Magor e ricomposto l'Occhio della Vita.` : `${h.name} è stato sconfitto da ${esc(R.over.cause || '???')} — ${G.biomeOf(R.floor).name}, piano ${R.floor}.`}</div>
+        ${saggio(UI.endLine(R, win))}
+        <div></div>
         ${unl}
         <div class="stats">
           <div>Livello raggiunto <b>${h.level}</b></div><div>Piano raggiunto <b>${R.floor}/${G.TOTAL_FLOORS}</b></div>
           <div>Nemici sconfitti <b>${R.stats.kills}</b></div><div>Guardiani sconfitti <b>${R.stats.bosses}</b></div>
           <div>Danni inflitti <b>${R.stats.dmgDealt}</b></div><div>Danni subiti <b>${R.stats.dmgTaken}</b></div>
-          <div>Reliquie <b>${h.relics.length}</b></div><div>Frammenti raccolti <b>${R.stats.gold}</b></div>
+          <div>Reliquie <b>${h.relics.length}</b></div><div>Schegge raccolte <b>${R.stats.gold}</b></div>
           <div>Turni <b>${R.turn}</b></div><div>Tempo <b>${mins}:${String(secs).padStart(2, '0')}</b></div>
           <div>Campioni battuti <b>${R.stats.champions || 0}</b></div><div>Segreti trovati <b>${R.stats.secrets || 0}</b></div>
         </div>
         <div style="color:#a89cb8;font-size:19px">Percorso: ${(R.route || []).filter(Boolean).slice(0, G.regionOf(R.floor) + 1).map(id => G.BIOME_BY_ID[id].name).join(' → ')}</div>
         <div class="mfoot"><button class="btn gold" id="again">Nuova partita</button><button class="btn" id="menu">Menu principale</button></div></div>`, { type: 'end', enter: () => $('#again').click() });
+      ritratti(m);
       $('#again').onclick = () => { closeModal(); G.run = null; UI.showSelect(); };
       $('#menu').onclick = () => { closeModal(); G.run = null; UI.showTitle(); };
     }, win ? 1800 : 1200);
@@ -881,7 +904,7 @@
       ['Punti Vita', h.hp + ' / ' + h.maxHp], ['Danno', (h.atk[0] + m.dmg) + '-' + (h.atk[1] + m.dmg) + (m.dmgMul !== 1 ? ' (×' + m.dmgMul.toFixed(2) + ')' : '')],
       ['Armatura', G.effDef(h)], ['Schivata', h.eva], ['Critico', h.crit + '% ×' + h.critMul.toFixed(2)], ['Velocità', h.speed],
       ['Furto vita', pct(m.lifesteal)], ['Rigenerazione', (m.regen ? (m.regen).toFixed(2) + ' PV/turno' : '—')], ['Esperienza', '×' + m.xpMul.toFixed(2)],
-      ['Frammenti', '×' + m.goldMul.toFixed(2)], ['Gittata extra', '+' + m.rangeBonus], ['Ricariche', m.cdr ? '−' + m.cdr : '—'], ['Furia per Potere', G.ultCost(h)],
+      ['Schegge', '×' + m.goldMul.toFixed(2)], ['Gittata extra', '+' + m.rangeBonus], ['Ricariche', m.cdr ? '−' + m.cdr : '—'], ['Furia per Potere', G.ultCost(h)],
     ];
     const skills = h.skills.map((s, i) => { const d = G.SKILLS[s.id]; return `<div class="skill-row"><div class="g" data-sicon="${s.id}"></div><div><b>[${G.KEYS.primary('skill' + (i + 1))}] ${d.name}</b> <small>${d.ult ? '(Furia ' + G.ultCost(h) + ')' : '(ricarica ' + G.skillCd(h, s.id) + ')'}</small><br><small>${esc(d.desc(h))}</small></div></div>`; }).join('');
     const perks = Object.keys(h.perks).map(id => { const p = G.PERK_BY_ID[id], tg = p.tag ? G.SYNERGIES[p.tag] : null; return `<div class="bl">${tg ? `<span style="color:${tg.color}">${tg.glyph}</span> ` : ''}<b>${p.name}</b>${h.perks[id] > 1 ? ' ×' + h.perks[id] : ''}<br><small>${esc(p.desc)}</small></div>`; }).join('') || '<div class="sub">Nessun dono ancora.</div>';
@@ -903,11 +926,11 @@
   // ================================================================
   G.SANCTUARY = [
     { id: 'pack_tempesta', name: 'Arsenale della Tempesta', cost: 60, desc: 'Aggiunge 3 reliquie al bottino: Lama del Vento, Sigillo del Predatore, Ampolla del Fulmine.' },
-    { id: 'pack_roscamar', name: 'Segreti di Roscamar', cost: 60, desc: 'Aggiunge 3 reliquie al bottino: Brace Eterna, Lanterna di Lavion, Guscio di Crabs.' },
-    { id: 'pack_razzle', name: 'Tesori di Razzle', cost: 80, desc: 'Aggiunge 3 reliquie al bottino: Corno di Guerra, Moneta di Razzle, Clessidra Spezzata.' },
+    { id: 'pack_roscamar', name: 'Segreti di Roscamar', cost: 60, desc: 'Aggiunge 3 reliquie al bottino: Brace Eterna, Lanterna di Lavion, Chela di Grankios.' },
+    { id: 'pack_tartantica', name: 'Tesori di Tartantica', cost: 80, desc: 'Aggiunge 3 reliquie al bottino: Corno di Guerra, Guscio di Tartantica, Clessidra Spezzata.' },
     { id: 'racconti', name: 'Racconti di Gorm', cost: 70, desc: 'Aggiunge 5 nuovi eventi: l\'Altare degli Elementi, il Ponte di corde, il Nido, il Viandante, il Germoglio dorato.' },
     { id: 'bisaccia', name: 'Bisaccia del Viandante', cost: 40, desc: 'Inizi ogni partita con una Pozione di Linfa in più.' },
-    { id: 'scorta', name: 'Scorta di Frammenti', cost: 40, desc: 'Inizi ogni partita con 25 Frammenti.' },
+    { id: 'scorta', name: 'Scorta di Schegge', cost: 40, desc: 'Inizi ogni partita con 25 Schegge.' },
     { id: 'reroll', name: 'Pergamena del Destino', cost: 90, desc: 'Una volta per partita puoi rimescolare i Doni offerti al level-up.' },
     { id: 'primo_dono', name: 'Il Primo Dono', cost: 120, desc: 'All\'inizio di ogni partita scegli subito un Dono del Saggio.' },
   ];
@@ -919,11 +942,13 @@
     }).join('');
     const s = $('#screen');
     s.innerHTML = `<div class="menu-bg"></div><div class="mbox panel" style="position:relative;z-index:2;width:min(1000px,94vw)"><h2>Santuario del Saggio</h2>
-      <div class="sub">"Ogni viaggio, anche quello finito male, lascia un'Essenza. Usala per rendere i prossimi viaggi più vari." — Hai <b style="color:#d8b0ff">${meta.essence} ✦</b> (guadagnata in totale: ${meta.essenceTotal || 0})</div>
+      ${saggio('Ogni viaggio, anche quello finito male, lascia un\'Essenza. Portala a me: la userò per rendere i tuoi prossimi viaggi più vari.')}
+      <div class="sub">Hai <b style="color:#d8b0ff">${meta.essence} ✦</b> (guadagnata in totale: ${meta.essenceTotal || 0})</div>
       <div class="shop">${items}</div>
       <p class="sub" style="margin-top:12px">L'Essenza si ottiene alla fine di ogni partita: piani raggiunti, guardiani sconfitti, nemici abbattuti e vittorie.</p>
       <div class="mfoot"><button class="btn" id="ok">Indietro</button></div></div>`;
     UI.state = 'sub';
+    ritratti(s);
     s.querySelectorAll('.sitem').forEach(el => el.onclick = () => {
       const it = G.SANCTUARY.find(x => x.id === el.dataset.id);
       if (meta.purchases[it.id]) return;
@@ -964,7 +989,7 @@
   UI.exportSave = function () {
     try {
       if (G.run && !G.run.over && UI.state === 'game') G.save();
-      const data = { format: 'gormiti-progressi', v: 1, date: new Date().toISOString(), meta: localStorage.getItem(G.STORE_KEYS.meta), run: localStorage.getItem(G.STORE_KEYS.run) };
+      const data = { format: 'gormiti-progressi', v: 1, game: G.VERSION, date: new Date().toISOString(), meta: localStorage.getItem(G.STORE_KEYS.meta), run: localStorage.getItem(G.STORE_KEYS.run) };
       const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = 'gormiti-progressi-' + new Date().toISOString().slice(0, 10) + '.json';

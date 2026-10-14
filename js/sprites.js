@@ -58,7 +58,7 @@
   S.granchio = { sym: true, pal: { d: '#8a2a1a', r: '#d0502a', o: '#ff8a4a', w: '#ffe0c0', e: '#101010' }, rows: [
     '........', '........', '.rr.....', 'roor....', 'r..r..w.', 'rr.r..e.', '.rr.r.r.', '...rrrrr',
     '..rroooo', '.rrrrooo', 'r.rrrrrr', '.rdrrrrr', 'r.r.dddd', '.r.r.r..', '........', '........'] };
-  S.crabs = { base: 'granchio', pal: { d: '#123050', r: '#2a6a9a', o: '#6ac0f0', w: '#ffe27a', e: '#ff3a3a' } };
+
   S.polypus = { sym: true, pal: { p: '#8a3a9a', l: '#c06ad0', w: '#f0d0f0', e: '#1a0a1a' }, rows: [
     '........', '........', '......pp', '....pppl', '...pplll', '...plllw', '...plwel', '...pllll',
     '....pppl', '..p.pp.p', '.p.p.p.p', '.p.p.p.p', 'p..p.p.p', 'p.p..p.p', '..p..p..', '........'] };
@@ -76,7 +76,7 @@
     '................', '................', '..........pp....', '.........plp....', '........pll.....', '.......plw......',
     '.......pll......', '......pllw......', '......plll......', '......pllw......', '.......plll.....', '.......pllw.....',
     '......pplllp....', '....pppppppppp..', '...pp..pp...pp..', '................'] };
-  S.orrore = { sym: true, size: 24, pal: { d: '#1a2a3a', p: '#3a2a5a', v: '#4a3a7a', l: '#7a62b0', e: '#ffe27a', r: '#c01a4a', w: '#e8e8f0' }, rows: [
+  S.orrore = { sym: true, size: 24, pal: { d: '#2a0a0a', p: '#5a1a14', v: '#8a2a1a', l: '#c04a2a', e: '#ffd23a', r: '#ff8a1a', w: '#e8dcc8' }, rows: [
     '............', '............', '........vvvv', '......vvllll', '.....vllllll', '....vllvllll', '....vlveelll', '...vlllellll',
     '...vllllllll', '...vlleevlle', '...vvlllllll', '....vvvrrrrr', '....vvrwrwrw', '...vvvrrrrrr', '..vv.vvvvvvv', '.vv.vv.vv.vv',
     'vv.vv.vv..vv', 'v..v..v..vv.', 'v.vv.vv..v..', '.vv..v..vv..', '..v..vv.v...', '......v.....', '............', '............'] };
@@ -124,7 +124,8 @@
     '................', '................', '............ww..', '..bb.......wwea.', '.bbbb......www..', '..bbbbb...ywww..',
     '...bbbbb.yyw....', '....bbbbyyyy....', '..yyyyybyyyy....', '.yyyyyyyyyyy....', 'y.yyyooyyyoy....', '..yy.o...y.y....',
     '..o..o...o..o...', '................', '................', '................'] };
-  S.mystral = { base: 'noctis', pal: { w: '#9ab0c0', a: '#5a7a8a', s: '#3a4a6a', b: '#2a2a4a', y: '#b07aff', e: '#ff4aff' } };
+  // Crudelion il Maledetto (Terza Serie): corpo blu e viola, piccole ali rosse
+  S.crudelion = { base: 'noctis', pal: { w: '#6a8ae0', a: '#4a5ab8', s: '#7a2a8a', b: '#3a1a5a', y: '#e83a2a', e: '#ff4a4a' } };
   S.devilfenix = { sym: true, size: 24, pal: { d: '#5a1010', r: '#c02a1a', o: '#ff6a1a', y: '#ffc83a', w: '#fff2b0', e: '#ffffff' }, rows: [
     '............', '...........y', '..........yo', '..........oo', '.........ooo', 'r........oer', 'or.......oow', 'yor.....rroo',
     'yyorr..rrooo', '.yyoorrrrooy', '..yyoorrooyy', '...yyoorooyw', '....yyooooyw', '.....yyyooyy', '......yyroyy', '.......rroyy',
@@ -141,6 +142,8 @@
   S.guerriero = { sym: true, pal: { d: '#2a1a1a', s: '#4a3030', l: '#6a4a40', o: '#ff6a1a', y: '#ffc83a' }, rows: [
     '........', '...d....', '...dd.ss', '....ssss', '....sdoo', '....ssss', '.ss.dsls', 'sllsdslo',
     'slosdsoy', 'sls.dslo', 'ss..dsss', 'oo..dsls', '.o...dss', '.....ds.', '....dds.', '........'] };
+  // Geyser l'Iroso (Seconda Serie): rosso scuro con placche grigie e vapore giallo
+  S.geyser = { base: 'guerriero', pal: { d: '#3a1010', s: '#8a1c1c', l: '#6a6a6a', o: '#ffd23a', y: '#ffb070' } };
   S.bombo = { sym: true, pal: { d: '#2a1a1a', b: '#4a3030', l: '#6a4a4a', o: '#ff6a1a', y: '#ffe27a', e: '#ff3a1a' }, rows: [
     '........', '........', '.......y', '.......o', '......dd', '....bbbb', '...bblll', '..bbllll',
     '..bbleel', '..bbbbll', '..bbbobb', '...bbbbb', '....bbbb', '........', '........', '........'] };
@@ -166,10 +169,10 @@
     '........', '........', '........', '........', '........', '..bbbbbb', '.bnnlnnn', '.bnnnnnn',
     '.ddddddy', '.bnnnnyy', '.bnnnnnn', '.bnnnnnn', '.ddddddd', '........', '........', '........'] };
   S.chest_rare = { base: 'chest', pal: { b: '#3a1a5a', n: '#6a3aa0', l: '#a070e0', y: '#ffe27a', d: '#ffb83a' } };
-  S.merchant = { pal: { g: '#3fa03a', l: '#7ad05a', d: '#2a6a2a', w: '#ffffff', e: '#101010', b: '#a0703a', y: '#ffd23a' }, rows: [
-    '................', '................', '.........lll....', '........lllll...', '........llwel...', '........llllll..',
-    '...bb...lllwww..', '..bbyb.gll......', '..bbbbgglll.....', '..bbbbgllll.....', 'g..bbgglll.l....', '.g.ggglll.......',
-    '..gggglll.......', '.....g..g.......', '....gg..gg......', '................'] };
+  // Tartantica la Veggente (Seconda Serie): tartaruga marina blu con il guscio scuro e la perla della veggente
+  S.merchant = { sym: true, pal: { d: '#123a52', s: '#1f5e78', b: '#2f7fb0', l: '#5aa8d8', c: '#9ad8e0', w: '#ffffff', y: '#bff8ff' }, rows: [
+    '........', '......bb', '.....bbb', '.....bwb', '.....bbl', '...dd.bl', '..dsdsbb', 'lldsdsbc',
+    'lbdsdsby', '.bdsdsbc', '..dsdsbc', '..ddsdbc', '...dd.bb', '....bb.b', '...bbb..', '........'] };
   S.shrine_fonte = { sym: true, pal: { s: '#7a7a8a', l: '#a0a0b0', b: '#3a8ad0', c: '#8ad8ff', w: '#ffffff' }, rows: [
     '........', '........', '.......c', '......cw', '.....c.c', '....c..s', '...c..ls', '.....lls',
     '.sssssss', 'slbbbccc', 'slbcbbcw', '.slllsll', '...slls.', '..ssssss', '........', '........'] };
@@ -209,7 +212,8 @@
     '................', '................', '................', '................', '................', '................',
     '................', '......c.........', '.....cw...c.....', '.....cc..cw.....', '....dcc.dcc.....', '....dcdcdccc....',
     '...ddddddddd....', '................', '................', '................'] };
-  S.pietra = { sym: true, pal: { c: '#ffd23a', w: '#ffffff', d: '#c08a1a' }, rows: [
+  // Frammento dell'Occhio della Vita
+  S.frammento = { sym: true, pal: { c: '#8affc8', w: '#ffffff', d: '#2aa07a' }, rows: [
     '........', '........', '......ww', '.....wcc', '....wccc', '...wcccc', '..wccccc', '..cccccc',
     '..cccccc', '..dccccc', '...dcccc', '....dccc', '.....dcc', '......dd', '........', '........'] };
 

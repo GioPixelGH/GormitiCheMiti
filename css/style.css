@@ -350,3 +350,10 @@ body.touch #minimap { width: 178px; height: 125px; }
 @media (max-width: 600px) {
   .heroes { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ---------------- il Vecchio Saggio, voce del gioco ---------------- */
+#log .saggio { color: #b8dcff; }
+.narratore { display: grid; grid-template-columns: 60px 1fr; gap: 12px; align-items: center; text-align: left; max-width: 760px; margin: 10px auto; padding: 8px 12px; background: rgba(40, 30, 72, 0.6); border: 2px solid #5a4a90; border-radius: 6px; }
+.narratore canvas { width: 56px; height: 56px; background: radial-gradient(circle at 50% 60%, #3a2a60, #120c1c); border: 2px solid #6a5aa0; border-radius: 4px; image-rendering: pixelated; }
+.narratore .chi { font-family: 'Press Start 2P'; font-size: 9px; color: #b0e0ff; margin-bottom: 4px; }
+.narratore .parola { font-size: 21px; line-height: 1.15; color: #ece4ff; }

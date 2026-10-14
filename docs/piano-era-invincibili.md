@@ -34,6 +34,19 @@ commit e nel menu.
 
 Dimensioni: **P** piccola · **M** media · **G** grande.
 
+## Stato di avanzamento
+
+| Fase | Versione | Stato |
+|---|---|---|
+| 0 — Strumenti e archivio | 1.2.2 | ✅ completata |
+| 1 — Coerenza con l'era | 1.3.0 | ✅ completata (vedi note sotto) |
+
+Note sulla Fase 1:
+- Crabs il Vendicatore e Mystral Corrotto sono stati sostituiti subito da due guerrieri dell'era, invece che da nemici generici: **Geyser l'Iroso** (Seconda Serie, élite della Fossa) e **Crudelion il Maledetto** (Terza Serie, élite dei Picchi). Gli sprite definitivi arrivano con la Fase 4.
+- Orrore Profondo ha già gli attacchi di fuoco della sua carta (Braccio di Lava, Magia Nera) e i colori giusti; lo sprite definitivo arriva con la Fase 2.
+- Tartantica ha uno sprite provvisorio da tartaruga marina.
+- I salvataggi della v1.2.x vengono convertiti automaticamente (reliquie, eventi, acquisti del Santuario, nemici e Pietre a terra).
+
 ## Panoramica
 
 | Fase | Versione | Nome | Contenuto | Dim. |

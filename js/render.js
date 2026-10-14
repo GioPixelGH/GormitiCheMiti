@@ -331,7 +331,7 @@
   }
   function itemSprite(it) {
     if (it.kind === 'gold') return G.SPR.gold.img;
-    if (it.kind === 'pietra') return G.SPR.pietra.img;
+    if (it.kind === 'frammento') return G.SPR.frammento.img;
     if (it.kind === 'relic') { const r = G.RELIC_BY_ID[it.id]; return G.itemSprite(r.icon, r.color); }
     const d = G.ITEM_BY_ID[it.id];
     return G.itemSprite(d.icon, d.color);
@@ -339,16 +339,16 @@
   RD.itemSprite = itemSprite;
   function drawItem(ctx, px, py, S, it) {
     const bob = Math.round(Math.sin(RD.time * 3 + it.x + it.y) * 1);
-    if (it.kind === 'relic' || it.kind === 'pietra') {
+    if (it.kind === 'relic' || it.kind === 'frammento') {
       const cx = px + 8 * S, cy = py + 8 * S;
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 10 * S);
-      const col = it.kind === 'pietra' ? '255,220,90' : '255,200,80';
+      const col = it.kind === 'frammento' ? '140,255,200' : '255,200,80';
       g.addColorStop(0, 'rgba(' + col + ',0.55)'); g.addColorStop(1, 'rgba(' + col + ',0)');
       ctx.fillStyle = g; ctx.fillRect(px - 4 * S, py - 4 * S, 24 * S, 24 * S);
     }
     shadow(ctx, px, py, S, 0.5);
     ctx.drawImage(itemSprite(it), px, py + bob * S, TS * S, TS * S);
-    if (it.kind === 'relic' || it.kind === 'pietra') sparkle(ctx, px, py, S, '#fff6c0');
+    if (it.kind === 'relic' || it.kind === 'frammento') sparkle(ctx, px, py, S, '#fff6c0');
   }
 
   const STATUS_ICON = { burn: '#ff7a2a', poison: '#9be35a', wet: '#5ab0ff', stun: '#ffe066', freeze: '#bff4ff', root: '#5fbf3a', slow: '#8899bb', confuse: '#ff9ef0', blind: '#dddddd', weak: '#bb8866', vuln: '#ff4466', haste: '#ffffff', rage: '#ff3030', thorns: '#7be04a', shield: '#9fd0ff', regen: '#6effa0', primed: '#ff2020' };

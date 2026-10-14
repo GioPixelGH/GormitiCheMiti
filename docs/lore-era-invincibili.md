@@ -1,6 +1,6 @@
 # Gormiti — L'Era degli Invincibili Signori della Natura
 
-Catalogo di riferimento per le decisioni di design di *GORMITI — Le Pietre di Gorm*.
+Catalogo di riferimento per le decisioni di design di *GORMITI — L'Occhio della Vita*.
 Ambito: **dalla Prima Serie (2005) a Final Evolution (2007-2008)**, cioè le otto linee di statuine
 dell'era originale e i corti animati che le accompagnavano. Tutto ciò che viene dopo
 (serie animata *Gormiti, che miti* del 2008, Nature Unleashed, Luxion, 2018, Legends, New Era)

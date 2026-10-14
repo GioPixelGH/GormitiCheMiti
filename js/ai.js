@@ -441,28 +441,28 @@
     const p2 = m.hp < m.maxHp * 0.5;
     if (p2 && !m.st.p2) {
       m.st.p2 = true; m.speed = 100;
-      phaseAnnounce(m, 'L\'Orrore Profondo scatena un gorgo che ti trascina verso di lui!');
+      phaseAnnounce(m, 'Orrore Profondo spalanca le ali d\'ossa: la sua Magia Nera ti trascina verso di lui!');
       return;
     }
     if (p2 && d <= 7 && d > 1 && !h.mods.noKnock && rng().chance(0.6)) {
-      G.fx.ring(m.x, m.y, 2, '#4aa0ff');
+      G.fx.ring(m.x, m.y, 2, '#8a2a6a');
       G.pull(m, h, 1);
     }
     if (ready(m, 'slam') && d <= 8 && G.hasLOS(m.x, m.y, h.x, h.y)) {
-      tele(m, SH.circle(h.x, h.y, 1), { dmg: [9, 12], elem: 'mare', status: 'wet', st: 4, push: 1, water: true, color: '#4aa0ff', src: 'Schianto Abissale' }, { label: 'Schianto Abissale' });
+      tele(m, SH.circle(h.x, h.y, 1), { dmg: [9, 12], elem: 'fuoco', fire: 3, push: 1, color: '#ff6a2a', src: 'Braccio di Lava' }, { label: 'Braccio di Lava' });
       setCd(m, 'slam', p2 ? 3 : 4);
       return;
     }
     if (ready(m, 'tent') && countType('tentacolo') < 4) {
-      G.log('Tentacoli emergono dal terreno!', 'bad');
+      G.log('Al comando di Orrore Profondo, i Tentacoli della Fossa emergono dal terreno!', 'bad');
       summon(m, 'tentacolo', 2, h.x, h.y, 2);
       setCd(m, 'tent', 7);
       return;
     }
     if (ready(m, 'ink') && d <= 5) {
       G.addStatus(h, 'darkness', 3);
-      G.fx.burst(h.x, h.y, '#202040', 30); G.fx.sound('splash');
-      G.log('L\'Orrore spruzza inchiostro nero: non vedi quasi nulla!', 'bad');
+      G.fx.burst(h.x, h.y, '#2a0a1a', 30); G.fx.sound('dark');
+      G.log('Orrore Profondo ti avvolge nella sua Magia Nera: non vedi quasi nulla!', 'bad');
       setCd(m, 'ink', 10);
       return;
     }

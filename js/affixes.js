@@ -10,7 +10,7 @@
     vampirico: { name: 'Vampirico', color: '#c81a3a', desc: 'Si cura colpendo in mischia.', apply(e) { e.flags.drain = true; } },
     esplosivo: { name: 'Esplosivo', color: '#ff8a2a', desc: 'Quando muore, esplode dopo un turno.', apply(e) { } },
     gelido:    { name: 'Gelido', color: '#bff4ff', desc: 'I suoi colpi rallentano.', apply(e) { } },
-    dorato:    { name: 'Dorato', color: '#ffd23a', desc: 'Lascia molti Frammenti.', apply(e) { e.flags.golden = true; } },
+    dorato:    { name: 'Dorato', color: '#ffd23a', desc: 'Lascia molte Schegge.', apply(e) { e.flags.golden = true; } },
     spinoso:   { name: 'Spinoso', color: '#7be04a', desc: 'Chi lo colpisce in mischia si ferisce.', apply(e) { } },
   };
   const IDS = Object.keys(G.AFFIXES);

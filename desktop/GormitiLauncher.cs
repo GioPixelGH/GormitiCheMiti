@@ -14,10 +14,10 @@ using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 
-[assembly: System.Reflection.AssemblyTitle("GORMITI - Le Pietre di Gorm")]
-[assembly: System.Reflection.AssemblyProduct("GORMITI - Le Pietre di Gorm")]
+[assembly: System.Reflection.AssemblyTitle("GORMITI - L'Occhio della Vita")]
+[assembly: System.Reflection.AssemblyProduct("GORMITI - L'Occhio della Vita")]
 [assembly: System.Reflection.AssemblyDescription("Roguelike fan-made a tema Gormiti")]
-[assembly: System.Reflection.AssemblyVersion("1.2.2.0")]
+[assembly: System.Reflection.AssemblyVersion("1.3.0.0")]
 
 namespace Gormiti
 {
@@ -35,7 +35,7 @@ namespace Gormiti
         {
             this.gameDir = gameDir;
             this.dev = dev;
-            Text = "GORMITI — Le Pietre di Gorm";
+            Text = "GORMITI — L'Occhio della Vita";
             BackColor = Color.FromArgb(5, 4, 10);
             ClientSize = new Size(1600, 900);
             MinimumSize = new Size(960, 600);
@@ -54,6 +54,7 @@ namespace Gormiti
         {
             try
             {
+                // nome storico della cartella dati: non cambiarlo, contiene i salvataggi dell'app
                 string data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GormitiPietreDiGorm");
                 Directory.CreateDirectory(data);
                 var opts = new CoreWebView2EnvironmentOptions("--autoplay-policy=no-user-gesture-required");

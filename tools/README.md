@@ -13,7 +13,10 @@ node tools/verifica.js
 - **ESITO: OK**: nessun errore di gioco e al massimo il 2% di partite bloccate.
 - **ESITO: DA CONTROLLARE**: c'è almeno un errore o troppi blocchi. Con `DEBUG=1` il simulatore descrive dove si blocca.
 
-Riferimento della v1.2.2: 70% di vittorie complessive (Noctis 37%, Poivrons 93%, gli altri tra 53% e 87%).
+Riferimenti (30 partite per eroe, margine circa ±17 punti):
+
+- v1.2.2: 70% di vittorie complessive (Noctis 37%, Poivrons 93%, gli altri tra 53% e 87%).
+- v1.3.0: 67% (Barbataus 40%, Noctis 43%, Tasarau 57%, Carrapax 90%, Poivrons 87%). Orrore Profondo ora è di Fuoco e penalizza gli eroi della Foresta.
 
 ## Batteria completa
 

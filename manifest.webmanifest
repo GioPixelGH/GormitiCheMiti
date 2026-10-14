@@ -1,7 +1,7 @@
 {
-  "name": "GORMITI — Le Pietre di Gorm",
+  "name": "GORMITI — L'Occhio della Vita",
   "short_name": "Gormiti",
-  "description": "Roguelike a turni sull'isola di Gorm: scendi nei cinque regni, raccogli reliquie e sconfiggi Magor.",
+  "description": "Roguelike a turni sull'isola di Gorm: recupera i Frammenti dell'Occhio della Vita e sconfiggi Magor.",
   "lang": "it",
   "start_url": "./index.html",
   "scope": "./",

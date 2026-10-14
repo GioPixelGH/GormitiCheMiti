@@ -1,6 +1,6 @@
-# GORMITI — Le Pietre di Gorm
+# GORMITI — L'Occhio della Vita
 
-Un roguelike a turni ambientato sull'isola di Gorm. Scegli uno dei Signori della Natura e attraversa 5 regioni e 15 piani generati proceduralmente, fino al cuore del Monte Vulcano, dove ti aspetta Magor, il Signore del Male.
+Un roguelike a turni ambientato sull'isola di Gorm, fedele alla storia dei Gormiti dell'*Era degli Invincibili Signori della Natura* (dalla Prima Serie a Final Evolution). Magor, il Signore del Male, si è risvegliato nel Monte Vulcano e ha frantumato l'**Occhio della Vita**, con cui il Vecchio Saggio creò i Popoli della Natura. Scegli un Signore della Natura, attraversa 5 regioni e 15 piani generati proceduralmente, strappa i Frammenti dell'Occhio ai guardiani di ogni regione e affronta Magor nel cuore del Monte Vulcano. Il Vecchio Saggio ti accompagna e ti consiglia lungo il viaggio.
 
 **▶ Gioca online: https://giopixelgh.github.io/GormitiCheMiti/** (PC, tablet e telefono, anche offline dopo la prima visita)
 
@@ -39,18 +39,18 @@ Tutti i tasti si possono cambiare da **Opzioni → Comandi**.
   - il Vecchio Saggio — sconfiggi Obscurio
   - il Sommo Luminescente — vinci una partita
   - Kolossus, Campione della Terra — raggiungi il Monte Vulcano con Gheos
-  - Carrapax, Campione del Mare — sconfiggi Glaciator
-  - Elios, Campione dell'Aria — sconfiggi Luxalion Corrotto
+  - Carrapax, Campione del Mare — sconfiggi Orrore Profondo
+  - Elios, Campione dell'Aria — sconfiggi Devilfenix
   - Barbataus, Campione della Foresta — abbatti 250 nemici in totale
 
   Ognuno ha una passiva, 3 abilità, un Potere Supremo e potenziamenti dedicati.
 - **7 regioni e bivi**: Foresta Silente → Fossa degli Antichi Spiriti *o* Ghiacciai Eterni → Caverna di Roscamar → Picchi della Valle del Destino *o* Tempio della Luce Infranta → Monte Vulcano. Dopo alcuni guardiani si aprono due portali e scegli tu la strada. Al primo piano di ogni regione c'è anche un **Portale Cremisi**: il Sentiero Pericoloso, con più nemici e tesori migliori.
-- **8 boss** con più fasi e attacchi annunciati: Cerbante, l'Orrore Profondo, Glaciator, Obscurio, Devilfenix, Luxalion Corrotto, Magmion e Magor.
+- **8 boss** con più fasi e attacchi annunciati: Cerbante, Orrore Profondo, Glaciator, Obscurio, Devilfenix, Luxalion Corrotto, Magmion e Magor.
 - **Nemici più tattici**: oltre 50 tipi di nemici, gruppi che si aiutano tra loro, varianti con modificatori (Corazzato, Rapido, Furioso, Vampirico, Esplosivo, Gelido, Dorato, Spinoso) e **Campioni** con un nome proprio e un premio.
 - **Risonanze**: ogni reliquia e ogni Dono ha un'affinità (Veleno, Fuoco, Critico, Vita, Difesa, Furia, Tempesta, Saggezza, Fortuna). Con 2 elementi della stessa affinità si attiva un bonus, con 4 un potere che cambia il modo di giocare.
-- **Eventi**: cippi luminosi con piccole storie e scelte da ponderare (Razzle nei guai, lo Specchio di Obscurio, la Forgia Antica, l'indovinello del Saggio e altri: 15 in tutto).
+- **Eventi**: cippi luminosi con piccole storie e scelte da ponderare (Tartantica in pericolo, lo Specchio di Obscurio, la Forgia Antica, l'indovinello del Saggio e altri: 15 in tutto).
 - **Segreti**: i muri incrinati si abbattono e nascondono tesori.
-- **Crescita**: a ogni livello scegli un Dono del Saggio (77 potenziamenti). In più ci sono 51 reliquie, 13 consumabili, mercanti, santuari e trappole.
+- **Crescita**: a ogni livello scegli un Dono del Saggio (77 potenziamenti). In più ci sono 51 reliquie, 13 consumabili, santuari, trappole e Tartantica la Veggente, la mercante, che accetta le Schegge di Gorm.
 - **Santuario del Saggio**: a fine partita guadagni Essenza, da spendere soprattutto per rendere i viaggi successivi più *vari* (nuove reliquie ed eventi nel bottino), più qualche piccola comodità di partenza. Niente potenziamenti permanenti alle statistiche.
 - **Rigiocabilità**: mappe sempre diverse, Sfida del giorno con seme condiviso, 5 livelli di Eclissi (difficoltà), Codex con bestiario, reliquie, imprese e cronache delle partite.
 - **Elementi**: Mare ▶ Fuoco ▶ Foresta ▶ Terra ▶ Aria ▶ Mare. Ogni elemento infligge ×1,5 danni a quello che segue.
