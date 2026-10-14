@@ -17,7 +17,7 @@ using Microsoft.Web.WebView2.WinForms;
 [assembly: System.Reflection.AssemblyTitle("GORMITI - Le Pietre di Gorm")]
 [assembly: System.Reflection.AssemblyProduct("GORMITI - Le Pietre di Gorm")]
 [assembly: System.Reflection.AssemblyDescription("Roguelike fan-made a tema Gormiti")]
-[assembly: System.Reflection.AssemblyVersion("1.2.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.2.1.0")]
 
 namespace Gormiti
 {

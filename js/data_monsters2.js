@@ -87,7 +87,7 @@
       desc: 'ÉLITE. Un giudice di luce corrotta. Il suo Giudizio indebolisce chi colpisce.',
     },
     luxalion: {
-      name: 'Luxalion Corrotto', title: 'Il Prisma Infranto', elem: 'luce', hp: 560, atk: [9, 13], def: 3, speed: 110, xp: 60, ai: 'boss_luxalion',
+      name: 'Luxalion Corrotto', title: 'Il Prisma Infranto', elem: 'luce', hp: 460, atk: [9, 13], def: 3, speed: 110, xp: 60, ai: 'boss_luxalion',
       flags: { boss: true, noKnock: true, alwaysAwake: true }, big: true,
       desc: 'BOSS. Il campione del Popolo della Luce, corrotto da Magor. I Piloni Prismatici lo curano: distruggili!',
     },
