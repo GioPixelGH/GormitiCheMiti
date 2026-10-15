@@ -91,7 +91,7 @@ Il gioco è pubblicato con GitHub Pages ed è una PWA: dal sito `https` si può 
 
 ## Sviluppo
 
-Nella cartella `tools/` ci sono gli strumenti di bilanciamento: un simulatore che fa giocare migliaia di partite a un bot (`node tools/verifica.js` per la mini-verifica di 8 minuti). Istruzioni in [tools/README.md](tools/README.md). In `docs/` ci sono il catalogo della storia originale e il piano di sviluppo.
+Nella cartella `tools/` ci sono gli strumenti di bilanciamento: un simulatore che fa giocare migliaia di partite a un bot (`node tools/verifica.js` per la mini-verifica di 8 minuti). In `tools/pixel/` ci sono i disegni dei personaggi e dei loro ritratti, da cui si genera `js/volti.js`. Istruzioni in [tools/README.md](tools/README.md). In `docs/` ci sono il catalogo della storia originale e il piano di sviluppo.
 
 ## Crediti
 

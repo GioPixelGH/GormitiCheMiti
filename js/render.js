@@ -499,6 +499,12 @@
           for (const o of [-2, 2]) { ctx.beginPath(); ctx.moveTo(sx - 5 * S + o * S, sy - 5 * S); ctx.lineTo(sx + 5 * S + o * S, sy + 5 * S); ctx.stroke(); }
         } else if (f.style === 'smash') {
           ctx.beginPath(); ctx.arc(sx, sy, r * (0.5 + k), 0, Math.PI * 2); ctx.stroke();
+        } else if (f.style === 'blade') {
+          // taglio netto obliquo rispetto alla direzione del colpo
+          const bx = f.dx - f.dy, by = f.dy + f.dx, n = Math.hypot(bx, by) || 1, len = r * 1.3 * Math.min(1, k * 4);
+          ctx.beginPath(); ctx.moveTo(sx - bx / n * len, sy - by / n * len); ctx.lineTo(sx + bx / n * len, sy + by / n * len); ctx.stroke();
+          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = Math.max(1, S * (1 - k));
+          ctx.beginPath(); ctx.moveTo(sx - bx / n * len, sy - by / n * len); ctx.lineTo(sx + bx / n * len, sy + by / n * len); ctx.stroke();
         } else if (f.style === 'arcane' || f.style === 'light') {
           for (let i = 0; i < 4; i++) { const aa = i * Math.PI / 2 + k * 2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + Math.cos(aa) * r, sy + Math.sin(aa) * r); ctx.stroke(); }
         } else {
@@ -555,11 +561,18 @@
     ctx.fillRect(sx - s * S, sy - s * S, s * 2 * S, s * 2 * S);
     ctx.fillStyle = '#ffffff'; ctx.fillRect(sx - S, sy - S, S, S);
   }
+  // colpo base di ogni eroe, con i colori e l'arma della sua carta (volti.js)
   const SLASH = {
-    gheos: { c: '#e0a050', p: '#a08a6a', k: 'smash' }, tasarau: { c: '#6ee05a', p: '#4a8a2a', k: 'vine' }, poivrons: { c: '#5ab0ff', p: '#a8e8ff', k: 'splash' },
-    noctis: { c: '#e8f8ff', p: '#ffffff', k: 'wind' }, saggio: { c: '#d8b0ff', p: '#f0e0ff', k: 'arcane' }, luminescente: { c: '#ffe27a', p: '#fff6c8', k: 'light' },
-    kolossus: { c: '#c8a070', p: '#8a7a6a', k: 'smash' }, carrapax: { c: '#ff8a4a', p: '#7ac0e0', k: 'claw' }, elios: { c: '#ffd84a', p: '#e8f8ff', k: 'wind' },
-    barbataus: { c: '#7ac04a', p: '#ffd23a', k: 'vine' },
+    gheos: { c: '#d8d8e0', p: '#e07438', k: 'smash' }, // mazza di pietra
+    tasarau: { c: '#8be06a', p: '#c87444', k: 'claw' }, // artigli e foglie
+    poivrons: { c: '#4a92e2', p: '#8adcf2', k: 'splash' },
+    noctis: { c: '#f4f8ff', p: '#6ad8c8', k: 'wind' }, // colpo d'ala
+    saggio: { c: '#8affc8', p: '#8a64c0', k: 'arcane' }, // bastone con l'Occhio della Vita
+    luminescente: { c: '#fff2a4', p: '#c8ccd8', k: 'blade' }, // lama di luce
+    kolossus: { c: '#f2d060', p: '#8a8a88', k: 'smash' }, // pugni d'oro
+    carrapax: { c: '#8ad8e0', p: '#4a8ad4', k: 'claw' }, // chele
+    elios: { c: '#f8f8ff', p: '#9aaac8', k: 'claw' }, // artigli
+    barbataus: { c: '#8ae03a', p: '#8a5632', k: 'vine' },
   };
   const PROJ = {
     light: { color: '#fff3a0', trail: '#ffffff', speed: 260 },

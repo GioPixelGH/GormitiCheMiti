@@ -1,4 +1,4 @@
-# Strumenti di bilanciamento
+# Strumenti di bilanciamento e di disegno
 
 Simulano migliaia di partite senza grafica, con un bot che gioca da solo, per capire quanto sono forti eroi, boss, reliquie e regioni. Serve **Node.js 18 o successivo**; non serve installare altro.
 
@@ -17,6 +17,7 @@ Riferimenti (30 partite per eroe, margine circa ±17 punti):
 
 - v1.2.2: 70% di vittorie complessive (Noctis 37%, Poivrons 93%, gli altri tra 53% e 87%).
 - v1.3.0: 67% (Barbataus 40%, Noctis 43%, Tasarau 57%, Carrapax 90%, Poivrons 87%). Orrore Profondo ora è di Fuoco e penalizza gli eroi della Foresta.
+- v1.4.0: identica alla v1.3.0 (la fase ha cambiato solo la grafica).
 
 ## Batteria completa
 
@@ -49,3 +50,18 @@ Tutti gli eroi giocano sugli **stessi semi** e su tutti i percorsi possibili in 
 - `analisi.js` produce le tabelle.
 
 Il bot è volutamente semplice: non sa tenersi a distanza né usare bene il terreno. Per questo conta il **confronto** tra eroi più dei valori assoluti.
+
+## Sprite e ritratti dei personaggi (`tools/pixel`)
+
+Gli eroi, il Vecchio Saggio e i grandi nemici dell'era sono disegnati a mano con forme geometriche (ellissi, poligoni, linee) su una griglia, guardando carte e statuine dell'archivio locale `riferimenti/` (che non viene pubblicato).
+
+- `pittore.js`: la "tela" con le forme e le ombreggiature.
+- `disegni.js`: gli sprite della mappa (16×16, boss 24×24); `ritratti.js`: i ritratti 48×48.
+- `genera.js` scrive `js/volti.js`, che il gioco carica dopo gli altri sprite:
+
+```
+node tools/pixel/genera.js
+node tools/pixel/anteprima.js anteprima.png gheos magor ritratto:gheos --scala 8
+```
+
+`anteprima.js` disegna sprite (`nome`) e ritratti (`ritratto:nome`) ingranditi, con la tavolozza e il contorno del gioco. Non modificare `js/volti.js` a mano: va rigenerato.

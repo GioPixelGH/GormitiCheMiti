@@ -4,7 +4,7 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 
 const ROOT = path.join(__dirname, '..', '..');
-const SOLO_BROWSER = new Set(['sprites.js', 'sprites2.js', 'icons.js', 'tiles.js', 'render.js', 'audio.js', 'keys.js', 'ui.js', 'input.js', 'touch.js', 'main.js']);
+const SOLO_BROWSER = new Set(['sprites.js', 'sprites2.js', 'volti.js', 'icons.js', 'tiles.js', 'render.js', 'audio.js', 'keys.js', 'ui.js', 'input.js', 'touch.js', 'main.js']);
 
 function fileLogica() {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');

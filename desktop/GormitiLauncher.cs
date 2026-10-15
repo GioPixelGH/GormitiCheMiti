@@ -17,7 +17,7 @@ using Microsoft.Web.WebView2.WinForms;
 [assembly: System.Reflection.AssemblyTitle("GORMITI - L'Occhio della Vita")]
 [assembly: System.Reflection.AssemblyProduct("GORMITI - L'Occhio della Vita")]
 [assembly: System.Reflection.AssemblyDescription("Roguelike fan-made a tema Gormiti")]
-[assembly: System.Reflection.AssemblyVersion("1.3.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.4.0.0")]
 
 namespace Gormiti
 {

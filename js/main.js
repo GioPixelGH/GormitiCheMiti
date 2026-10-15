@@ -100,6 +100,18 @@
       if (i > names.length + 39) break;
     }
     s.appendChild(cv);
+    // ritratti 48x48
+    const ps = Object.keys(G.PORTRAIT), pc = document.createElement('canvas');
+    pc.width = cols * cell; pc.height = Math.ceil(ps.length / cols) * cell;
+    const pctx = pc.getContext('2d'); pctx.imageSmoothingEnabled = false;
+    pctx.font = '12px monospace';
+    ps.forEach((n, j) => {
+      const x = (j % cols) * cell, y = Math.floor(j / cols) * cell;
+      pctx.fillStyle = '#4a4458'; pctx.fillRect(x + 2, y + 2, cell - 4, cell - 4);
+      pctx.drawImage(G.PORTRAIT[n], x + 8, y + 2, 96, 96);
+      pctx.fillStyle = '#fff'; pctx.fillText(n, x + 4, y + cell - 4);
+    });
+    s.appendChild(pc);
     // tileset del bioma scelto
     const b = G.BIOME_BY_ID[params.get('biome')] || G.BIOMES[0];
     const ts = G.buildTileset(b);

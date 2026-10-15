@@ -17,6 +17,21 @@
     if (size) { c.style.width = size + 'px'; c.style.height = size + 'px'; }
     return c;
   }
+  // volto di un personaggio: il ritratto 48x48 se c'è, altrimenti lo sprite ingrandito a 48x48
+  function drawVolto(ctx, name) {
+    ctx.clearRect(0, 0, 48, 48); ctx.imageSmoothingEnabled = false;
+    const p = G.PORTRAIT && G.PORTRAIT[name];
+    if (p) { ctx.drawImage(p, 0, 0); return; }
+    const spr = G.SPR[name]; if (!spr) return;
+    const k = Math.max(1, Math.floor(48 / Math.max(spr.w, spr.h))), w = spr.w * k, h = spr.h * k;
+    ctx.drawImage(spr.img, Math.floor((48 - w) / 2), Math.floor((48 - h) / 2), w, h);
+  }
+  function voltoCanvas(name, size) {
+    const c = document.createElement('canvas'); c.width = 48; c.height = 48;
+    drawVolto(c.getContext('2d'), name);
+    if (size) { c.style.width = size + 'px'; c.style.height = size + 'px'; }
+    return c;
+  }
   function iconCanvas(img) {
     const c = document.createElement('canvas'); c.width = 16; c.height = 16;
     c.getContext('2d').drawImage(img, 0, 0); return c;
@@ -25,6 +40,7 @@
   const itemImg = (id) => { const d = G.ITEM_BY_ID[id]; return G.itemSprite(d.icon, d.color); };
   const elemBadge = (el) => { const E = G.ELEMS[el]; return `<span class="el" style="background:${E.color}22;border:1px solid ${E.color};color:${E.color}">${E.glyph} ${E.name}</span>`; };
   UI.spriteCanvas = spriteCanvas;
+  UI.voltoCanvas = voltoCanvas;
 
   // ---------------------------------------------------------------- transizioni
   function fade(fn) {
@@ -145,8 +161,8 @@
         ctx.drawImage(spr.img, x, y, 16 * hs, 16 * hs);
       });
       // Magor sullo sfondo
-      const mg = G.SPR.magor;
-      if (mg) { ctx.globalAlpha = 0.18 + 0.05 * Math.sin(t / 900); ctx.drawImage(mg.img, W / 2 - 12 * S * 4, H * 0.08, 24 * S * 4, 24 * S * 4); ctx.globalAlpha = 1; }
+      const mg = G.PORTRAIT.magor || G.SPR.magor.img;
+      ctx.globalAlpha = 0.18 + 0.05 * Math.sin(t / 900); ctx.drawImage(mg, W / 2 - 12 * S * 4, H * 0.08, 24 * S * 4, 24 * S * 4); ctx.globalAlpha = 1;
       bgRaf = requestAnimationFrame(loop);
     };
     bgRaf = requestAnimationFrame(loop);
@@ -182,7 +198,7 @@
         <div class="ecl">${meta.maxEclissi > 0 ? `<button class="btn small" data-a="ecl-">◀</button><div><div class="ecl-name" id="ecl-name"></div></div><button class="btn small" data-a="ecl+">▶</button><div class="ecl-desc" id="ecl-desc"></div>` : '<div class="ecl-desc">Vinci una partita per sbloccare i livelli di Eclissi (difficoltà).</div>'}</div>
         <button class="btn gold" data-a="start">Inizia l'avventura ▶</button>
       </div></div>`;
-    s.querySelectorAll('.cv').forEach(el => { const c = spriteCanvas(el.dataset.spr); if (!meta.unlocked[el.dataset.spr]) c.style.filter = 'brightness(0)'; el.replaceWith(c); });
+    s.querySelectorAll('.cv').forEach(el => { const c = voltoCanvas(el.dataset.spr); if (!meta.unlocked[el.dataset.spr]) c.style.filter = 'brightness(0)'; el.replaceWith(c); });
     s.querySelectorAll('.hcard').forEach(el => el.onclick = () => {
       if (!meta.unlocked[el.dataset.h]) { G.audio.play('miss'); return; }
       UI.sel.hero = el.dataset.h; G.audio.play('select'); UI.showSelect();
@@ -309,8 +325,7 @@
     const R = G.run; if (!R) return;
     const h = R.hero;
     // ritratto
-    const pc = $('#portrait'), pctx = pc.getContext('2d');
-    pctx.clearRect(0, 0, 16, 16); pctx.drawImage(G.SPR[h.heroId].img, 0, 0);
+    drawVolto($('#portrait').getContext('2d'), h.heroId);
     $('#hero-lvl').textContent = 'Lv' + h.level;
     $('#hero-name').innerHTML = `${h.name}<small>${G.HEROES[h.heroId].title}</small>`;
     const sh = h.status.shield ? h.status.shield.p : 0;
@@ -392,6 +407,9 @@
     if (boss) {
       bb.classList.remove('hidden');
       const d = G.MON[boss.type];
+      const bp = $('#boss-portrait');
+      const who = boss.sprite || boss.type;
+      if (bp.dataset.who !== who) { bp.dataset.who = who; drawVolto(bp.getContext('2d'), who); }
       $('#boss-name').innerHTML = `${d.name}<small>${d.title || ''} ${elemBadge(boss.elem)}</small>`;
       bb.querySelector('.bar .fill').style.width = (100 * boss.hp / boss.maxHp) + '%';
       bb.querySelector('.bar span').textContent = `${boss.hp} / ${boss.maxHp}`;
@@ -605,7 +623,7 @@
   function saggio(text) {
     return `<div class="narratore"><div data-spr="saggio"></div><div><div class="chi">Il Vecchio Saggio</div><div class="parola">«${text}»</div></div></div>`;
   }
-  function ritratti(root) { root.querySelectorAll('.narratore [data-spr]').forEach(el => el.replaceWith(spriteCanvas(el.dataset.spr, 56))); }
+  function ritratti(root) { root.querySelectorAll('.narratore [data-spr]').forEach(el => el.replaceWith(voltoCanvas(el.dataset.spr))); }
   UI.saggio = saggio;
 
   UI.showIntro = function () {
@@ -837,7 +855,7 @@
     const s = $('#screen');
     s.innerHTML = `<div class="menu-bg"></div><div class="mbox panel" style="position:relative;z-index:2;width:min(1100px,94vw)">${html}</div>`;
     UI.state = 'sub';
-    s.querySelectorAll('[data-spr]').forEach(el => el.replaceWith(spriteCanvas(el.dataset.spr)));
+    s.querySelectorAll('[data-spr]').forEach(el => el.replaceWith(voltoCanvas(el.dataset.spr)));
     s.querySelectorAll('[data-rel]').forEach(el => el.replaceWith(iconCanvas(relicImg(el.dataset.rel))));
     s.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { G.audio.play('click'); UI.showCodex(b.dataset.t); });
     $('#ok').onclick = () => UI.showTitle();
@@ -911,13 +929,14 @@
     const relics = h.relics.map(id => { const r = G.RELIC_BY_ID[id], tg = r.tag ? G.SYNERGIES[r.tag] : null; return `<div class="bl" data-relic="${id}"><span style="color:${G.RARITY[r.rarity].color}">${r.name}</span>${tg ? ` <span style="color:${tg.color}">${tg.glyph}</span>` : ''}<br><small>${esc(r.desc)}</small></div>`; }).join('') || '<div class="sub">Nessuna reliquia ancora.</div>';
     const cnt = G.synCounts(h);
     const syns = G.SYN_ORDER.map(t => { const S = G.SYNERGIES[t], n = cnt[t] || 0, lv = G.synLevel(h, t); return `<div class="bl synrow lv${lv}"><b style="color:${S.color}">${S.glyph} ${S.name}</b> <span class="sub">${n}/4</span><br><small class="${lv >= 1 ? 'on' : ''}">(2) ${esc(S.t1)}</small><br><small class="${lv >= 2 ? 'on' : ''}">(4) ${esc(S.t2)}</small></div>`; }).join('');
-    const md = openModal(`<h2>${h.name} — livello ${h.level}</h2><div class="sub">${G.HEROES[h.heroId].title} · ${G.biomeOf(R.floor).name}, piano ${R.floor}</div>
+    const md = openModal(`<div class="volto-head"><div data-volto="${h.heroId}"></div><div><h2>${h.name} — livello ${h.level}</h2><div class="sub">${G.HEROES[h.heroId].title} · ${G.biomeOf(R.floor).name}, piano ${R.floor}</div></div></div>
       <div class="build">
         <div><h3>Statistiche</h3><div class="bstats">${stats.map(s => `<div>${s[0]}<b>${s[1]}</b></div>`).join('')}</div><h3>Abilità</h3>${skills}</div>
         <div><h3>Doni del Saggio</h3>${perks}<h3>Reliquie (${h.relics.length})</h3>${relics}</div>
         <div><h3>Risonanze</h3>${syns}</div>
       </div><div class="mfoot"><button class="btn gold" id="ok">Chiudi (${G.KEYS.primary('build')})</button></div>`, { type: 'build', esc: () => closeModal(), enter: () => closeModal() });
     md.querySelectorAll('[data-sicon]').forEach(el => el.appendChild(iconCanvas(G.skillIcon(el.dataset.sicon))));
+    md.querySelectorAll('[data-volto]').forEach(el => el.replaceWith(voltoCanvas(el.dataset.volto)));
     $('#ok').onclick = () => closeModal();
   };
 

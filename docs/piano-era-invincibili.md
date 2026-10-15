@@ -40,12 +40,21 @@ Dimensioni: **P** piccola · **M** media · **G** grande.
 |---|---|---|
 | 0 — Strumenti e archivio | 1.2.2 | ✅ completata |
 | 1 — Coerenza con l'era | 1.3.0 | ✅ completata (vedi note sotto) |
+| 2 — I volti dell'era | 1.4.0 | ✅ completata (vedi note sotto) |
 
 Note sulla Fase 1:
 - Crabs il Vendicatore e Mystral Corrotto sono stati sostituiti subito da due guerrieri dell'era, invece che da nemici generici: **Geyser l'Iroso** (Seconda Serie, élite della Fossa) e **Crudelion il Maledetto** (Terza Serie, élite dei Picchi). Gli sprite definitivi arrivano con la Fase 4.
 - Orrore Profondo ha già gli attacchi di fuoco della sua carta (Braccio di Lava, Magia Nera) e i colori giusti; lo sprite definitivo arriva con la Fase 2.
 - Tartantica ha uno sprite provvisorio da tartaruga marina.
 - I salvataggi della v1.2.x vengono convertiti automaticamente (reliquie, eventi, acquisti del Santuario, nemici e Pietre a terra).
+
+Note sulla Fase 2:
+- Scelta la dimensione consigliata: **16×16 sulla mappa** (boss 24×24) e **ritratti 48×48**. I ritratti compaiono nella selezione dell'eroe, nell'HUD, nella scheda dell'eroe, nel Codex, nei riquadri del Saggio, nella barra del boss e (Magor) sullo sfondo del titolo; i boss che non hanno ancora un ritratto mostrano lo sprite ingrandito.
+- Ridisegnati i 10 eroi, il Vecchio Saggio, Orrore Profondo, Obscurio, Devilfenix, Magmion e Magor, guardando carte e statuine dell'archivio locale (nessuna foto convertita). Saggio e Magor non hanno una statuina nell'era: sono disegnati nello stile delle carte.
+- I disegni stanno in `tools/pixel/` (forme geometriche su griglia) e generano `js/volti.js`; vedi `tools/README.md`.
+- Colpi base con i colori e le armi delle carte (mazza di Gheos, chele di Carrapax, artigli di Elios, lama di luce del Sommo Luminescente…).
+- Crudelion e le ombre di Obscurio (cloni, Riflesso) sono ricolorati sui nuovi sprite.
+- Il salvataggio non cambia: i file della v1.3.0 si importano così come sono.
 
 ## Panoramica
 

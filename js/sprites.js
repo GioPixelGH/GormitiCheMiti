@@ -9,25 +9,7 @@
   const S = G.SPRITE_DEFS = {};
 
   // ---------------------------------------------------------------- EROI
-  S.gheos = { sym: true, pal: { b: '#5c3d24', m: '#8a6038', l: '#b88a52', h: '#e0b878', o: '#ff9a2e', s: '#6e6a70', t: '#a8a4ac', e: '#ffe25a' }, rows: [
-    '........', '........', '......tt', '.....stt', '....mmll', '....mlle', '....mmll', '.ts.bmoo',
-    'ttsbbmoo', 'tsmbbmmh', 'smmbbmmm', 'mmh.bbmm', '.mm.bbmm', '.....bm.', '.....mm.', '........'] };
-  S.tasarau = { sym: true, pal: { g: '#2f7a2a', f: '#4fb33a', l: '#8be06a', b: '#5a3a1e', n: '#8a5a30', e: '#d8ff6a' }, rows: [
-    '........', '....gfff', '..ggflll', '.gffgflf', '.ggfgfff', '..ggbnnn', '...bneen', '...bnnnn',
-    '..fgbnnb', '.gf.bnbn', '.n..bnnb', '.n..bbnb', '.n..bnb.', '....bnb.', '...bb.bb', '..b.....'] };
-  S.poivrons = { sym: true, pal: { d: '#1b3f7a', b: '#2f6fc0', l: '#5ab0ff', c: '#a8e8ff', f: '#3fd0c0', e: '#fff27a' }, rows: [
-    '........', '.......f', '......ff', '.....bfl', '....bbll', '....bebl', '.ff.bbbc', 'fff.dbbl',
-    'ff.ddbcc', '.bbbdbcc', 'bbb.dbbl', 'll..ddbb', '.....dbb', '.....bb.', '....bbb.', '........'] };
-  S.noctis = { sym: true, pal: { w: '#f4f8ff', a: '#bcd4f0', s: '#7f9cc8', b: '#4a6aa8', y: '#ffd84a', e: '#3ae8ff' }, rows: [
-    '........', '......wa', 's....wwa', 'as...www', 'aas.wewa', 'waas.wwy', 'wwaas.ww', '.wwasbww',
-    '..wwsbwa', '...wsbaw', '....sbaa', '.....bab', '.....aa.', '.....y..', '....y...', '........'] };
-  S.saggio = { pal: { p: '#5a3a8a', l: '#9a70d0', k: '#1a1028', e: '#4ad0ff', s: '#ece4d4', f: '#f0c8a0', n: '#8a6a3a', o: '#ffe27a' }, rows: [
-    '...........oo...', '..........oeeo..', '......pp...oo...', '.....pllp...n...', '....plppp...n...', '....pkkkpp..n...',
-    '....kekekp..n...', '....kssskp..n...', '...pssssspffn...', '..ppssssspp.n...', '..plpsssplp.n...', '..plppspplp.n...',
-    '..pllppppllpn...', '..ppllpplllpn...', '...pppppppp.n...', '................'] };
-  S.luminescente = { sym: true, pal: { y: '#ffe27a', o: '#e0a030', w: '#ffffff', c: '#fff6c8', e: '#3ae8ff' }, rows: [
-    '........', '...y..y.', '....yyoy', '....wccc', '....cecc', '....cccw', '.y..oycc', 'yo.ooyyc',
-    'yoooyycw', '.yo.oyyc', '.o..oyyy', '.w..ooyy', '.....oyo', '.....oy.', '....oo..', '........'] };
+  // gli eroi, il Vecchio Saggio e i grandi nemici dell'era sono in volti.js (generato da tools/pixel)
 
   // ---------------------------------------------------------------- FORESTA
   S.rovo = { sym: true, pal: { d: '#2a4a1a', g: '#3f7a2a', l: '#6ab040', t: '#d8c080', r: '#ff3a3a' }, rows: [
@@ -76,10 +58,6 @@
     '................', '................', '..........pp....', '.........plp....', '........pll.....', '.......plw......',
     '.......pll......', '......pllw......', '......plll......', '......pllw......', '.......plll.....', '.......pllw.....',
     '......pplllp....', '....pppppppppp..', '...pp..pp...pp..', '................'] };
-  S.orrore = { sym: true, size: 24, pal: { d: '#2a0a0a', p: '#5a1a14', v: '#8a2a1a', l: '#c04a2a', e: '#ffd23a', r: '#ff8a1a', w: '#e8dcc8' }, rows: [
-    '............', '............', '........vvvv', '......vvllll', '.....vllllll', '....vllvllll', '....vlveelll', '...vlllellll',
-    '...vllllllll', '...vlleevlle', '...vvlllllll', '....vvvrrrrr', '....vvrwrwrw', '...vvvrrrrrr', '..vv.vvvvvvv', '.vv.vv.vv.vv',
-    'vv.vv.vv..vv', 'v..v..v..vv.', 'v.vv.vv..v..', '.vv..v..vv..', '..v..vv.v...', '......v.....', '............', '............'] };
 
   // ---------------------------------------------------------------- ROSCAMAR
   S.golem = { sym: true, pal: { d: '#4a4a52', s: '#6e6e78', l: '#9a9aa4', h: '#c8c8d0', g: '#5a8a3a', e: '#5ae0ff' }, rows: [
@@ -101,11 +79,7 @@
   S.colosso = { sym: true, pal: { c: '#3a8ab0', l: '#7ad8ff', w: '#e0f8ff', d: '#1a4a6a', e: '#ffffff', p: '#b07aff' }, rows: [
     '........', '.w......', '.lw...l.', '..lw.cll', '..llccwl', '...ccelc', '.l.cclll', 'lll.dccc',
     'lwlcdccl', 'lllcdcpl', 'cc.cdccc', 'cc..dccl', '.....dcc', '....dcc.', '...ddcc.', '........'] };
-  S.obscurio = { sym: true, size: 24, pal: { k: '#0a0610', d: '#1a1028', p: '#3a2058', v: '#6a3aa0', l: '#a070e0', e: '#ff4aff', g: '#c0c0d0', r: '#a01a3a' }, rows: [
-    '............', '......d.....', '......dd....', '.......d.ddd', '.......ddppp', '........dppp', '........pkkk', '........pkek',
-    '........pkkk', '......dddpgp', '....ddpvvpgp', '...dppvvlvpv', '..dpvvlvvvpv', '..dpvl.vvvpp', '.dpvvl.vvrvp', '.dpvv..vvrrv',
-    '.dpv...vvvvv', 'dppv...pvvvv', 'dpvv...pvvpv', 'dpv....pv.pv', 'dp.....pv.pv', 'd......dd.dd', '............', '............'] };
-  S.clone = { base: 'obscurio', size: 24, pal: { k: '#000000', d: '#0a0612', p: '#1a1030', v: '#2a1a4a', l: '#4a3a7a', e: '#ff4aff', g: '#505060', r: '#401020' } };
+  S.clone = { base: 'obscurio', size: 24, pal: { n: '#1a1030', N: '#2a1a4a', M: '#4a3a7a', b: '#0a0612', k: '#000000', l: '#505060', r: '#401020', R: '#602040', e: '#ff4aff' } };
 
   // ---------------------------------------------------------------- CIELI
   S.arpia = { sym: true, pal: { b: '#6a4a3a', n: '#9a7a5a', l: '#c8a888', f: '#f0d0b0', e: '#ff3a3a', h: '#3a2030', y: '#ffd23a' }, rows: [
@@ -125,11 +99,7 @@
     '...bbbbb.yyw....', '....bbbbyyyy....', '..yyyyybyyyy....', '.yyyyyyyyyyy....', 'y.yyyooyyyoy....', '..yy.o...y.y....',
     '..o..o...o..o...', '................', '................', '................'] };
   // Crudelion il Maledetto (Terza Serie): corpo blu e viola, piccole ali rosse
-  S.crudelion = { base: 'noctis', pal: { w: '#6a8ae0', a: '#4a5ab8', s: '#7a2a8a', b: '#3a1a5a', y: '#e83a2a', e: '#ff4a4a' } };
-  S.devilfenix = { sym: true, size: 24, pal: { d: '#5a1010', r: '#c02a1a', o: '#ff6a1a', y: '#ffc83a', w: '#fff2b0', e: '#ffffff' }, rows: [
-    '............', '...........y', '..........yo', '..........oo', '.........ooo', 'r........oer', 'or.......oow', 'yor.....rroo',
-    'yyorr..rrooo', '.yyoorrrrooy', '..yyoorrooyy', '...yyoorooyw', '....yyooooyw', '.....yyyooyy', '......yyroyy', '.......rroyy',
-    '......rr.oyy', '.....rr..ooy', '....r....o.y', '.........o..', '..........o.', '............', '............', '............'] };
+  S.crudelion = { base: 'noctis', pal: { t: '#7a2a8a', T: '#9a4aaa', u: '#4a1a5a', w: '#6a8ae0', W: '#4a5ab8', a: '#c83a2a', A: '#8a1a1a', y: '#7a2a8a', o: '#e8c83a', k: '#ff4a4a' } };
   S.uovo = { sym: true, pal: { o: '#ff8a2a', y: '#ffd06a', w: '#fff2c0', r: '#c02a1a' }, rows: [
     '........', '........', '........', '......yy', '.....yww', '....yyww', '....yyyw', '...oyyyy',
     '...oyryy', '...ooyry', '...ooyyr', '...ooyyy', '....ooyy', '.....ooo', '........', '........'] };
@@ -152,14 +122,6 @@
     '...rrogo', '..rroogo', '.y.rooog', '.f.roooo', '...roooo', '..rrrooo', '..rrrrrr', '........'] };
   S.lavico = { base: 'lupo', pal: { d: '#3a1010', b: '#a02a1a', l: '#ff6a1a', w: '#ffc83a', e: '#ffe27a', k: '#120d18' } };
   S.lavion = { base: 'golem', pal: { d: '#3a1010', s: '#6a2018', l: '#c04a1a', h: '#ff9a2a', g: '#ffc83a', e: '#ffffff' } };
-  S.magmion = { sym: true, size: 24, pal: { d: '#2a1010', s: '#4a2020', l: '#7a3a2a', o: '#ff6a1a', y: '#ffc83a', w: '#fff0a0' }, rows: [
-    '............', '.......d....', '......ds....', '......dss.ss', '.......sssss', '........slll', '........slyl', '........ssss',
-    '....ss.dsooo', '...slls.dsss', '..sllllsdsll', '..slolls.sll', '..sllllsdslo', '...slls.dsoy', '...sooodsloy', '...syyo.dsoo',
-    '....oo..dsll', '........dsss', '.......dss.s', '.......dss.s', '......dss..s', '......ddd..d', '............', '............'] };
-  S.magor = { sym: true, size: 24, pal: { k: '#0a0608', d: '#2a0a14', p: '#4a1a2a', r: '#8a1a2a', o: '#ff4a1a', y: '#ffc83a', e: '#ff2a2a', g: '#b09a7a' }, rows: [
-    '............', '..g.......y.', '..gg.....yo.', '...gg...ooyo', '....gg.dpppp', 'd....gdppppp', 'dd....dpkkkk', 'pdd...dpkeek',
-    'ppdd..dpkkkk', 'pppdd.dpkoko', 'rpppddddpppp', 'rrppprdpprrp', '.rrppprdprrr', '..rrpprddpro', '...rrprdpprr', '....rrrdppro',
-    '.....r.dpprr', '.......dpprp', '.......dppdp', '......dpp.dp', '......dpp.dp', '.....ddd..dd', '............', '............'] };
   S.germoglio = { sym: true, pal: { g: '#3fa03a', l: '#8be06a', b: '#6a4a2a', n: '#9a6a3a', e: '#ffffff' }, rows: [
     '........', '........', '.....l..', '...lllg.', '..llglll', '..lglgll', '...gglgg', '.....bnn',
     '....bnen', '..l.bnnn', '..lbbnnb', '....bnnb', '....bnb.', '...bb.b.', '........', '........'] };
@@ -291,6 +253,7 @@
     for (const k in S) check(k, S[k]);
     for (const k in RI) check('relic:' + k, RI[k]);
     for (const k in G.DECO_DEFS) check('deco:' + k, G.DECO_DEFS[k]);
+    for (const k in (G.PORTRAIT_DEFS || {})) check('ritratto:' + k, G.PORTRAIT_DEFS[k]);
     return errs;
   };
 
@@ -346,6 +309,9 @@
     }
     G.SPR_DECO = {};
     for (const k in G.DECO_DEFS) G.SPR_DECO[k] = render(G.DECO_DEFS[k].rows, G.DECO_DEFS[k].pal, false);
+    // ritratti 48x48 (volti.js): schede, HUD, Codex, narratore, barra del boss
+    G.PORTRAIT = {};
+    for (const k in (G.PORTRAIT_DEFS || {})) G.PORTRAIT[k] = render(G.PORTRAIT_DEFS[k].rows, G.PORTRAIT_DEFS[k].pal, true);
   };
 
   // oggetti/reliquie colorati (cache)

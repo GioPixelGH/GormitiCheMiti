@@ -1,24 +1,10 @@
 'use strict';
 // ============================================================
 //  sprites2.js : pixel art dei contenuti aggiunti
-//  (nuovi eroi, Ghiacciai, Tempio della Luce, eventi, decorazioni)
+//  (Ghiacciai, Tempio della Luce, eventi, decorazioni)
 // ============================================================
 (function () {
   const S = G.SPRITE_DEFS;
-
-  // ---------------------------------------------------------------- NUOVI EROI
-  S.kolossus = { sym: true, pal: { d: '#3a3430', s: '#6a5e52', l: '#9a8a74', h: '#c8b89a', g: '#5a8a3a', e: '#ffb030' }, rows: [
-    '........', '.....sss', '....slhh', '....sdee', '....ssll', 'gg.dssss', 'ssgsslll', 'shsssllh',
-    'sshdssll', 'sssdssss', 'll.dsdss', 'lh.dssss', '....sss.', '....sss.', '...ddd..', '........'] };
-  S.carrapax = { sym: true, pal: { d: '#7a2a1a', r: '#c84a2a', o: '#ff8a4a', w: '#ffe0a0', e: '#101010' }, rows: [
-    '........', '.....e..', '.....d..', 'rr..rrrr', 'ror.rooo', 'rrr.rwoo', '.rr.rrrr', '..rdrooo',
-    '...drooo', '...drrrr', '...ddrrr', '....drrd', '....dr..', '...ddr..', '........', '........'] };
-  S.elios = { sym: true, pal: { w: '#fff8e8', y: '#ffd84a', o: '#ffa52a', b: '#7aa0d0', s: '#c0d8f0', e: '#2a7ab0' }, rows: [
-    '........', '....y.y.', '.....yyy', 's...wwww', 'ss..wewo', 'sss.wwww', 'bss..yww', 'bbss.oyw',
-    '.bbsyyow', '..bsooyw', '...syoww', '....yowy', '.....ww.', '.....w..', '....yy..', '........'] };
-  S.barbataus = { sym: true, pal: { g: '#3f8a2a', l: '#7ac04a', b: '#6a4a2a', n: '#9a6a3a', w: '#d8e8b0', e: '#3a2a10', f: '#e0b890' }, rows: [
-    '..n.....', '..nn..n.', '...nnnn.', '....gggg', '...glllg', '....ffff', '....feff', '...wwwww',
-    '..gwwlww', '..gwwwww', '..ggwwwg', '..gggwgg', '..ggggbg', '...gg.gg', '...bb.bb', '........'] };
 
   // ---------------------------------------------------------------- VARIANTI DI COLORE
   S.lupoalfa = { base: 'lupo', pal: { d: '#141018', b: '#3e3640', l: '#6e6470', w: '#d8d0d8', e: '#ff3a3a', k: '#120d18' } };
@@ -30,7 +16,7 @@
   S.accolito = { base: 'sacerdote', pal: { r: '#b09040', o: '#f0e0a0', y: '#ffffff', f: '#fff6c8', s: '#3a2a1a', e: '#ff4aff', g: '#ffe27a' } };
   S.arconte = { base: 'folgoratore', pal: { b: '#a08030', l: '#f0d070', c: '#fff6c8', y: '#ffffff', w: '#ffffff', e: '#ff4aff' } };
   S.antico = { base: 'treant', pal: { b: '#3a2a1e', n: '#6a5030', l: '#8a6a40', g: '#4ab03a', v: '#ffd23a', e: '#7aff7a' } };
-  S.riflesso = { base: 'obscurio', size: 24, pal: { k: '#000000', d: '#0a0612', p: '#1a1030', v: '#2a1a4a', l: '#4a3a7a', e: '#ff4aff', g: '#505060', r: '#401020' } };
+  S.riflesso = { base: 'obscurio', size: 24, pal: { n: '#1a1030', N: '#2a1a4a', M: '#4a3a7a', b: '#0a0612', k: '#000000', l: '#505060', r: '#401020', R: '#602040', e: '#ff4aff' } };
 
   // ---------------------------------------------------------------- GHIACCIAI
   S.tricheco = { pal: { b: '#6a4a3a', l: '#9a7a6a', w: '#f0f0e0', e: '#101010', p: '#c09a8a' }, rows: [
