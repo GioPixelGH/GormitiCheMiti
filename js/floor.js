@@ -198,6 +198,15 @@
       const s = pick((x, y) => far(x, y, 7) && wallsAround(x, y) <= 2 && !isChokepoint(x, y));
       if (s) { const ev = G.pickEvent(rng); const f = { id: R.nextId++, type: 'event', x: s[0], y: s[1], ev: ev.id, data: {} }; if (ev.init) ev.init(f, rng); R.features.push(f); }
     }
+    // --- Porte Ultradimensionali: due varchi collegati (Regione di Oscuro Orizzonte) ---
+    if (biome.dark && rng.chance(0.85)) {
+      const a = pick((x, y) => far(x, y, 6) && wallsAround(x, y) <= 2 && !isChokepoint(x, y));
+      const b = a && pick((x, y) => far(x, y, 6) && U.cheb(x, y, a[0], a[1]) >= 16 && wallsAround(x, y) <= 2 && !isChokepoint(x, y));
+      if (a && b) {
+        const ia = R.nextId++, ib = R.nextId++;
+        R.features.push({ id: ia, type: 'rift', x: a[0], y: a[1], twin: ib }, { id: ib, type: 'rift', x: b[0], y: b[1], twin: ia });
+      }
+    }
     // --- bivio: un secondo portale verso il Sentiero Pericoloso (1° piano di ogni regione) ---
     if (fl === 1 && m.stairs) {
       R.portals.push({ x: m.stairs[0], y: m.stairs[1], kind: 'safe' });
@@ -213,7 +222,7 @@
     }
     // --- trappole ---
     const nTraps = 3 + reg + (R.eclissi >= 3 ? 2 : 0);
-    const trapTypes = [['spine', 4], ['veleno', reg <= 1 ? 3 : 1], ['fuoco', reg >= 3 ? 4 : 1], ['tele', 2], ['allarme', 2], ['gelo', reg >= 2 ? 2 : 0]];
+    const trapTypes = [['spine', 4], ['veleno', reg <= 1 ? 3 : 1], ['fuoco', reg >= 3 ? 4 : biome.id === 'nebbie' ? 3 : 1], ['tele', 2], ['allarme', 2], ['gelo', reg >= 2 ? 2 : 0], ['crollo', biome.id === 'roscamar' ? 4 : 0]];
     for (let i = 0; i < nTraps; i++) {
       const s = pick((x, y) => far(x, y, 5));
       if (s) R.traps.push({ x: s[0], y: s[1], type: rng.weighted(trapTypes, e => e[1])[0] });
@@ -455,6 +464,19 @@
       return ask('event');
     }
     if (f.type === 'merchant') { G.ensureStockRelics(f); return ask('shop'); }
+    if (f.type === 'rift') {
+      const tw = R.features.find(o => o.id === f.twin && !o.gone);
+      const spots = tw ? U.DIRS8.map(d => [tw.x + d[0], tw.y + d[1]]).filter(p => G.canEnter(h, p[0], p[1]) && !G.isHazardFor(h, p[0], p[1])) : [];
+      if (!spots.length) { G.log('La Porta Ultradimensionale vibra, ma l\'altro varco è bloccato.', 'info'); return 0; }
+      const s = rng.pick(spots), ox = h.x, oy = h.y;
+      h.x = s[0]; h.y = s[1];
+      G.fx.teleport(h, ox, oy); G.fx.sound('teleport');
+      R.distMapsDirty = true;
+      G.log('Attraversi la Porta Ultradimensionale!', 'info');
+      G.hint('rift', 'Le Porte Ultradimensionali sono collegate a coppie: urtane una per comparire accanto all\'altra.');
+      G.onEnter(h);
+      return 100;
+    }
     if (f.type === 'shrine') {
       if (f.used) { G.log('Il santuario ha esaurito il suo potere.', 'info'); return 0; }
       return ask('shrine');
@@ -562,7 +584,7 @@
   const RUN_KEY = 'gormiti_run_v4', META_KEY = 'gormiti_meta_v1';
   G.STORE_KEYS = { run: RUN_KEY, meta: META_KEY };
   // formato della partita salvata: le versioni precedenti vengono convertite, non cancellate
-  G.RUN_VERSION = 5;
+  G.RUN_VERSION = 6;
 
   // ---------------- conversione dei salvataggi delle versioni precedenti ----------------
   // v1.3.0 (storia originale): identificativi di reliquie, eventi e acquisti del Santuario cambiati
@@ -586,26 +608,58 @@
     }
     return v;
   }
+  // v1.5.0 (le regioni dell'era): via Ghiacciai Eterni, Tempio della Luce, Cerbante, Glaciator e Luxalion;
+  // Lavion da élite del Vulcano diventa il boss della Pianura delle Nebbie (l'élite ora è Il Mastodontico)
+  // tipo vecchio -> [tipo nuovo, nome vecchio]; null = tolto dalla partita
+  G.REPLACED_MONSTERS_V6 = {
+    cerbante: ['aracno', 'Cerbante'], glaciator: ['lavion', 'Glaciator'], luxalion: ['obscurio', 'Luxalion Corrotto'], lavion: ['mastodontico', 'Lavion'],
+    lupoghiaccio: ['lupocenere', 'Lupo dei Ghiacci'], spiritogelido: ['spettronebbia', 'Spirito Gelido'], golemghiaccio: ['golemlava', 'Golem di Ghiaccio'],
+    tricheco: ['lupocenere', 'Tricheco Zannuto'], sciamano: ['sciamanolava', 'Sciamano dei Ghiacci'], yeti: ['lavor', 'Yeti Ancestrale'],
+    sentinella: ['cristallonero', 'Sentinella di Cristallo'], falena: ['falenanotte', 'Falena Abbagliante'], paladino: ['cavaliereombra', 'Paladino Corrotto'],
+    prisma: ['cavaliereombra', 'Prisma Vivente'], accolito: ['accolitonotte', 'Accolito dell\'Alba'], arconte: ['pantanera', 'Arconte di Luce'],
+    frammento: null, pilone: null, scheggia: null,
+  };
+  // le vittorie contro i boss tolti passano al boss che ne ha preso il posto
+  const BOSS_V6 = { cerbante: 'aracno', glaciator: 'lavion', luxalion: 'obscurio' };
+  const region = (id) => G.RENAMED_REGIONS[id] || id;
+  function convertMonster(e, rep) {
+    const nd = G.MON[rep[0]];
+    e.name = (e.name || rep[1]).replace(rep[1], nd.name);
+    e.type = rep[0]; e.elem = nd.elem; e.ai = nd.ai; e.speed = nd.speed || 100;
+    const keep = {};
+    for (const k of ['champion', 'golden', 'summoned', 'elite']) if (e.flags[k]) keep[k] = e.flags[k];
+    e.flags = Object.assign({}, nd.flags || {}, keep);
+  }
   G.migrateMeta = function (d) {
     renameIds(d);
     for (const t in G.REPLACED_MONSTERS) if (d.monsters) delete d.monsters[t];
+    if (!(d.v >= 2)) {
+      const M = G.REPLACED_MONSTERS_V6;
+      if (d.monsters) { if (d.monsters.lavion) d.monsters.mastodontico = true; for (const t in M) delete d.monsters[t]; }
+      if (d.bosses) for (const t in BOSS_V6) if (d.bosses[t]) { d.bosses[BOSS_V6[t]] = (d.bosses[BOSS_V6[t]] || 0) + d.bosses[t]; delete d.bosses[t]; }
+      if (d.regions) for (const t in G.RENAMED_REGIONS) if (d.regions[t]) { d.regions[G.RENAMED_REGIONS[t]] = true; delete d.regions[t]; }
+      for (const hs of d.history || []) if (hs.route) hs.route = hs.route.map(region);
+      d.v = 2;
+    }
     return d;
   };
   G.migrateRun = function (R) {
     if (R.version === 4) {
       renameIds(R);
-      for (const e of R.ents || []) {
-        const rep = G.REPLACED_MONSTERS[e.type];
-        if (!rep) continue;
-        const nd = G.MON[rep[0]];
-        e.name = (e.name || rep[1]).replace(rep[1], nd.name);
-        e.type = rep[0]; e.elem = nd.elem; e.ai = nd.ai;
-        Object.assign(e.flags, nd.flags);
-        if (!nd.flags.swim) delete e.flags.swim;
-      }
+      for (const e of R.ents || []) if (G.REPLACED_MONSTERS[e.type]) convertMonster(e, G.REPLACED_MONSTERS[e.type]);
       for (const t in G.REPLACED_MONSTERS) if (R.seenMonsters) delete R.seenMonsters[t];
       for (const it of R.items || []) if (it.kind === 'pietra') { it.kind = 'frammento'; it.name = G.fragmentName(G.regionOf(R.floor)); }
       R.version = 5;
+    }
+    if (R.version === 5) {
+      const M = G.REPLACED_MONSTERS_V6;
+      R.route = (R.route || []).map(id => id && region(id));
+      for (const p of R.portals || []) if (p.dest) p.dest = region(p.dest);
+      if (R.map && R.map.biome) R.map.biome = region(R.map.biome);
+      R.ents = (R.ents || []).filter(e => !(e.kind === 'monster' && M[e.type] === null));
+      for (const e of R.ents) if (e.kind === 'monster' && M[e.type]) convertMonster(e, M[e.type]);
+      if (R.seenMonsters) for (const t of Object.keys(R.seenMonsters)) if (t in M) { delete R.seenMonsters[t]; if (M[t]) R.seenMonsters[M[t][0]] = true; }
+      R.version = 6;
     }
     return R;
   };

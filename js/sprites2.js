@@ -1,64 +1,47 @@
 'use strict';
 // ============================================================
 //  sprites2.js : pixel art dei contenuti aggiunti
-//  (Ghiacciai, Tempio della Luce, eventi, decorazioni)
+//  (Pianura delle Nebbie, Oscuro Orizzonte, eventi, decorazioni)
+//  Molti nemici di contorno sono varianti di colore: i guerrieri dell'era
+//  con il loro aspetto definitivo arrivano con la Fase 4 del piano.
 // ============================================================
 (function () {
   const S = G.SPRITE_DEFS;
 
   // ---------------------------------------------------------------- VARIANTI DI COLORE
   S.lupoalfa = { base: 'lupo', pal: { d: '#141018', b: '#3e3640', l: '#6e6470', w: '#d8d0d8', e: '#ff3a3a', k: '#120d18' } };
-  S.lupoghiaccio = { base: 'lupo', pal: { d: '#5a7a96', b: '#b8cce0', l: '#e4eef8', w: '#ffffff', e: '#2a8aff', k: '#120d18' } };
   S.lupospirito = { base: 'lupo', pal: { d: '#2a6a3a', b: '#5ab06a', l: '#9ae0a0', w: '#e0ffe0', e: '#ffffff', k: '#123018' } };
-  S.spiritogelido = { base: 'spiritovento', pal: { w: '#ffffff', c: '#bff4ff', b: '#5aaad0', e: '#1a4a8a' } };
-  S.golemghiaccio = { base: 'golem', pal: { d: '#4a7a9a', s: '#8ac0e0', l: '#bfe4f8', h: '#ffffff', g: '#e0f6ff', e: '#2a6aff' } };
-  S.sciamano = { base: 'sacerdote', pal: { r: '#2a4a7a', o: '#4a7ab0', y: '#bff4ff', f: '#ffffff', s: '#0a1a2a', e: '#7af0ff', g: '#c0e8ff' } };
-  S.accolito = { base: 'sacerdote', pal: { r: '#b09040', o: '#f0e0a0', y: '#ffffff', f: '#fff6c8', s: '#3a2a1a', e: '#ff4aff', g: '#ffe27a' } };
-  S.arconte = { base: 'folgoratore', pal: { b: '#a08030', l: '#f0d070', c: '#fff6c8', y: '#ffffff', w: '#ffffff', e: '#ff4aff' } };
   S.antico = { base: 'treant', pal: { b: '#3a2a1e', n: '#6a5030', l: '#8a6a40', g: '#4ab03a', v: '#ffd23a', e: '#7aff7a' } };
   S.riflesso = { base: 'obscurio', size: 24, pal: { n: '#1a1030', N: '#2a1a4a', M: '#4a3a7a', b: '#0a0612', k: '#000000', l: '#505060', r: '#401020', R: '#602040', e: '#ff4aff' } };
 
-  // ---------------------------------------------------------------- GHIACCIAI
-  S.tricheco = { pal: { b: '#6a4a3a', l: '#9a7a6a', w: '#f0f0e0', e: '#101010', p: '#c09a8a' }, rows: [
-    '................', '................', '................', '................', '................', '.......bbbbb....',
-    '.....bbllllbb...', '...bbllllleblb..', '..bllllllllllb..', '.bllllllllpppb..', '.bbllllllbpwpw..', '..bbbblllbb.w.w.',
-    '...bb.bb.b..w.w.', '................', '................', '................'] };
-  S.yeti = { sym: true, pal: { w: '#f0f4f8', s: '#c0ccd8', d: '#8a9ab0', b: '#5a7aa0', e: '#ff3a3a' }, rows: [
-    '........', '.....www', '....wwww', '...wwbbb', '...wbebb', 'w..wbbdd', 'ww.wwwbb', 'wwwwwwww',
-    '.wwswwww', '..wsswww', '..wssssw', '...wssss', '...wwww.', '..ddd...', '........', '........'] };
+  // ---------------------------------------------------------------- PIANURA DELLE NEBBIE
+  S.lupocenere = { base: 'lupo', pal: { d: '#2a2622', b: '#6a645c', l: '#9a948a', w: '#d8d2c8', e: '#ff8a2a', k: '#120d18' } };
+  S.spettronebbia = { base: 'spiritovento', pal: { w: '#f0f2ee', c: '#c8ccc6', b: '#8a8e88', e: '#3a3e44' } };
+  S.golemlava = { base: 'golem', pal: { d: '#2a1410', s: '#4a2a20', l: '#7a3a24', h: '#ff8a2a', g: '#ffc83a', e: '#ffe27a' } };
+  S.sciamanolava = { base: 'sacerdote', pal: { r: '#5a1a12', o: '#a8381a', y: '#ff8a2a', f: '#ffd23a', s: '#1a0806', e: '#ffe27a', g: '#c8a040' } };
+  // provvisori, in attesa dei guerrieri dell'era (Fase 4)
+  S.lavor = { base: 'guerriero', pal: { d: '#4a1410', s: '#c8321e', l: '#e8562a', o: '#ffd23a', y: '#ffe27a' } };
+  S.mastodontico = { base: 'golem', pal: { d: '#5a1410', s: '#b8281e', l: '#e04a2a', h: '#ff8a5a', g: '#ffd23a', e: '#ffe27a' } };
+
+  // ---------------------------------------------------------------- REGIONE DI OSCURO ORIZZONTE
+  S.cristallonero = { sym: true, pal: { y: '#6a3aa0', o: '#3a2a5a', w: '#d8b0ff', c: '#2a1a4a', e: '#9ae07a', d: '#1a1030' }, rows: [
+    '........', '........', '......yy', '.....ycc', '....yccc', '....ccce', '....yccc', '.....ycc',
+    '......yy', '......oo', '.....ooo', '....dooo', '...ddddd', '........', '........', '........'] };
+  S.falenanotte = { sym: true, pal: { y: '#3a2a6a', o: '#6a3aa0', w: '#9ae07a', b: '#1a1030', e: '#ff3a3a' }, rows: [
+    '........', '........', '........', 'yy......', 'yyyy..b.', 'yeyyy.b.', 'yyyyyob.', '.yyyyobb',
+    '..yywobb', '.yyyyobb', 'yeyyy.bb', 'yyyy...b', '.yy.....', '........', '........', '........'] };
+  S.cavaliereombra = { sym: true, pal: { s: '#2a2a4a', l: '#4a4a7a', g: '#9ae07a', d: '#14142a', e: '#ff3a3a', v: '#b77cff' }, rows: [
+    '.....ggg', '....g...', '.....sss', '....slll', '....sdde', '....ssss', '.gg.vsll', 'gllgvsss',
+    'gllgvsls', 'glvgdsss', 'gllg.sss', '.gg..sds', '.....ss.', '.....ss.', '....dd..', '........'] };
+  S.accolitonotte = { base: 'sacerdote', pal: { r: '#1a1838', o: '#2e2a5a', y: '#9ae07a', f: '#c8f8a8', s: '#08060e', e: '#ff3a3a', g: '#b77cff' } };
+  // provvisoria, in attesa dei guerrieri dell'era (Fase 4)
+  S.pantanera = { base: 'lupo', pal: { d: '#0a0812', b: '#1e1a3a', l: '#34306a', w: '#9ae07a', e: '#ff3a3a', k: '#06040a' } };
+
+  // ---------------------------------------------------------------- OGGETTI E SCENA
+  // il Frammento dell'Occhio della Vita
   S.frammento = { sym: true, pal: { c: '#7ad8ff', w: '#ffffff', l: '#bff4ff', d: '#2a6a9a' }, rows: [
     '........', '........', '........', '........', '.......w', '......cw', '.....ccl', '...c.ccl',
     '..cw.cll', '..ccccll', '..cclcll', '...ccll.', '..dddddd', '........', '........', '........'] };
-  S.glaciator = { sym: true, size: 24, pal: { w: '#ffffff', c: '#bff4ff', l: '#7ad8ff', b: '#3a8ab0', d: '#1a4a6a', k: '#0a1a2a', e: '#7affff' }, rows: [
-    '............', '........c...', '......c.cc.c', '.......ccccc', '........llll', '.......lllll', '.......lkkkk', '.......lkeek',
-    '.......lkkkk', '.....ccddlll', '...cclbdllcl', '..cllbdlccll', '.cllbbdlclwl', '.clbbdlccwwl', 'clbbddlcclll', 'clbd.dlcllcl',
-    'cbd..dlllcll', 'cb...dllllll', '.....dlll.ll', '.....dll..ll', '.....dll..ll', '....ddd..ddd', '............', '............'] };
-
-  // ---------------------------------------------------------------- TEMPIO DELLA LUCE
-  S.sentinella = { sym: true, pal: { y: '#ffe27a', o: '#d0a040', w: '#ffffff', c: '#fff6c8', e: '#ff4a4a', d: '#8a6a3a' }, rows: [
-    '........', '........', '......yy', '.....ycc', '....yccc', '....ccce', '....yccc', '.....ycc',
-    '......yy', '......oo', '.....ooo', '....dooo', '...ddddd', '........', '........', '........'] };
-  S.falena = { sym: true, pal: { y: '#fff3a0', o: '#e0b040', w: '#ffffff', b: '#8a6a3a', e: '#4a3aa0' }, rows: [
-    '........', '........', '........', 'yy......', 'yyyy..b.', 'yeyyy.b.', 'yyyyyob.', '.yyyyobb',
-    '..yywobb', '.yyyyobb', 'yeyyy.bb', 'yyyy...b', '.yy.....', '........', '........', '........'] };
-  S.paladino = { sym: true, pal: { s: '#b0b0bc', l: '#e8e8f0', g: '#ffd23a', d: '#5a5a6a', e: '#ff3a3a', v: '#7a3a9a' }, rows: [
-    '.....ggg', '....g...', '.....sss', '....slll', '....sdde', '....ssss', '.gg.vsll', 'gllgvsss',
-    'gllgvsls', 'glvgdsss', 'gllg.sss', '.gg..sds', '.....ss.', '.....ss.', '....dd..', '........'] };
-  S.prisma = { sym: true, pal: { c: '#ffe8a0', w: '#ffffff', p: '#ff9aff', b: '#7ad8ff', d: '#c09a3a', e: '#2a1a4a' }, rows: [
-    '........', '........', '.......w', '......cw', '.....ccp', '....cccb', '...ccebb', '..cccbbp',
-    '..ccbbpp', '...cbbpp', '....bbpd', '.....bdd', '......dd', '.......d', '........', '........'] };
-  S.scheggia = { sym: true, pal: { c: '#ffe8a0', w: '#ffffff', b: '#7ad8ff', d: '#c09a3a', e: '#2a1a4a' }, rows: [
-    '........', '........', '........', '........', '........', '........', '.......w', '......cw',
-    '.....ceb', '......bb', '.......d', '........', '........', '........', '........', '........'] };
-  S.pilone = { sym: true, pal: { c: '#fff6c8', y: '#ffe27a', w: '#ffffff', d: '#8a6a3a', o: '#d0a040' }, rows: [
-    '........', '.......w', '......wc', '......cc', '......cy', '.....ccy', '.....cyy', '.....cyy',
-    '.....cyo', '.....yyo', '.....yoo', '....dddd', '...doood', '...ddddd', '........', '........'] };
-  S.luxalion = { sym: true, size: 24, pal: { y: '#ffe27a', o: '#e0a030', w: '#ffffff', c: '#fff6c8', d: '#8a5a1a', e: '#ff3aff', v: '#9a3aa0' }, rows: [
-    '............', '.......y....', '....y..y..y.', '.....y.yy.yy', '......yyoooo', '....yyoooooo', '...yoooccccc', '...yoocceccc',
-    '...yoocccccd', '....yoocccvc', '.....oyycccc', '......yywyyy', '....ccyyyyvy', '...cwcyyyyyy', '...cccoyyyoy', '...cc.oyyyyy',
-    '......oyyyoy', '......oyy.yy', '......oyy.yy', '.....ooy..yy', '.....dd...dd', '............', '............', '............'] };
-
-  // ---------------------------------------------------------------- ALLEATI / SCENA
   S.fiore = { sym: true, pal: { p: '#ff7ab0', w: '#ffffff', y: '#ffe27a', g: '#3fa03a', l: '#7ad05a' }, rows: [
     '........', '........', '........', '........', '......pp', '....pppw', '....ppyy', '....ppyy',
     '.....ppp', '.......g', '.....l.g', '.....llg', '.......g', '......gg', '........', '........'] };
@@ -73,5 +56,11 @@
     12: { pal: { o: '#c09a3a', y: '#ffe27a' }, rows: deco({ 4: '.......o........', 5: '......oyo.......', 6: '.....oy.yo......', 7: '......oyo.......', 8: '.......o........' }) },
     13: { pal: { w: '#ffffff', s: '#d8e8f4' }, rows: deco({ 11: '...ww......w....', 12: '..wwss....wws...' }) },
     14: { pal: { y: '#fff3a0', w: '#ffffff' }, rows: deco({ 5: '....y...........', 9: '..........w.....', 12: '.....y......y...' }) },
+    // incudine delle forge di Roscamar
+    15: { pal: { l: '#9a9aa4', s: '#5a5a64', d: '#2a2a32' }, rows: deco({ 8: '...llllllll.....', 9: '....ssssssss....', 10: '......ssss......', 11: '.....ssssss.....', 12: '....dddddddd....' }) },
+    // funghi d'ombra di Oscuro Orizzonte
+    16: { pal: { p: '#7a4ab0', g: '#9ae07a', l: '#3a2a5a' }, rows: deco({ 10: '...p.......g....', 11: '..ppp.....ggg...', 12: '...l.......l....', 13: '...l..p....l....', 14: '.....ppp........' }) },
+    // la Porta Ultradimensionale dipinta sul suolo dell'arena di Obscurio
+    17: { pal: { v: '#b77cff', g: '#9ae07a', n: '#140a28' }, rows: deco({ 3: '......vvvv......', 4: '....vvnnnnvv....', 5: '...vnnnnnnnnv...', 6: '...vnngggnnnv...', 7: '..vnnggnnggnnv..', 8: '..vnngnnnngnnv..', 9: '..vnnggnnggnnv..', 10: '...vnngggnnnv...', 11: '...vnnnnnnnnv...', 12: '....vvnnnnvv....', 13: '......vvvv......' }) },
   });
 })();

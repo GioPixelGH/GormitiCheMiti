@@ -401,36 +401,44 @@
     G.log(text, 'boss'); G.fx.banner(sub || m.name, text); G.fx.shake(8); G.fx.sound('roar');
   }
 
-  // ---- Cerbante ----
-  AI.boss_cerbante = function (m) {
+  // ---- Aracno il Crudele ----
+  AI.boss_aracno = function (m) {
     const R = G.run, h = R.hero, d = dist(m, h);
-    bossInit(m, { breath: 3, howl: 6 });
+    bossInit(m, { acid: 2, web: 3, brood: 4, leap: 6 });
     const p2 = m.hp < m.maxHp * 0.5;
     if (p2 && !m.st.p2) {
       m.st.p2 = true; m.speed = 125;
-      phaseAnnounce(m, 'Cerbante è furioso! Le tre teste ruggiscono insieme.');
-      summon(m, 'lupo', 2, m.x, m.y, 2);
+      phaseAnnounce(m, 'Aracno tesse la Tela del Crudele: l\'arena si riempie di ragnatele!', 'Aracno — La Tela del Crudele');
+      G.spinWebs(m.x, m.y, 6, 0.2, 30);
+      summon(m, 'ragnetto', 2, m.x, m.y, 3);
       return;
     }
-    if (ready(m, 'breath') && d <= 5 && G.hasLOS(m.x, m.y, h.x, h.y)) {
-      const [dx, dy] = U.dirTo(m.x, m.y, h.x, h.y);
-      tele(m, SH.cone(m.x, m.y, dx, dy, 5), { dmg: [6, 9], elem: 'fuoco', fire: 3, status: 'burn', st: 3, sp: 2, color: '#ff6a2a', src: 'Soffio Infernale' }, { label: 'Soffio Infernale' });
-      G.log('Cerbante inspira profondamente... sta per sputare fuoco!', 'bad');
-      setCd(m, 'breath', p2 ? 4 : 5);
+    if (ready(m, 'web') && d <= 7 && G.hasLOS(m.x, m.y, h.x, h.y)) {
+      tele(m, SH.circle(h.x, h.y, 1), { k: 'web', dmg: [3, 5], elem: 'neutro', turns: 25, color: '#e8e8f0', src: 'Ragnatela' }, { label: 'Ragnatela' });
+      G.log('Aracno spruzza una ragnatela verso di te!', 'bad');
+      setCd(m, 'web', p2 ? 5 : 6);
       return;
     }
-    if (ready(m, 'howl') && countType('lupo') < 3) {
-      G.log('Cerbante ulula: il branco risponde!', 'bad'); G.fx.sound('roar'); G.fx.ring(m.x, m.y, 3, '#ff6a2a');
-      summon(m, 'lupo', 2, m.x, m.y, 3);
-      setCd(m, 'howl', 11);
+    if (ready(m, 'acid') && d >= 2 && d <= 6 && G.hasLOS(m.x, m.y, h.x, h.y)) {
+      tele(m, SH.circle(h.x, h.y, 1), { dmg: [5, 8], elem: 'neutro', status: 'vuln', st: 2, color: '#7aff4a', src: 'Sputo d\'Acido' }, { label: 'Sputo d\'Acido' });
+      G.log('Aracno sputa un acido che fonde qualsiasi cosa!', 'bad');
+      setCd(m, 'acid', p2 ? 3 : 4);
+      return;
+    }
+    if (ready(m, 'brood') && countType('ragnetto') < (p2 ? 3 : 2)) {
+      G.log('Dalle tele di Aracno scendono i suoi ragnetti!', 'bad');
+      summon(m, 'ragnetto', p2 ? 2 : 1, m.x, m.y, 2);
+      setCd(m, 'brood', 10);
+      return;
+    }
+    if (ready(m, 'leap') && d >= 3) {
+      tele(m, SH.circle(h.x, h.y, 1), { k: 'dive', center: [h.x, h.y], dmg: [6, 9], elem: 'fuoco', color: '#ff8a3a', src: 'Balzo dalle Pareti' }, { label: 'Balzo dalle Pareti' });
+      G.log('Aracno si arrampica sulle pareti... e ti piomba addosso!', 'bad');
+      setCd(m, 'leap', p2 ? 5 : 7);
       return;
     }
     const adj = adjacentHostile(m);
-    if (adj) {
-      G.attack(m, adj);
-      if (!adj.dead && rng().chance(p2 ? 0.4 : 0.2)) { G.attack(m, adj); }
-      return;
-    }
+    if (adj) { G.attack(m, adj); if (!adj.dead && rng().chance(0.2)) G.addStatus(adj, 'poison', 4, 2); return; }
     stepToward(m, h);
   };
 
@@ -515,8 +523,154 @@
     chase(m);
   };
 
+  // ---- Armageddon il Signore del Vulcano ----
+  AI.boss_armageddon = function (m) {
+    const R = G.run, h = R.hero, d = dist(m, h);
+    bossInit(m, { erupt: 2, quake: 4, minions: 3, devour: 4 });
+    const p2 = m.hp < m.maxHp * 0.5;
+    if (p2 && !m.st.p2) {
+      m.st.p2 = true; m.speed = 100;
+      phaseAnnounce(m, 'L\'aura nera di Armageddon si allarga: chi gli sta accanto si sente strappare la vita!', 'Armageddon — Aura Nera');
+      return;
+    }
+    // aura nera: ferisce chi gli resta accanto
+    if (p2 && d <= 1) {
+      G.dealDamage(m, h, 3, { pierce: true, dot: true, src: 'Aura Nera', color: '#b77cff' });
+      if (h.dead) return;
+    }
+    // divora un servitore vicino per assorbirne la potenza
+    if (ready(m, 'devour') && m.hp < m.maxHp * 0.85) {
+      const prey = R.ents.find(o => !o.dead && o !== m && o.kind === 'monster' && o.faction === m.faction && !o.flags.boss && dist(o, m) <= 3 && G.hasLOS(m.x, m.y, o.x, o.y));
+      if (prey) {
+        G.fx.bolt(prey.x, prey.y, m.x, m.y, '#ff3a1a');
+        G.kill(prey, null, { vanish: true, noXp: true, noDrop: true });
+        G.heal(m, m.maxHp * 0.08); G.addStatus(m, 'empower', 5);
+        G.fx.burst(m.x, m.y, '#ff3a1a', 20); G.fx.sound('roar');
+        G.log('Armageddon divora ' + prey.name + ' e ne assorbe la potenza!', 'bad');
+        G.hint('divora', 'Armageddon divora i suoi servitori per curarsi e diventare più forte: abbatti i Minatori prima che li afferri.');
+        setCd(m, 'devour', 8);
+        return;
+      }
+    }
+    if (ready(m, 'minions') && countType('minatore') < 3) {
+      G.log('Armageddon chiama i Minatori Maledetti dalle forge!', 'bad');
+      summon(m, 'minatore', 2, m.x, m.y, 3);
+      setCd(m, 'minions', 12);
+      return;
+    }
+    if (ready(m, 'erupt') && d <= 5 && G.hasLOS(m.x, m.y, h.x, h.y)) {
+      const [dx, dy] = U.dirTo(m.x, m.y, h.x, h.y);
+      tele(m, SH.cone(m.x, m.y, dx, dy, 5), { dmg: [9, 12], elem: 'fuoco', fire: 3, lava: p2, color: '#ff5a1a', src: 'Eruzione del Braccio' }, { label: 'Eruzione del Braccio' });
+      G.log('Il braccio di Armageddon si gonfia di fuoco: sta per eruttare!', 'bad');
+      setCd(m, 'erupt', p2 ? 4 : 5);
+      return;
+    }
+    if (ready(m, 'quake') && d <= 8) {
+      const centers = [[h.x, h.y]];
+      for (let k = 0; k < (p2 ? 4 : 2); k++) centers.push([h.x + rng().int(-4, 4), h.y + rng().int(-4, 4)]);
+      const tiles = [];
+      for (const [x, y] of centers) for (const p of SH.circle(x, y, 1)) if (!tiles.some(q => q[0] === p[0] && q[1] === p[1])) tiles.push(p);
+      tele(m, tiles, { k: 'crollo', dmg: [9, 13], elem: 'terra', boulders: centers.slice(1), turns: 14, color: '#c8a070', src: 'Crollo', shake: 9 }, { label: 'Crollo' });
+      G.log('Armageddon fa tremare la terra: la volta della caverna sta per crollare!', 'bad');
+      setCd(m, 'quake', p2 ? 4 : 5);
+      return;
+    }
+    chase(m);
+  };
+
   // funzioni condivise con i moduli dei nuovi mostri
   Object.assign(AI, { ready, setCd, dist, summon, countType, shoot, wander, chase, pickTarget, adjacentHostile, slamCheck, bossInit, phaseAnnounce, doMove });
+
+  // ---- ragnatele (Foresta Silente e Aracno) ----
+  const WEBBABLE = [T.FLOOR, T.GRASS, T.ASH, T.SAND, T.RUBBLE];
+  // tesse una ragnatela: turns = durata, 0 = permanente
+  G.makeWeb = function (x, y, turns) {
+    const R = G.run, t = G.tileAt(x, y);
+    if (!WEBBABLE.includes(t) || G.featureAt(x, y) || (R.map.stairs && U.cheb(R.map.stairs[0], R.map.stairs[1], x, y) <= 1)) return false;
+    G.setTile(x, y, T.WEB);
+    if (turns) R.tempTiles.push({ x, y, orig: t, tile: T.WEB, t: turns });
+    return true;
+  };
+  G.spinWebs = function (cx, cy, r, chance, turns) {
+    const R = G.run, h = R.hero;
+    for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) {
+      if (!G.inb(x, y) || U.cheb(x, y, h.x, h.y) <= 1 || !R.rng.chance(chance)) continue;
+      if (G.makeWeb(x, y, turns)) G.fx.burst(x, y, '#e8e8f0', 3);
+    }
+    R.distMapsDirty = true;
+  };
+  // chi la attraversa la strappa: torna il terreno di prima
+  G.breakWeb = function (x, y) {
+    const R = G.run;
+    if (G.tileAt(x, y) !== T.WEB) return;
+    const tt = (R.tempTiles || []).find(q => q.x === x && q.y === y && q.tile === T.WEB);
+    G.setTile(x, y, tt ? tt.orig : (G.biomeOf(R.floor).id === 'foresta' ? T.GRASS : T.FLOOR));
+    if (tt) R.tempTiles = R.tempTiles.filter(q => q !== tt);
+    R.distMapsDirty = true;
+  };
+  G.TELE_FN.web = function (owner, tiles, p) {
+    const R = G.run;
+    for (const [x, y] of tiles) {
+      G.fx.burst(x, y, '#e8e8f0', 5);
+      const e = G.entityAt(x, y);
+      if (e && !e.dead) {
+        if ((owner && !G.hostile(owner, e)) || e.flags.webWalk) continue;
+        G.dealDamage(owner && !owner.dead ? owner : null, e, R.rng.int(p.dmg[0], p.dmg[1]), { elem: p.elem, src: p.src });
+        if (!e.dead && !e.flags.fly) G.addStatus(e, 'root', 2);
+      } else G.makeWeb(x, y, p.turns || 25);
+    }
+    R.distMapsDirty = true;
+    G.fx.sound('trap');
+  };
+  // ---- il braccio vivo di Lavion: afferra la prima preda sulla linea e la trascina ----
+  G.TELE_FN.grab = function (owner, tiles, p) {
+    if (!owner || owner.dead) return;
+    for (const [x, y] of tiles) {
+      G.fx.burst(x, y, p.color || '#c0c0c8', 4);
+      const e = G.entityAt(x, y);
+      if (!e || e.dead || !G.hostile(owner, e)) continue;
+      G.dealDamage(owner, e, G.run.rng.int(p.dmg[0], p.dmg[1]), { elem: p.elem, src: p.src });
+      if (e.dead) break;
+      G.pull(owner, e, 6);
+      if (!e.dead && p.status) G.addStatus(e, p.status, p.st || 2);
+      break;
+    }
+    G.fx.sound('hit');
+  };
+  // ---- colate di lava (Lavion e la Pianura delle Nebbie): lava temporanea ----
+  const LAVABLE = [T.FLOOR, T.ASH, T.GRASS, T.SAND, T.RUBBLE];
+  G.TELE_FN.colata = function (owner, tiles, p) {
+    const R = G.run;
+    for (const [x, y] of tiles) {
+      G.fx.burst(x, y, '#ff6a1a', 6);
+      const e = G.entityAt(x, y);
+      if (e && !e.dead && !e.flags.fireImmune && !e.flags.fly && (!owner || G.hostile(owner, e))) {
+        G.dealDamage(owner && !owner.dead ? owner : null, e, R.rng.int(p.dmg[0], p.dmg[1]), { elem: p.elem, src: p.src });
+        if (!e.dead) G.addStatus(e, 'burn', 3, 2 + G.regionOf(R.floor));
+      }
+      const t = G.tileAt(x, y);
+      const nearPortal = (R.portals || []).some(q => U.cheb(q.x, q.y, x, y) <= 1) || (R.map.stairs && U.cheb(R.map.stairs[0], R.map.stairs[1], x, y) <= 1);
+      if (LAVABLE.includes(t) && !nearPortal && !G.entityAt(x, y) && !G.featureAt(x, y) && !R.items.some(i => i.x === x && i.y === y)) {
+        G.setTile(x, y, T.LAVA); R.tempTiles.push({ x, y, orig: t, tile: T.LAVA, t: p.turns || 10 });
+      }
+    }
+    R.distMapsDirty = true;
+    G.fx.shake(4); G.fx.sound('boom');
+  };
+  // ---- crolli (Armageddon e la Caverna di Roscamar): danni, detriti e massi temporanei ----
+  G.TELE_FN.crollo = function (owner, tiles, p) {
+    const R = G.run, h = R.hero;
+    G.TELE_FN.blast(owner, tiles, Object.assign({}, p, { sound: 'stone' }));
+    for (const [x, y] of tiles) if (G.tileAt(x, y) === T.FLOOR && R.rng.chance(0.5)) G.setTile(x, y, T.RUBBLE);
+    for (const [x, y] of p.boulders || []) {
+      const t = G.tileAt(x, y);
+      if ((t !== T.FLOOR && t !== T.RUBBLE && t !== T.ASH) || G.entityAt(x, y) || G.featureAt(x, y) || R.items.some(i => i.x === x && i.y === y)) continue;
+      if (U.cheb(x, y, h.x, h.y) <= 1 || (R.portals || []).some(q => U.cheb(q.x, q.y, x, y) <= 1) || (R.map.stairs && U.cheb(R.map.stairs[0], R.map.stairs[1], x, y) <= 1)) continue;
+      G.setTile(x, y, T.PILLAR); R.tempTiles.push({ x, y, orig: t, tile: T.PILLAR, t: p.turns || 14 });
+      G.fx.dust(x, y, 1);
+    }
+    R.distMapsDirty = true;
+  };
 
   // ---- Devilfenix ----
   G.TELE_FN.dive = function (owner, tiles, p) {

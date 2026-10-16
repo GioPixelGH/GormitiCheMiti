@@ -31,10 +31,6 @@
   S.treant = { sym: true, pal: { b: '#3a2a1e', n: '#5a4030', l: '#7a5a40', g: '#3a6a2a', v: '#8a3a9a', e: '#ff3a3a' }, rows: [
     '..n...n.', '..nn.nn.', '...nnnn.', '.n..nnnn', '.nn.bnnn', '..nnbnnl', '...bnnnl', '...bnenl',
     '...bnnvn', '.nnbbnvv', 'n..bnnnl', '...bnnll', '..gbnnnl', '..bb.bnn', '.bb..b.n', '........'] };
-  S.cerbante = { sym: true, size: 24, pal: { d: '#2a0808', b: '#6a1818', r: '#b0302a', o: '#ff8a2a', e: '#ffe27a', y: '#ffe27a', w: '#f0e8e0' }, rows: [
-    '............', '............', '.........r..', '.........rr.', '..r.....rrrr', '..rr....reyr', '.rrrr...rrrr', '.reyr...wrww',
-    '.rrrr.b..www', '.wrww.bb....', '..www.bbbbbb', '...bbbbbbrrb', '..bbbrrbbrrr', '.bbrrrrbrrrr', '.brrorrrrror', '.brrrrrrrrrr',
-    '.bbrrrrrrrrr', '..brrrrrrrbb', '..bbrb..bbb.', '..bbbb..bbb.', '..bb.b...bb.', '.dd.dd...dd.', '............', '............'] };
 
   // ---------------------------------------------------------------- MARE
   S.granchio = { sym: true, pal: { d: '#8a2a1a', r: '#d0502a', o: '#ff8a4a', w: '#ffe0c0', e: '#101010' }, rows: [
@@ -121,7 +117,6 @@
     '.......f', '......fy', '......yo', '.....rrr', '....rooo', '....rsss', '....rses', '....rsss',
     '...rrogo', '..rroogo', '.y.rooog', '.f.roooo', '...roooo', '..rrrooo', '..rrrrrr', '........'] };
   S.lavico = { base: 'lupo', pal: { d: '#3a1010', b: '#a02a1a', l: '#ff6a1a', w: '#ffc83a', e: '#ffe27a', k: '#120d18' } };
-  S.lavion = { base: 'golem', pal: { d: '#3a1010', s: '#6a2018', l: '#c04a1a', h: '#ff9a2a', g: '#ffc83a', e: '#ffffff' } };
   S.germoglio = { sym: true, pal: { g: '#3fa03a', l: '#8be06a', b: '#6a4a2a', n: '#9a6a3a', e: '#ffffff' }, rows: [
     '........', '........', '.....l..', '...lllg.', '..llglll', '..lglgll', '...gglgg', '.....bnn',
     '....bnen', '..l.bnnn', '..lbbnnb', '....bnnb', '....bnb.', '...bb.b.', '........', '........'] };

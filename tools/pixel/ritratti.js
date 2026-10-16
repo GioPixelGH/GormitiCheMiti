@@ -248,4 +248,67 @@ R.magor = () => {
   return { pal: { k: '#1a0a0a', d: '#3a1010', p: '#5a1a14', P: '#7a2a1a', o: '#ff6a1a', O: '#ffc04a', h: '#d8c8a8', H: '#a89878', e: '#ffe24a' }, t };
 };
 
+// =====================================================================================
+//  LE REGIONI DELL'ERA (Fase 3)
+// =====================================================================================
+// Aracno il Crudele: testa gialla con calotta rossa, fauci a tentacoli, braccia grigie a uncino
+R.aracno = () => {
+  const t = new Tela(48);
+  t.poligono([[19, 30], [C, 29], [C, 48], [20, 48]], 'r');
+  t.linea(18, 33, 7, 21, 'g', 2).linea(18, 34.4, 7.6, 23, 'h');
+  t.linea(7, 21, 5, 12, 'k', 2).linea(5, 12, 9, 7, 'k', 2).linea(9, 7, 10.6, 10, 'k');
+  t.linea(19, 40, 6, 41, 'g', 2).linea(19, 41.6, 6, 42.6, 'h');
+  t.linea(6, 41, 2.4, 45, 'k', 2).linea(2.4, 45, 4.6, 47, 'k');
+  t.luce({ g: ['G', ''] });
+  t.ellisse(C, 19, 8, 7, 'y').luce({ y: ['Y', 'o'] });
+  t.ellisse(C, 12.4, 8.6, 5, 'r');
+  t.rect(17, 17, 4, 2, 'k').px(18, 17, 'e');
+  for (const [x0, x1] of [[19, 17], [21, 20], [23, 23]]) t.linea(x0, 24, x1, 33, x0 === 23 ? 'Y' : 'y', 2);
+  t.luce({ r: ['R', 'd'] });
+  t.specchia();
+  t.punti([[29, 31], [30, 33], [29, 35], [30, 36], [28, 37]], 'v').px(29, 32, 'V');
+  return { pal: { r: '#d82a2a', R: '#ff5a4a', d: '#8a1414', y: '#ffd23a', Y: '#ffe88a', o: '#c89a18', g: '#c8c8d0', G: '#e8e8f0', h: '#8a8a94', k: '#2a2a34', e: '#ff3a3a', v: '#7aff4a', V: '#c8ffa0' }, t };
+};
+// Lavion il Signore del Terrore: elmo-cresta grigio a strisce gialle, maschera gialla, corazza gialla;
+// sulla spalla sinistra la creatura viva del suo braccio
+R.lavion = () => {
+  const t = new Tela(48);
+  t.ellisse(C, 47, 22, 13, 'r');
+  t.ellisse(C, 21, 8, 10, 'r');
+  t.luce({ r: ['R', 'd'] });
+  t.poligono([[17, 38], [C, 36], [C, 48], [18, 48]], 'y').luce({ y: ['Y', 'o'] });
+  t.poligono([[16, 15], [17, 8], [21, 5], [C, 4.4], [C, 13], [19, 14]], 'g').luce({ g: ['G', 'h'] });
+  t.rect(22, 3, 2, 12, 'y');
+  t.rect(18, 19, 3, 2, 'k').px(19, 19, 'e');
+  t.poligono([[17.4, 24], [C, 23.4], [C, 31], [19.4, 30]], 'y');
+  t.linea(19.4, 27, C, 27, 'o');
+  t.specchia();
+  // la creatura viva sulla spalla sinistra
+  t.linea(5, 48, 7, 38, 'g', 3);
+  t.ellisse(9.6, 33, 6.2, 5, 'g');
+  t.luce({ g: ['G', 'h'] });
+  t.linea(14, 34, 20, 38.6, 'g').linea(14.6, 36, 19, 42, 'g').linea(13, 37.4, 15, 44, 'g').linea(14, 31.6, 20, 34.6, 'g');
+  t.ellisse(8.4, 32, 1.8, 1.8, 'k').px(8, 31, 'G');
+  t.punti([[6, 41], [7, 44], [5, 46]], 'b');
+  return { pal: { r: '#d8281e', R: '#ff5a40', d: '#8a1410', y: '#ffd23a', Y: '#fff09a', o: '#c89a18', g: '#b8bcb8', G: '#e0e4e0', h: '#7a807a', k: '#1a1a1a', b: '#3a3a3a', e: '#ffe27a' }, t };
+};
+// Armageddon il Signore del Vulcano: enorme testa-cupola a creste, fauci oscure e spine nere,
+// corpo nero, il braccio destro gigantesco
+R.armageddon = () => {
+  const t = new Tela(48);
+  t.ellisse(C, 46, 15, 9, 'n').luce({ n: ['N', ''] });
+  t.ellisse(5, 41, 5, 8, 'r').luce({ r: ['R', 'd'] });
+  t.poligono([[20, 38], [C, 37], [C, 48], [21, 48]], 'r');
+  t.ellisse(C, 17, 16, 13, 'r').luce({ r: ['R', 'd'] });
+  for (const x0 of [12, 17]) t.linea(x0, 6, x0 - 2, 24, 'd');
+  t.linea(22, 4, 22, 25, 'd');
+  t.ellisse(C, 28, 11, 4.4, 'k');
+  for (const [x, y] of [[15, 27], [18, 29], [21, 29.6]]) t.poligono([[x - 1, y], [x + 1, y], [x, y + 3]], 'n');
+  for (const [x, y] of [[8, 25], [6, 30], [10, 32], [4, 35], [13, 33]]) t.poligono([[x - 1.6, y], [x + 1.6, y], [x - 2.6, y + 4]], 'n');
+  t.specchia();
+  t.ellisse(42, 41, 7, 9, 'r').luce({ r: ['R', 'd'] });
+  for (const [x, y] of [[40, 36], [43, 39], [40, 42], [44, 44], [41, 46]]) t.linea(x, y, x + 2, y + 1, 'd');
+  return { pal: { r: '#c8281e', R: '#ee4a3a', d: '#7a1410', n: '#1a1418', N: '#3a3238', k: '#0e0a0c' }, t };
+};
+
 module.exports = R;

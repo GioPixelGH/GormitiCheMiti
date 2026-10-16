@@ -165,10 +165,7 @@ function botAct() {
     for (const [dx, dy] of dirs) { const x = h.x + dx, y = h.y + dy; if (G.canEnter(h, x, y) && !G.teleAt(x, y) && !G.isHazardFor(h, x, y)) { return G.endTurn(G.act.move(dx, dy)); } }
   }
   const enemies = G.visibleEnemies();
-  let n = nearestEnemy(h);
-  // come farebbe un giocatore: prima i piloni che curano il boss (anche se fuori vista, se ne ricorda)
-  const pyl = R.ents.filter(e => !e.dead && e.type === 'pilone').sort((a, b) => U.cheb(a.x, a.y, h.x, h.y) - U.cheb(b.x, b.y, h.x, h.y));
-  if (pyl.length && !(n && U.cheb(n.x, n.y, h.x, h.y) <= 1 && n.type !== 'pilone' && h.hp < h.maxHp * 0.3)) n = pyl[0];
+  const n = nearestEnemy(h);
   if (n) {
     if (n.flags.boss) for (let i = 0; i < 6; i++) { const s = h.items[i]; if (s && s.id === 'bomba' && U.cheb(n.x, n.y, h.x, h.y) <= 6 && U.cheb(n.x, n.y, h.x, h.y) >= 2) return G.endTurn(G.act.item(i, [n.x, n.y])); }
     const c = trySkills(h, enemies, n);

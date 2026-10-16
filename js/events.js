@@ -4,7 +4,7 @@
 // ============================================================
 (function () {
   const U = G.U;
-  const PEOPLE = { foresta: 'della Foresta', mare: 'del Mare', ghiaccio: 'dei Ghiacci', roscamar: 'della Terra', cieli: 'dell\'Aria', luce: 'della Luce', vulcano: 'del Fuoco' };
+  const PEOPLE = { foresta: 'della Foresta', mare: 'del Mare', nebbie: 'della Terra', roscamar: 'della Terra', cieli: 'dell\'Aria', orizzonte: 'della Luce', vulcano: 'del Fuoco' };
   const people = () => PEOPLE[G.biomeOf(G.run.floor).id] || 'di Gorm';
   const reg = () => G.regionOf(G.run.floor);
   const hasItem = (h, id) => h.items.findIndex(s => s && s.id === id);

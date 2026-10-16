@@ -16,8 +16,8 @@
     roscamar: { grass: ['#3a4a2a', '#4a5a30', '#5a7040', '#708a50'], sand: '#7a6a50', water: '#2a5a7a', deep: '#14304a', chasm: 'void' },
     cieli: { grass: ['#4a6a4a', '#5a8a5a', '#7ab07a', '#a0d0a0'], sand: '#a09a8a', water: '#4a8ac0', deep: '#2a5a9a', chasm: 'sky' },
     vulcano: { grass: ['#4a3a2a', '#5a4a30', '#6a5a3a', '#7a6a4a'], sand: '#5a4a40', water: '#3a5a6a', deep: '#1a2a3a', chasm: 'void' },
-    ghiaccio: { grass: ['#8aa0b4', '#9ab4c8', '#b4cadc', '#d8e8f4'], sand: '#c8d8e4', water: '#5a9ac8', deep: '#2a5a8a', chasm: 'void', snow: true },
-    luce: { grass: ['#8a7a4a', '#a08a50', '#c0a860', '#e0c870'], sand: '#c8b080', water: '#6ab0d0', deep: '#2a6a9a', chasm: 'sky', mosaic: true },
+    nebbie: { grass: ['#4a4a3a', '#58583f', '#6a6a4a', '#82805a'], sand: '#5a5650', water: '#4a5a60', deep: '#2a3438', chasm: 'void' },
+    orizzonte: { grass: ['#1c1a38', '#262248', '#322c5c', '#4a3a7a'], sand: '#2c2644', water: '#3a2a6a', deep: '#1a1040', chasm: 'abyss', crystal: ['#fff3a0', '#ffffff', '#e0b84a'] },
   };
 
   G.buildTileset = function (biome) {
@@ -99,10 +99,12 @@
       }
       rect(ctx, 0, 15, TS, 1, shade(F, -0.5));
     });
-    set.crystalTop = variants(2, (ctx, v) => { wallTopFn(ctx, v); for (let i = 0; i < 3; i++) { const x = (r() * 12 + 2) | 0, y = (r() * 10 + 3) | 0; rect(ctx, x, y, 2, 3, '#7ad8ff'); px(ctx, x, y, '#e0f8ff'); } });
+    // cristalli: azzurri di solito, di luce dorata nella Regione di Oscuro Orizzonte
+    const CR = X.crystal || ['#7ad8ff', '#e0f8ff', '#4ab0e0'];
+    set.crystalTop = variants(2, (ctx, v) => { wallTopFn(ctx, v); for (let i = 0; i < 3; i++) { const x = (r() * 12 + 2) | 0, y = (r() * 10 + 3) | 0; rect(ctx, x, y, 2, 3, CR[0]); px(ctx, x, y, CR[1]); } });
     set.crystalFace = variants(2, (ctx, v) => {
       set.wallFace[v].getContext && ctx.drawImage(set.wallFace[v], 0, 0);
-      for (let i = 0; i < 3; i++) { const x = 2 + i * 5, h = 5 + ((r() * 4) | 0); rect(ctx, x, 15 - h, 3, h, '#4ab0e0'); rect(ctx, x + 1, 15 - h, 1, h, '#a8ecff'); px(ctx, x + 1, 15 - h - 1, '#ffffff'); }
+      for (let i = 0; i < 3; i++) { const x = 2 + i * 5, h = 5 + ((r() * 4) | 0); rect(ctx, x, 15 - h, 3, h, CR[2]); rect(ctx, x + 1, 15 - h, 1, h, CR[0]); px(ctx, x + 1, 15 - h - 1, '#ffffff'); }
     });
     set.pillar = variants(1, (ctx) => {
       rect(ctx, 3, 1, 10, 3, shade(C.wallTop, 0.2));
@@ -142,6 +144,10 @@
         const g = ctx.createLinearGradient(0, 0, 0, TS); g.addColorStop(0, '#6a8ab8'); g.addColorStop(1, '#8aaad0');
         ctx.fillStyle = g; ctx.fillRect(0, 0, TS, TS);
         for (let i = 0; i < 3; i++) { const x = ((r() * 16) + f * 2) % 16, y = r() * 14; ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.fillRect(x | 0, y | 0, 5, 2); ctx.fillRect((x | 0) + 1, (y | 0) - 1, 3, 1); }
+      } else if (X.chasm === 'abyss') { // l'abisso ultradimensionale: viola profondo e stelle lontane
+        rect(ctx, 0, 0, TS, TS, '#0a0418');
+        for (let i = 0; i < 4; i++) px(ctx, (r() * TS) | 0, (r() * TS) | 0, (i + f) % 3 === 0 ? '#b77cff' : '#3a2060');
+        if (f === 1) px(ctx, (r() * TS) | 0, (r() * TS) | 0, '#9ae07a');
       } else {
         rect(ctx, 0, 0, TS, TS, '#05040a');
         for (let i = 0; i < 2; i++) px(ctx, (r() * TS) | 0, (r() * TS) | 0, f === i ? '#6a5a9a' : '#2a2040');
@@ -182,6 +188,16 @@
       for (let k = 0; k < 2; k++) { const x = (r() * 10) | 0, y = (r() * 12 + 2) | 0; for (let j = 0; j < 5; j++) px(ctx, x + j, y - (j >> 1), '#ffffff'); }
       if (v === 1) { let x = (r() * 8 + 4) | 0, y = 3; for (let k = 0; k < 8; k++) { px(ctx, x, y, '#7ab0d0'); x += r() < 0.5 ? 1 : -1; y++; } }
       rect(ctx, 0, 15, TS, 1, '#8ac0e0');
+    });
+    // ---- ragnatele (disegnate sopra il terreno) ----
+    set.web = variants(2, (ctx, v) => {
+      ctx.strokeStyle = 'rgba(236,236,244,0.75)'; ctx.lineWidth = 1;
+      const cx = 8 + (v ? 1 : -1), cy = 8 + (v ? -1 : 1);
+      ctx.beginPath();
+      for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4 + v * 0.3; ctx.moveTo(cx + 0.5, cy + 0.5); ctx.lineTo(cx + 0.5 + Math.cos(a) * 9, cy + 0.5 + Math.sin(a) * 9); }
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(236,236,244,0.55)';
+      for (const rr of [2.5, 5, 7.5]) { ctx.beginPath(); for (let k = 0; k <= 8; k++) { const a = k * Math.PI / 4 + v * 0.3, x = cx + 0.5 + Math.cos(a) * rr, y = cy + 0.5 + Math.sin(a) * rr; if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y); } ctx.stroke(); }
     });
     // ---- muri incrinati ----
     const crack = (ctx) => {

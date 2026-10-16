@@ -137,6 +137,8 @@ Sono gli stessi personaggi della Terza Serie nei **popoli evoluti**, cioè Diama
 | 4b | Tempio della Luce Infranta ⚠️ → **Regione di Oscuro Orizzonte** | Luxalion ⚠️ → **Obscurio il Signore delle Tenebre** | Terza Serie |
 | 5 | Monte Vulcano (resta) | Magmion il Signore del Male + Magor ✅ | Prima Serie |
 
+Realizzato nella v1.5.0 (Fase 3 del piano): tutte le regioni e i boss di questa tabella. Nel Monte Vulcano l'élite Lavion è stata sostituita da Il Mastodontico.
+
 ### Nemici: i guerrieri veri dell'era
 - Foresta (avanguardia di Magmion): Insecticus · Lo Strappapensieri · L'Anonimo Multiforme · Il Guardiano Urlante
 - Fossa (esercito di Orrore Profondo): Geyser l'Iroso · L'Incandescente Fantasma · Lamacciaio il Tagliagole · Il Misterioso Cavaliere · Incubo di Fuoco · Bombos Potenza di Fuoco

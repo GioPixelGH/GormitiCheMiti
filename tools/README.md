@@ -18,6 +18,7 @@ Riferimenti (30 partite per eroe, margine circa ±17 punti):
 - v1.2.2: 70% di vittorie complessive (Noctis 37%, Poivrons 93%, gli altri tra 53% e 87%).
 - v1.3.0: 67% (Barbataus 40%, Noctis 43%, Tasarau 57%, Carrapax 90%, Poivrons 87%). Orrore Profondo ora è di Fuoco e penalizza gli eroi della Foresta.
 - v1.4.0: identica alla v1.3.0 (la fase ha cambiato solo la grafica).
+- v1.5.0: 68% (Noctis 20%, Tasarau 43%, Elios 43%, Poivrons 97%, Carrapax 97%). Nuove regioni e boss: Aracno, Lavion, Armageddon; Obscurio spostato in Oscuro Orizzonte.
 
 ## Batteria completa
 

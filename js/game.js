@@ -181,6 +181,11 @@
         if (!e.dead) G.addStatus(e, 'burn', 3, 2 + G.regionOf(R.floor));
         if (e.kind === 'hero') G.log('La lava ti ustiona!', 'bad');
       } else if (t === T.CHASM) { G.fall(e); return; }
+      else if (t === T.WEB && !e.flags.webWalk) {
+        G.breakWeb(e.x, e.y);
+        G.addStatus(e, 'root', 2);
+        if (e.kind === 'hero') { G.log('Resti invischiato nella ragnatela!', 'bad'); G.hint('web', 'Le ragnatele ti invischiano per un turno quando le attraversi (puoi comunque attaccare). Il fuoco le brucia.'); }
+      }
       const trap = G.trapAt(e.x, e.y);
       if (trap) G.triggerTrap(trap, e);
     }
@@ -430,6 +435,12 @@
     opts = opts || {};
     const R = G.run;
     if (!tgt || tgt.dead) return 0;
+    // chi legge nel pensiero (Aracno) a volte prevede le abilità dell'eroe e le schiva
+    if (tgt.flags.mindRead && src && src.kind === 'hero' && G._inSkill && !opts.dot && R.rng.chance(tgt.flags.mindRead)) {
+      G.fx.float(tgt.x, tgt.y, 'previsto!', '#9ae07a', { small: true });
+      G.hint('mindread', 'Aracno legge nel pensiero: a volte prevede le tue abilità e le schiva. I colpi normali non riesce a prevederli!');
+      return 0;
+    }
     let dmg = base;
     const hero = R.hero;
     const elem = opts.elem || (src ? src.elem : null);
@@ -832,6 +843,7 @@
     tele:   { name: 'Runa del vento', color: '#b08aff', desc: 'Teletrasporta in un punto a caso.' },
     allarme:{ name: 'Corno d\'allarme', color: '#ffd23a', desc: 'Sveglia tutti i nemici del piano.' },
     gelo:   { name: 'Runa di gelo', color: '#bff4ff', desc: 'Congela chi si trova vicino.' },
+    crollo: { name: 'Volta instabile', color: '#c8a070', desc: 'La volta della caverna crolla su chi passa: danni e stordimento.' },
   };
   G.triggerTrap = function (trap, e) {
     const R = G.run, reg = G.regionOf(R.floor), info = G.TRAPS[trap.type];
@@ -865,6 +877,13 @@
       case 'gelo':
         for (const o of R.ents) if (!o.dead && U.cheb(o.x, o.y, e.x, e.y) <= 1) G.addStatus(o, 'freeze', 2);
         G.fx.burst(e.x, e.y, '#bff4ff', 24);
+        break;
+      case 'crollo':
+        G.dealDamage(null, e, 5 + reg * 3, { pierce: true, src: 'trappola' });
+        if (!e.dead) G.addStatus(e, 'stun', 1);
+        for (const [dx, dy] of U.DIRS8) if (G.tileAt(e.x + dx, e.y + dy) === T.FLOOR && R.rng.chance(0.5)) G.setTile(e.x + dx, e.y + dy, T.RUBBLE);
+        G.fx.dust(e.x, e.y, 1); G.fx.shake(6); G.fx.sound('stone');
+        trap.gone = true;
         break;
     }
   };
@@ -1034,17 +1053,31 @@
     if (h.status.blind) r = Math.min(r, 1);
     return Math.max(1, r);
   };
+  // caselle illuminate nelle regioni buie: cristalli, portali, lava e fuochi rischiarano i dintorni
+  G.LIGHTS = { [T.CRYSTAL]: 3, [T.STAIRS]: 2, [T.LAVA]: 1 };
+  G.lightMap = function () {
+    const R = G.run, m = R.map, lit = new Uint8Array(m.w * m.h);
+    const opaque = (x, y) => G.isOpaque(x, y);
+    const mark = (x, y) => { if (x >= 0 && y >= 0 && x < m.w && y < m.h) lit[y * m.w + x] = 1; };
+    for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) {
+      const i = y * m.w + x, r = G.LIGHTS[m.t[i]] || (m.fire[i] ? 1 : 0);
+      if (r) G.shadowcast(x, y, r, opaque, mark);
+    }
+    return lit;
+  };
   G.computeFOV = function () {
     const R = G.run, m = R.map, h = R.hero;
     if (!R.vis || R.vis.length !== m.w * m.h) R.vis = new Uint8Array(m.w * m.h);
     R.vis.fill(0);
     const r = G.heroSight(h);
-    G.shadowcast(h.x, h.y, r, (x, y) => G.isOpaque(x, y), (x, y) => {
+    // nel buio vedi vicino a te e, più lontano, solo le caselle illuminate in linea di vista
+    const lit = G.biomeOf(R.floor).dark ? G.lightMap() : null, r2 = r * r + r;
+    G.shadowcast(h.x, h.y, lit ? Math.max(r, 12) : r, (x, y) => G.isOpaque(x, y), (x, y) => {
       if (x < 0 || y < 0 || x >= m.w || y >= m.h) return;
       const i = y * m.w + x;
+      if (lit && !lit[i]) { const dx = x - h.x, dy = y - h.y; if (dx * dx + dy * dy > r2) return; }
       R.vis[i] = 1; m.seen[i] = 1;
     });
-    // le fonti luminose rivelano caselle già in linea di vista entro raggio maggiore (lava, cristalli)
   };
 
   // ---------------- Mappe di distanza per l'IA ----------------
@@ -1153,6 +1186,8 @@
     R.turn++;
     G.updateFire();
     G.resolveTelegraphs();
+    const tick = G.REGION_TICK && G.REGION_TICK[G.biomeOf(R.floor).id];
+    if (tick) tick(R);
     if (R.tempTiles && R.tempTiles.length) {
       for (const tt of R.tempTiles) { tt.t--; if (tt.t <= 0 && G.tileAt(tt.x, tt.y) === tt.tile) { G.setTile(tt.x, tt.y, tt.orig); G.fx.dust(tt.x, tt.y, 0); } }
       R.tempTiles = R.tempTiles.filter(tt => tt.t > 0);

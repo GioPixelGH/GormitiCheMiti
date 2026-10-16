@@ -233,6 +233,8 @@
         }
         for (const [x, y] of floorCells) if (rng.chance(0.06) && openAround(x, y) && get(m, x, y) !== T.TALL) set(m, x, y, T.TREE);
         pools(m, rng, 2, T.SHALLOW, T.SHALLOW);
+        // le tele dei ragni di Aracno, tese tra gli alberi
+        webs(m, rng, rng.int(2, 4));
         sprinkle(m, rng, [T.FLOOR, T.GRASS], [[2, 6], [3, 3], [10, 3], [4, 1], [1, 4]], 0.09);
         break;
       case 'mare':
@@ -246,6 +248,8 @@
           if (t !== T.FLOOR && t !== T.SAND) continue;
           for (const [dx, dy] of U.DIRS8) if (get(m, x + dx, y + dy) === T.DEEP) { set(m, x, y, T.SHALLOW); break; }
         }
+        // l'abisso vulcanico: sfiatatoi di lava sul fondo della Fossa
+        if (rng.chance(0.75)) pools(m, rng, rng.int(1, 2), T.LAVA, T.ASH);
         sprinkle(m, rng, [T.FLOOR, T.SAND], [[5, 5], [6, 4], [1, 3], [4, 1]], 0.08);
         break;
       case 'roscamar':
@@ -261,35 +265,38 @@
           for (let x = r.x - 1; x <= r.x + r.w; x++) for (const y of [r.y - 1, r.y + r.h]) tryDoor(m, x, y, rng);
           for (let y = r.y - 1; y <= r.y + r.h; y++) for (const x of [r.x - 1, r.x + r.w]) tryDoor(m, x, y, rng);
         }
+        // le forge di Magor: braci di lava e incudini al centro di alcune sale
+        if (m.rooms) for (const r of rng.shuffle(m.rooms.slice()).slice(0, 3)) {
+          if (r.w < 6 || r.h < 5 || !rng.chance(0.6) || get(m, r.cx, r.cy) !== T.FLOOR) continue;
+          set(m, r.cx, r.cy, T.LAVA);
+          for (const [dx, dy] of U.DIRS8) if (get(m, r.cx + dx, r.cy + dy) === T.FLOOR) set(m, r.cx + dx, r.cy + dy, T.ASH);
+          if (get(m, r.cx + 2, r.cy) === T.FLOOR) m.deco[I(m, r.cx + 2, r.cy)] = 15;
+        }
         sprinkle(m, rng, [T.FLOOR, T.RUBBLE], [[4, 4], [11, 2], [7, 3], [1, 5], [3, 2]], 0.07);
         break;
       case 'cieli':
         for (const [x, y] of floorCells) if (nz[I(m, x, y)] > 0.55) set(m, x, y, T.GRASS);
         sprinkle(m, rng, [T.FLOOR, T.GRASS], [[8, 4], [1, 4], [2, 2], [4, 1]], 0.06);
         break;
-      case 'ghiaccio':
-        // lastre di ghiaccio (rallentano) e pozze gelide
-        for (const [x, y] of floorCells) { const n = nz[I(m, x, y)]; if (n > 0.56) set(m, x, y, T.ICE); }
-        pools(m, rng, 2, T.DEEP, T.ICE);
+      case 'nebbie':
+        // pianura di cenere ed erba secca, speroni di roccia e fiumi di lava sotto la bruma
+        for (const [x, y] of floorCells) { const n = nz[I(m, x, y)], n2 = nz2[I(m, x, y)]; if (n2 > 0.6) set(m, x, y, T.ASH); else if (n > 0.58) set(m, x, y, T.GRASS); }
+        for (const [x, y] of floorCells) if (get(m, x, y) === T.FLOOR && rng.chance(0.02) && openAround(x, y)) set(m, x, y, T.PILLAR);
+        for (let r = rng.int(1, 2); r > 0; r--) lavaRiver(m, rng);
+        pools(m, rng, 2, T.LAVA, T.ASH);
+        sprinkle(m, rng, [T.FLOOR, T.ASH, T.GRASS], [[1, 4], [9, 3], [11, 1], [10, 2]], 0.07);
+        break;
+      case 'orizzonte':
+        // altopiano d'ombra: muschio scuro, abissi senza fondo e cristalli di luce
+        for (const [x, y] of floorCells) if (nz[I(m, x, y)] > 0.6) set(m, x, y, T.GRASS);
+        for (let y = 2; y < H - 2; y++) for (let x = 2; x < W - 2; x++) if (nz2[I(m, x, y)] > 0.74 && openAround(x, y)) m.t[I(m, x, y)] = T.CHASM;
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
           if (get(m, x, y) !== T.WALL) continue;
-          let adj = false; for (const [dx, dy] of U.DIRS4) if (G.TILE[get(m, x + dx, y + dy)].walk) adj = true;
-          if (adj && nz2[I(m, x, y)] > 0.78 && rng.chance(0.5)) m.t[I(m, x, y)] = T.CRYSTAL;
+          let adj = false; for (const [dx, dy] of U.DIRS4) { const t = get(m, x + dx, y + dy); if (G.TILE[t].walk && t !== T.CHASM) adj = true; }
+          if (adj && rng.chance(0.05)) m.t[I(m, x, y)] = T.CRYSTAL;
         }
-        sprinkle(m, rng, [T.FLOOR], [[7, 4], [1, 4], [4, 1], [13, 3]], 0.07);
-        break;
-      case 'luce':
-        // colonne di cristallo simmetriche nelle sale e mosaici dorati
-        if (m.rooms) for (const r of m.rooms) {
-          if (r.w >= 7 && r.h >= 5 && rng.chance(0.7)) for (const [px, py] of [[r.x + 1, r.y + 1], [r.x + r.w - 2, r.y + 1], [r.x + 1, r.y + r.h - 2], [r.x + r.w - 2, r.y + r.h - 2]]) if (get(m, px, py) === T.FLOOR) set(m, px, py, T.CRYSTAL);
-          if (rng.chance(0.5)) for (let x = r.x + 2; x < r.x + r.w - 2; x++) if (get(m, x, r.cy) === T.FLOOR) m.deco[I(m, x, r.cy)] = 12;
-        }
-        for (const [x, y] of floorCells) if (nz[I(m, x, y)] > 0.72 && get(m, x, y) === T.FLOOR) set(m, x, y, T.RUBBLE);
-        if (m.rooms) for (const r of m.rooms) {
-          for (let x = r.x - 1; x <= r.x + r.w; x++) for (const y of [r.y - 1, r.y + r.h]) tryDoor(m, x, y, rng);
-          for (let y = r.y - 1; y <= r.y + r.h; y++) for (const x of [r.x - 1, r.x + r.w]) tryDoor(m, x, y, rng);
-        }
-        sprinkle(m, rng, [T.FLOOR, T.RUBBLE], [[7, 4], [14, 3], [1, 2]], 0.06);
+        for (const [x, y] of floorCells) if (get(m, x, y) !== T.CHASM && rng.chance(0.012) && openAround(x, y)) set(m, x, y, T.CRYSTAL);
+        sprinkle(m, rng, [T.FLOOR, T.GRASS], [[16, 3], [1, 3], [8, 2]], 0.06);
         break;
       case 'vulcano':
         for (const [x, y] of floorCells) set(m, x, y, nz2[I(m, x, y)] > 0.55 ? T.ASH : T.FLOOR);
@@ -320,6 +327,21 @@
       }
     }
   }
+  // gruppi di ragnatele vicino ad alberi e pareti
+  function webs(m, rng, n) {
+    for (let k = 0, guard = 0; k < n && guard < 200; guard++) {
+      const cx = rng.int(3, m.w - 4), cy = rng.int(3, m.h - 4);
+      const t = get(m, cx, cy);
+      if (t !== T.FLOOR && t !== T.GRASS) continue;
+      let near = false; for (const [dx, dy] of U.DIRS8) { const u = get(m, cx + dx, cy + dy); if (u === T.TREE || u === T.WALL) near = true; }
+      if (!near) continue;
+      for (let y = cy - 2; y <= cy + 2; y++) for (let x = cx - 2; x <= cx + 2; x++) {
+        const u = get(m, x, y);
+        if ((u === T.FLOOR || u === T.GRASS) && Math.hypot(x - cx, y - cy) <= 2.2 && rng.chance(0.45)) set(m, x, y, T.WEB);
+      }
+      k++;
+    }
+  }
   function lavaRiver(m, rng) {
     const horiz = rng.chance(0.5);
     let x = horiz ? 1 : rng.int(8, m.w - 9), y = horiz ? rng.int(6, m.h - 7) : 1;
@@ -347,7 +369,7 @@
     const cells = [];
     for (let y = 1; y < m.h - 1; y++) for (let x = 1; x < m.w - 1; x++) {
       const t = get(m, x, y);
-      if (pass(x, y) && t !== T.SHALLOW && t !== T.DOOR && t !== T.TALL) cells.push([x, y]);
+      if (pass(x, y) && t !== T.SHALLOW && t !== T.DOOR && t !== T.TALL && t !== T.WEB) cells.push([x, y]);
     }
     const start = rng.pick(cells);
     const dist = G.dijkstra(m.w, m.h, [[start[0], start[1], 0]], (x, y) => pass(x, y) ? 1 : Infinity);
@@ -373,8 +395,8 @@
       case 'rooms': m = genRooms(W, H, rng, { maxRooms: 15 }); break;
       case 'islands': m = genIslands(W, H, rng); break;
       case 'volcano': m = rng.chance(0.5) ? genCaves(W, H, rng, 0.46) : genRooms(W, H, rng, { maxRooms: 12, wide: true }); break;
-      case 'glacier': m = genCaves(W, H, rng, 0.44); break;
-      case 'temple': m = genRooms(W, H, rng, { maxRooms: 13 }); break;
+      case 'plains': m = genCaves(W, H, rng, 0.40); break;
+      case 'rifts': m = genCaves(W, H, rng, 0.45); break;
     }
     decorate(m, biome, rng);
     ensureConnected(m, rng);
@@ -443,19 +465,36 @@
       case 'foresta':
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR) set(m, x, y, nz[I(m, x, y)] > 0.62 ? T.TALL : T.GRASS);
         for (const [x, y] of pillars) set(m, x, y, T.TREE);
+        // le tele di Aracno tra gli alberi dell'arena
+        for (const [px, py] of [[cx - 9, cy - 2], [cx + 9, cy - 2], [cx - 4, cy - 8], [cx + 4, cy - 8], [cx - 10, cy + 4], [cx + 10, cy + 4]]) {
+          for (let y = py - 1; y <= py + 1; y++) for (let x = px - 1; x <= px + 1; x++) { const t = get(m, x, y); if ((t === T.GRASS || t === T.TALL) && rng.chance(0.6)) set(m, x, y, T.WEB); }
+        }
         break;
       case 'mare':
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR) set(m, x, y, T.SAND);
-        for (const [px, py] of [[cx - 8, cy], [cx + 8, cy], [cx, cy - 7]]) {
+        // due pozze d'acqua e, alle spalle di Orrore Profondo, uno sfiatatoio di lava dell'abisso
+        for (const [px, py, hot] of [[cx - 8, cy, false], [cx + 8, cy, false], [cx, cy - 7, true]]) {
           for (let y = py - 2; y <= py + 2; y++) for (let x = px - 2; x <= px + 2; x++) {
             const d = Math.hypot(x - px, y - py);
             if (get(m, x, y) === T.WALL) continue;
-            set(m, x, y, d <= 1.5 ? T.DEEP : T.SHALLOW);
+            if (hot) { if (d <= 1.2) set(m, x, y, T.LAVA); else if (d <= 2.3) set(m, x, y, T.ASH); }
+            else set(m, x, y, d <= 1.5 ? T.DEEP : T.SHALLOW);
           }
         }
         break;
+      case 'nebbie':
+        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR) set(m, x, y, nz[I(m, x, y)] > 0.6 ? T.ASH : T.FLOOR);
+        // due colate di lava ai lati dell'arena e speroni di roccia
+        for (const s of [-1, 1]) for (let k = -4; k <= 3; k++) { const x = cx + s * (10 + Math.round(Math.sin(k * 0.9))), y = cy + k; if (get(m, x, y) !== T.WALL) set(m, x, y, T.LAVA); }
+        for (const [x, y] of pillars) set(m, x, y, T.PILLAR);
+        break;
       case 'roscamar':
-        for (const [x, y] of pillars) set(m, x, y, T.CRYSTAL);
+        // le forge di Armageddon: quattro bracieri di lava con incudini, e cristalli nelle pareti
+        for (const [x, y] of pillars) {
+          set(m, x, y, T.LAVA);
+          for (const [dx, dy] of U.DIRS4) if (get(m, x + dx, y + dy) === T.FLOOR) set(m, x + dx, y + dy, T.ASH);
+          if (get(m, x + (x < cx ? 2 : -2), y) === T.FLOOR) m.deco[I(m, x + (x < cx ? 2 : -2), y)] = 15;
+        }
         for (const [x, y] of [[cx - 3, cy - 7], [cx + 3, cy - 7], [cx - 10, cy], [cx + 10, cy]]) set(m, x, y, T.CRYSTAL);
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR && nz[I(m, x, y)] > 0.7) set(m, x, y, T.RUBBLE);
         break;
@@ -469,13 +508,12 @@
         }
         for (const [x, y] of pillars) set(m, x, y, T.PILLAR);
         break;
-      case 'ghiaccio':
-        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR && nz[I(m, x, y)] > 0.58) set(m, x, y, T.ICE);
-        for (const [x, y] of pillars) set(m, x, y, T.CRYSTAL);
-        break;
-      case 'luce':
-        for (const [x, y] of pillars.concat([[cx - 10, cy - 1], [cx + 10, cy - 1], [cx, cy - 8]])) set(m, x, y, T.CRYSTAL);
-        for (let x = cx - 8; x <= cx + 8; x++) if (get(m, x, cy) === T.FLOOR) m.deco[I(m, x, cy)] = 12;
+      case 'orizzonte':
+        // nel buio, solo i cristalli di luce: dietro Obscurio si apre la Porta Ultradimensionale
+        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR && nz[I(m, x, y)] > 0.62) set(m, x, y, T.GRASS);
+        for (const [x, y] of pillars.concat([[cx - 10, cy - 1], [cx + 10, cy - 1], [cx - 3, cy + 7], [cx + 3, cy + 7]])) set(m, x, y, T.CRYSTAL);
+        for (const [px, py] of [[cx - 8, cy + 2], [cx + 8, cy + 2]]) for (const [dx, dy] of [[0, 0], [1, 0], [0, 1]]) if (get(m, px + dx, py + dy) === T.FLOOR || get(m, px + dx, py + dy) === T.GRASS) set(m, px + dx, py + dy, T.CHASM);
+        m.deco[I(m, cx, cy - 7)] = 17;
         break;
       case 'vulcano':
         for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (get(m, x, y) === T.FLOOR) set(m, x, y, nz[I(m, x, y)] > 0.55 ? T.ASH : T.FLOOR);
@@ -491,7 +529,6 @@
     m.stairs = null;
     m.biome = biome.id;
     m.arena = true;
-    for (let i = 0; i < m.t.length; i++) if (m.deco[i] !== 12) m.deco[i] = 0;
     m.cracked = {};
     return m;
   };

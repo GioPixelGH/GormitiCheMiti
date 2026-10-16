@@ -38,10 +38,15 @@
       flags: { elite: true, noKnock: true }, slam: { cd: 5, shape: 'around', r: 1, dmg: [6, 9], status: 'root', st: 2, color: '#6ee05a', label: 'Schianto di Radici' },
       desc: 'ÉLITE. Un antico albero piegato dal male. I suoi rami schiantano tutto intorno.',
     },
-    cerbante: {
-      name: 'Cerbante', title: 'La Belva dalle Tre Teste', elem: 'tenebre', hp: 125, atk: [4, 7], def: 2, speed: 100, xp: 40, ai: 'boss_cerbante',
-      flags: { boss: true, noKnock: true, fireImmune: true, alwaysAwake: true }, big: true,
-      desc: 'BOSS. Il guardiano della Foresta Silente. Sputa fuoco dalle sue tre fauci ed evoca il branco.',
+    ragnetto: {
+      name: 'Ragnetto di Aracno', elem: 'fuoco', hp: 7, atk: [1, 3], eva: 15, speed: 130, xp: 2, ai: 'melee', pack: [2, 3], flags: { webWalk: true },
+      onHit: st('poison', 4, 1, 0.3),
+      desc: 'I cuccioli di Aracno: piccoli, veloci e velenosi. Camminano sulle ragnatele senza restarne invischiati.',
+    },
+    aracno: {
+      name: 'Aracno', title: 'Il Crudele', elem: 'fuoco', hp: 100, atk: [4, 6], def: 1, eva: 8, speed: 100, xp: 40, ai: 'boss_aracno',
+      flags: { boss: true, noKnock: true, webWalk: true, alwaysAwake: true, mindRead: 0.15 }, big: true,
+      desc: 'BOSS. L\'amico fidato di Magmion, "secondo solo a lui per crudeltà" (Prima Serie). Piccolo ed esile, si arrampica ovunque e sputa un acido che fonde ogni corazza. Legge nel pensiero: a volte schiva le tue abilità.',
     },
 
     // ================= FOSSA DEGLI ANTICHI SPIRITI =================
@@ -109,10 +114,17 @@
       flags: { elite: true, noKnock: true }, slam: { cd: 5, shape: 'cross', r: 5, dmg: [10, 15], status: 'vuln', st: 3, color: '#7fd8ff', label: 'Lance di Cristallo' },
       desc: 'ÉLITE. Un gigante di cristallo vivente. Proietta lance in quattro direzioni.',
     },
+    armageddon: {
+      name: 'Armageddon', title: 'Il Signore del Vulcano', elem: 'fuoco', hp: 340, atk: [8, 12], def: 4, speed: 85, xp: 90, ai: 'boss_armageddon',
+      flags: { boss: true, noKnock: true, fireImmune: true, alwaysAwake: true }, big: true,
+      desc: 'BOSS. Creato dalla crudeltà di Magor (Terza Serie): il più grande e potente Signore del Vulcano. Il fuoco del suo braccio è un\'eruzione, la terra trema quando si muove e divora i suoi servitori per assorbirne la potenza.',
+    },
+
+    // ================= REGIONE DI OSCURO ORIZZONTE (gli altri nemici sono in data_monsters2.js) =================
     obscurio: {
       name: 'Obscurio', title: 'Signore delle Tenebre', elem: 'tenebre', hp: 380, atk: [8, 12], def: 3, speed: 100, xp: 90, ai: 'boss_obscurio',
       flags: { boss: true, noKnock: true, alwaysAwake: true }, big: true,
-      desc: 'BOSS. L\'antico nemico della luce. Si teletrasporta, evoca ombre e spegne la tua vista.',
+      desc: 'BOSS. Richiamato su Gorm da Magor attraverso la Porta Ultradimensionale (Terza Serie): magia nera e mazza ferrata. Si teletrasporta, evoca ombre e spegne la luce. Il suo acerrimo nemico è il Sommo Luminescente.',
     },
     clone: {
       name: 'Riflesso di Obscurio', elem: 'tenebre', hp: 20, atk: [4, 7], speed: 100, xp: 1, ai: 'melee',
@@ -180,10 +192,10 @@
       name: 'Segugio Lavico', elem: 'fuoco', hp: 28, atk: [6, 9], eva: 8, speed: 130, xp: 10, ai: 'melee', flags: { fireImmune: true }, pack: [2, 3],
       desc: 'Cani di magma che cacciano in branco.',
     },
-    lavion: {
-      name: 'Lavion', elem: 'fuoco', hp: 180, atk: [10, 14], def: 5, speed: 100, xp: 60, ai: 'melee',
-      flags: { elite: true, noKnock: true, fireImmune: true }, slam: { cd: 5, shape: 'target', r: 2, dmg: [12, 18], fire: 4, color: '#ff6a2a', label: 'Eruzione' },
-      desc: 'ÉLITE. Il Signore della Lava. Fa eruttare il terreno sotto i tuoi piedi.',
+    mastodontico: {
+      name: 'Il Mastodontico', elem: 'fuoco', hp: 180, atk: [10, 14], def: 5, speed: 85, xp: 60, ai: 'melee',
+      flags: { elite: true, noKnock: true, fireImmune: true }, slam: { cd: 4, shape: 'around', r: 1, dmg: [13, 18], status: 'stun', st: 1, color: '#ff9a2a', label: 'Pugni Demolitori' },
+      desc: 'ÉLITE. Guerriero del Popolo della Lava (Prima Serie): lento ma potentissimo. "A che servono armi o magia, quando i tuoi pugni possono demolire il mondo?"',
     },
     magmion: {
       name: 'Magmion', title: 'Signore del Magma', elem: 'fuoco', hp: 320, atk: [10, 14], def: 5, speed: 100, xp: 120, ai: 'boss_magmion',

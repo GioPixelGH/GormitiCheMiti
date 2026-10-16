@@ -438,12 +438,13 @@
       else if (t === T.CHASM) c = '#0a0a18';
       else if (t === T.STAIRS) { const p = G.portalAt(x, y); c = p && p.kind === 'danger' ? '#ff4a4a' : '#c08aff'; }
       else if (t === T.ICE) c = v ? '#a8d8f0' : '#6a8aa0';
+      else if (t === T.WEB) c = v ? '#9a98a8' : '#5a5868';
       else if (t === T.DOOR) c = '#8a5a2a';
       else c = v ? '#4a4258' : '#2a2434';
       ctx.fillStyle = c; ctx.fillRect(x * sc, y * sc, sc, sc);
     }
     for (const it of R.items) if (m.seen[it.y * m.w + it.x]) { ctx.fillStyle = it.kind === 'relic' || it.kind === 'frammento' ? '#ffd23a' : it.kind === 'gold' ? '#7fe8ff' : '#7fffb0'; ctx.fillRect(it.x * sc + 1, it.y * sc + 1, 2, 2); }
-    for (const f of R.features) if (!f.gone && m.seen[f.y * m.w + f.x]) { ctx.fillStyle = f.type === 'chest' ? '#ffb83a' : f.type === 'merchant' ? '#6ee05a' : f.type === 'event' ? (f.used ? '#5a6a7a' : '#a0f0ff') : '#ff9ad0'; ctx.fillRect(f.x * sc, f.y * sc, sc, sc); }
+    for (const f of R.features) if (!f.gone && m.seen[f.y * m.w + f.x]) { ctx.fillStyle = f.type === 'chest' ? '#ffb83a' : f.type === 'merchant' ? '#6ee05a' : f.type === 'event' ? (f.used ? '#5a6a7a' : '#a0f0ff') : f.type === 'rift' ? '#b77cff' : '#ff9ad0'; ctx.fillRect(f.x * sc, f.y * sc, sc, sc); }
     if (showStairs) { ctx.fillStyle = '#e0b0ff'; ctx.fillRect(m.stairs[0] * sc - 1, m.stairs[1] * sc - 1, sc + 2, sc + 2); }
     for (const e of R.ents) {
       if (e.dead || e.kind === 'hero') continue;
@@ -538,6 +539,7 @@
       if (f.type === 'event') { const ev = G.EVENT_BY_ID[f.ev]; return `<h4>${ev.title}</h4>${f.used ? 'Hai già fatto la tua scelta.' : 'Qualcosa ti attende qui. Urtalo per scoprirlo.'}`; }
       if (f.type === 'chest') return `<h4>${f.rare ? 'Scrigno Antico' : 'Forziere'}</h4>${f.rare ? 'Contiene una reliquia.' : 'Schegge e forse un oggetto.'} Urtalo per aprirlo.`;
       if (f.type === 'merchant') return `<h4>Tartantica la Veggente</h4>L'antica tartaruga del Popolo del Mare vende pozioni e reliquie: sa sempre cosa ti servirà. Urtala per commerciare.`;
+      if (f.type === 'rift') return `<h4>Porta Ultradimensionale</h4>Un varco tra le dimensioni, collegato a un varco gemello in questa regione. Urtalo per comparire accanto all'altro.`;
       if (f.type === 'shrine') { const s = G.SHRINES[f.kind]; return `<h4>${s.name}</h4>${esc(s.desc)}${f.used ? '<div class="sub">Già usato.</div>' : '<div class="sub">Urtalo per interagire.</div>'}`; }
     }
     const it = R.items.find(o => o.x === x && o.y === y);
@@ -777,7 +779,8 @@
       <h3>Risonanze</h3>
       <p>Ogni reliquia e Dono ha un'affinità (Veleno, Fuoco, Critico, Vita, Difesa, Furia, Tempesta, Saggezza, Fortuna). Con 2 elementi della stessa affinità si attiva un bonus; con 4 un potere che cambia il tuo stile di gioco. Premi <span class="k">I</span> per la Scheda dell'eroe.</p>
       <h3>Bivi e regioni</h3>
-      <p>Al primo piano di ogni regione trovi anche un <b style="color:#ff5050">Portale Cremisi</b>: il Sentiero Pericoloso ha più nemici ma tesori migliori. Dopo alcuni guardiani si aprono due portali: scegli tra regioni diverse (Fossa o Ghiacciai Eterni, Picchi o Tempio della Luce).</p>
+      <p>Al primo piano di ogni regione trovi anche un <b style="color:#ff5050">Portale Cremisi</b>: il Sentiero Pericoloso ha più nemici ma tesori migliori. Dopo alcuni guardiani si aprono due portali: scegli tra regioni diverse (Fossa degli Antichi Spiriti o Pianura delle Nebbie, Valle del Destino o Regione di Oscuro Orizzonte).</p>
+      <p>Ogni regione ha i suoi pericoli: le <b>ragnatele</b> della Foresta Silente ti invischiano per un turno; nella <b>Pianura delle Nebbie</b> vedi poco e la lava scende a colate; a <b>Roscamar</b> la volta può crollare; nella <b>Regione di Oscuro Orizzonte</b> vedi lontano solo ciò che i cristalli illuminano, e le Porte Ultradimensionali collegano due punti del piano.</p>
       <h3>Segreti, varianti, eventi</h3>
       <p>I muri incrinati si abbattono e nascondono tesori. Alcuni nemici hanno varianti (Corazzato, Esplosivo, Dorato…) e i Campioni ♛ sono nemici con un nome e un premio. I cippi luminosi sono eventi con scelte da ponderare.</p>
       <h3>Morte e progressi</h3>
@@ -829,7 +832,7 @@
     if (tab === 'mostri') {
       const order = [];
       for (const b of G.BIOMES) { for (const [k] of b.monsters) order.push(k); order.push(...b.elites, b.boss); if (b.id === 'vulcano') order.splice(order.length - 1, 0, 'magmion'); }
-      body = '<div class="codex">' + order.map(k => {
+      body = '<div class="codex">' + order.filter((k, i) => order.indexOf(k) === i).map(k => {
         const d = G.MON[k], known = meta.monsters[k] || meta.bosses[k];
         return `<div class="cx ${known ? '' : 'unknown'}"><div data-spr="${k}"></div><div><div class="nm">${known ? d.name : '???'}</div><div class="ds">${known ? G.ELEMS[d.elem].name + ' · ' + esc(d.desc) : 'Non ancora incontrato.'}</div></div></div>`;
       }).join('') + '</div>';

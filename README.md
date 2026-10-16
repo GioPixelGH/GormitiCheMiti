@@ -44,8 +44,8 @@ Tutti i tasti si possono cambiare da **Opzioni → Comandi**.
   - Barbataus, Campione della Foresta — abbatti 250 nemici in totale
 
   Ognuno ha una passiva, 3 abilità, un Potere Supremo e potenziamenti dedicati.
-- **7 regioni e bivi**: Foresta Silente → Fossa degli Antichi Spiriti *o* Ghiacciai Eterni → Caverna di Roscamar → Picchi della Valle del Destino *o* Tempio della Luce Infranta → Monte Vulcano. Dopo alcuni guardiani si aprono due portali e scegli tu la strada. Al primo piano di ogni regione c'è anche un **Portale Cremisi**: il Sentiero Pericoloso, con più nemici e tesori migliori.
-- **8 boss** con più fasi e attacchi annunciati: Cerbante, Orrore Profondo, Glaciator, Obscurio, Devilfenix, Luxalion Corrotto, Magmion e Magor.
+- **7 regioni dell'era e bivi**: Foresta Silente → Fossa degli Antichi Spiriti *o* Pianura delle Nebbie → Caverna di Roscamar → Picchi della Valle del Destino *o* Regione di Oscuro Orizzonte → Monte Vulcano. Ognuna ha i suoi pericoli: ragnatele, abissi vulcanici, nebbia e colate di lava, forge e crolli, venti e baratri, buio e cristalli di luce. Dopo alcuni guardiani si aprono due portali e scegli tu la strada. Al primo piano di ogni regione c'è anche un **Portale Cremisi**: il Sentiero Pericoloso, con più nemici e tesori migliori.
+- **8 boss** dell'Era degli Invincibili, con più fasi e attacchi annunciati: Aracno il Crudele, Orrore Profondo, Lavion il Signore del Terrore, Armageddon, Devilfenix, Obscurio, Magmion e Magor.
 - **Nemici più tattici**: oltre 50 tipi di nemici, gruppi che si aiutano tra loro, varianti con modificatori (Corazzato, Rapido, Furioso, Vampirico, Esplosivo, Gelido, Dorato, Spinoso) e **Campioni** con un nome proprio e un premio.
 - **Risonanze**: ogni reliquia e ogni Dono ha un'affinità (Veleno, Fuoco, Critico, Vita, Difesa, Furia, Tempesta, Saggezza, Fortuna). Con 2 elementi della stessa affinità si attiva un bonus, con 4 un potere che cambia il modo di giocare.
 - **Eventi**: cippi luminosi con piccole storie e scelte da ponderare (Tartantica in pericolo, lo Specchio di Obscurio, la Forgia Antica, l'indovinello del Saggio e altri: 15 in tutto).

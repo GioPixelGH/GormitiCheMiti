@@ -14,6 +14,7 @@
       if (!G.canWalk(h, x, y)) return Infinity;
       if (G.featureAt(x, y)) return Infinity;
       if (G.isHazardFor(h, x, y)) return Infinity;
+      if (G.tileAt(x, y) === T.WEB && !h.flags.fly) return 8;
       const tr = G.trapAt(x, y);
       if (tr && !h.flags.fly) return 30;
       if (R.tele.some(t => t.tiles.some(p => p[0] === x && p[1] === y))) return 20;

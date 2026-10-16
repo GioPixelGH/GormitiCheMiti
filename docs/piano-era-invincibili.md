@@ -41,6 +41,7 @@ Dimensioni: **P** piccola · **M** media · **G** grande.
 | 0 — Strumenti e archivio | 1.2.2 | ✅ completata |
 | 1 — Coerenza con l'era | 1.3.0 | ✅ completata (vedi note sotto) |
 | 2 — I volti dell'era | 1.4.0 | ✅ completata (vedi note sotto) |
+| 3 — Le regioni dell'era | 1.5.0 | ✅ completata (vedi note sotto) |
 
 Note sulla Fase 1:
 - Crabs il Vendicatore e Mystral Corrotto sono stati sostituiti subito da due guerrieri dell'era, invece che da nemici generici: **Geyser l'Iroso** (Seconda Serie, élite della Fossa) e **Crudelion il Maledetto** (Terza Serie, élite dei Picchi). Gli sprite definitivi arrivano con la Fase 4.
@@ -55,6 +56,18 @@ Note sulla Fase 2:
 - Colpi base con i colori e le armi delle carte (mazza di Gheos, chele di Carrapax, artigli di Elios, lama di luce del Sommo Luminescente…).
 - Crudelion e le ombre di Obscurio (cloni, Riflesso) sono ricolorati sui nuovi sprite.
 - Il salvataggio non cambia: i file della v1.3.0 si importano così come sono.
+
+Note sulla Fase 3:
+- **Foresta Silente**: boss **Aracno il Crudele** (sputo d'acido che rende Vulnerabili, ragnatele che invischiano, ragnetti velenosi, balzo dalle pareti; "legge nel pensiero" e a volte schiva le abilità). Ragnatele e ragnetti anche nei piani normali.
+- **Fossa degli Antichi Spiriti**: sfiatatoi di lava dell'abisso vulcanico, anche nell'arena di Orrore Profondo.
+- **Pianura delle Nebbie** (al posto dei Ghiacciai Eterni): vista ridotta e nebbia biancastra, fiumi e **colate di lava** che scendono periodicamente; boss **Lavion il Signore del Terrore** (braccio vivo che afferra e trascina e che nella seconda fase si stacca e combatte da solo, terrore che indebolisce e rallenta, rocce che tremano, colate di lava). Élite provvisoria: **Lavor il Potente**.
+- **Caverna di Roscamar**: forge con incudini, trappole "Volta instabile"; boss **Armageddon il Signore del Vulcano** (eruzione del braccio, crolli che lasciano detriti e massi, Minatori che divora per curarsi, aura nera nella seconda fase).
+- **Regione di Oscuro Orizzonte** (al posto del Tempio della Luce): buio quasi totale in cui si vedono lontano solo le zone illuminate dai cristalli di luce, abissi senza fondo e **Porte Ultradimensionali** collegate a coppie; boss **Obscurio** (spostato da Roscamar). Élite provvisoria: **Pantanera il Sergente del Terrore**.
+- **Monte Vulcano**: l'élite Lavion lascia il posto a **Il Mastodontico** (provvisorio), perché Lavion ora è un boss.
+- I nemici di contorno delle due regioni nuove sono creature maledette (varianti di colore); i guerrieri veri dell'era e gli sprite definitivi delle élite arrivano con la Fase 4.
+- Sprite e ritratti nuovi per Aracno, Lavion e Armageddon (più i ragnetti e il braccio di Lavion), disegnati con `tools/pixel` guardando carte e statuine.
+- Salvataggi della v1.4.0 convertiti automaticamente: regioni, percorsi e storico (Ghiacciai → Pianura delle Nebbie, Tempio → Oscuro Orizzonte), nemici in partita (es. Glaciator → Lavion, Luxalion → Obscurio, Lavion élite → Il Mastodontico; i piloni vengono tolti), vittorie contro i boss (Cerbante → Aracno, Glaciator → Lavion, Luxalion → Obscurio).
+- Bilanciamento con i duelli da checkpoint: Aracno ~92% di duelli vinti (Cerbante era al 100%), Lavion ~90%, Armageddon ~95%, Obscurio nella nuova regione ~100% (PV lasciati a 380). Mini-verifica: 68% di vittorie (v1.4.0: 67%). Noctis resta molto debole (~20%): muore soprattutto contro Aracno e i suoi ragnetti; da valutare un rinforzo dell'eroe.
 
 ## Panoramica
 

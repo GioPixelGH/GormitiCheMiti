@@ -79,6 +79,7 @@
       case T.CRYSTAL: ctx.drawImage(southSolid ? ts.crystalTop[v % 2] : ts.crystalFace[v % 2], px, py); break;
       case T.CRACKED: ctx.drawImage(southSolid ? ts.crackedTop[0] : ts.crackedFace[0], px, py); break;
       case T.ICE: ctx.drawImage(ts.ice[v], px, py); break;
+      case T.WEB: ctx.drawImage(RD.biomeId === 'foresta' ? ts.grass[v] : ts.floor[v], px, py); ctx.drawImage(ts.web[v % 2], px, py); break;
       case T.PILLAR: floorBase(); ctx.drawImage(ts.pillar[0], px, py); break;
       case T.TREE: ctx.drawImage(ts.grass[v], px, py); ctx.drawImage(ts.tree[v % 2], px, py); break;
       case T.FLOOR: floorBase(); break;
@@ -107,21 +108,23 @@
   }
 
   // ---------------------------------------------------------------- nebbia/luce
+  // la nebbia della Pianura delle Nebbie è biancastra; il buio di Oscuro Orizzonte più fitto
+  const FOG = { nebbie: { c: [150, 152, 148], seen: 0.66, max: 0.62 }, orizzonte: { c: [6, 2, 16], seen: 0.74, max: 0.6 } };
   function updateFog() {
     const R = G.run, m = R.map, h = R.hero, d = RD.fogImg.data;
-    const r = G.heroSight(h);
+    const r = G.heroSight(h), F = FOG[RD.biomeId] || { c: [4, 3, 12], seen: 0.58, max: 0.45 };
     for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) {
       const i = y * m.w + x;
-      let a;
+      let a, c = F.c;
       if (R.vis[i]) {
         const dx = x - h.x, dy = y - h.y, dd = Math.sqrt(dx * dx + dy * dy) / (r + 0.5);
-        a = Math.min(0.45, dd * dd * 0.45);
+        a = Math.min(F.max, dd * dd * F.max);
         const t = m.t[i];
         if (t === T.LAVA || m.fire[i] || t === T.STAIRS || t === T.CRYSTAL) a *= 0.4;
-      } else if (m.seen[i]) a = 0.58;
-      else a = 1;
+      } else if (m.seen[i]) a = F.seen;
+      else { a = 1; c = [4, 3, 12]; }
       const o = i * 4;
-      d[o] = 4; d[o + 1] = 3; d[o + 2] = 12; d[o + 3] = Math.round(a * 255);
+      d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = Math.round(a * 255);
     }
     RD.fogCtx.putImageData(RD.fogImg, 0, 0);
   }
@@ -196,7 +199,8 @@
     for (const f of R.features) {
       if (f.gone || !m.seen[f.y * m.w + f.x]) continue;
       const [px, py] = W2S(f.x * TS, f.y * TS);
-      let spr = f.type === 'chest' ? (f.rare ? G.SPR.chest_rare : G.SPR.chest) : f.type === 'merchant' ? G.SPR.merchant : f.type === 'event' ? G.SPR.event : G.SPR['shrine_' + f.kind];
+      if (f.type === 'rift') { drawRift(ctx, px, py, S); continue; }
+      let spr =f.type === 'chest' ? (f.rare ? G.SPR.chest_rare : G.SPR.chest) : f.type === 'merchant' ? G.SPR.merchant : f.type === 'event' ? G.SPR.event : G.SPR['shrine_' + f.kind];
       if (!spr) continue;
       ctx.globalAlpha = f.used ? 0.45 : 1;
       if (f.type === 'event' && !f.used) {
@@ -305,6 +309,18 @@
       ctx.stroke();
     }
     if (sealed) { ctx.strokeStyle = '#ff3a3a'; ctx.beginPath(); ctx.moveTo(cx - 5 * S, cy - 4 * S); ctx.lineTo(cx + 5 * S, cy + 4 * S); ctx.moveTo(cx + 5 * S, cy - 4 * S); ctx.lineTo(cx - 5 * S, cy + 4 * S); ctx.stroke(); }
+  }
+  // Porta Ultradimensionale: un vortice viola e verde
+  function drawRift(ctx, px, py, S) {
+    const t = RD.time, cx = px + 8 * S, cy = py + 8 * S;
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 9 * S);
+    g.addColorStop(0, 'rgba(10,4,24,0.95)'); g.addColorStop(0.55, 'rgba(120,60,200,0.6)'); g.addColorStop(1, 'rgba(60,20,120,0)');
+    ctx.fillStyle = g; ctx.fillRect(px - 2 * S, py - 2 * S, 20 * S, 20 * S);
+    ctx.lineWidth = S;
+    for (let k = 0; k < 3; k++) {
+      ctx.strokeStyle = k === 1 ? '#9ae07a' : '#b77cff';
+      ctx.beginPath(); ctx.ellipse(cx, cy, (6.5 - k * 1.8) * S, (7 - k * 1.9) * S, 0, -t * (2 + k) + k, -t * (2 + k) + k + 4); ctx.stroke();
+    }
   }
   function drawFire(ctx, px, py, S, x, y) {
     const t = RD.time * 8 + x * 1.7 + y * 2.3;
@@ -581,6 +597,7 @@
     wind: { color: '#e8f8ff', trail: '#ffffff', speed: 240 }, fire: { color: '#ff7a2a', trail: '#ffd23a', speed: 200 },
     arcane: { color: '#d8b0ff', trail: '#f0e0ff', speed: 260 }, bomb: { color: '#ff6a2a', trail: '#ffd23a', speed: 160, arc: 14 },
     ice: { color: '#bff4ff', trail: '#ffffff', speed: 160, arc: 14 },
+    mist: { color: '#d8dcd8', trail: '#ffffff', speed: 180 }, shadow: { color: '#6a3aa0', trail: '#b77cff', speed: 220 },
   };
 
   // ---------------------------------------------------------------- ambiente
@@ -594,10 +611,19 @@
       p.t += dt;
       p.x += p.vx * dt; p.y += p.vy * dt;
       if (b === 'leaves' || b === 'snow') p.x += Math.sin(p.t * 2 + i) * 12 * dt;
-      if (p.x < -20 || p.x > RD.W + 20 || p.y < -20 || p.y > RD.H + 20 || p.t > p.life) { RD.ambient[i] = newAmb(b, false); continue; }
+      if (p.x < -200 || p.x > RD.W + 20 || p.y < -20 || p.y > RD.H + 20 || p.t > p.life) { RD.ambient[i] = newAmb(b, false); continue; }
       ctx.globalAlpha = p.a * Math.min(1, p.t, p.life - p.t);
+      if (b === 'mist') {
+        // banco di nebbia: un'ellisse sfumata
+        ctx.save(); ctx.translate(p.x, p.y); ctx.scale(1, p.h / p.w);
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, p.w / 2);
+        g.addColorStop(0, p.c); g.addColorStop(1, 'rgba(223,226,220,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+        continue;
+      }
       ctx.fillStyle = p.c;
-      ctx.fillRect(p.x, p.y, p.s * (b === 'wind' ? 6 : 1), p.s);
+      ctx.fillRect(p.x, p.y, p.w || p.s * (b === 'wind' ? 6 : 1), p.h || p.s);
     }
     ctx.globalAlpha = 1;
   }
@@ -612,6 +638,10 @@
       case 'embers': return { x: r() * W, y: init ? r() * H : H + 10, vx: (r() - 0.5) * 20, vy: -(25 + r() * 35), c: r() < 0.5 ? '#ff8a2a' : '#ffd23a', s: Math.max(2, S - 1), a: 0.7, t: 0, life: 10 };
       case 'snow': return { x: r() * W, y: init ? r() * H : -10, vx: -8 + r() * 16, vy: 18 + r() * 22, c: '#ffffff', s: Math.max(2, S - 1), a: 0.75, t: 0, life: 14 };
       case 'motes': return { x: r() * W, y: init ? r() * H : H + 10, vx: (r() - 0.5) * 10, vy: -(8 + r() * 12), c: r() < 0.5 ? '#fff3a0' : '#ffffff', s: Math.max(2, S - 1), a: 0.5, t: 0, life: 12 };
+      // banchi di nebbia che scorrono lenti
+      case 'mist': return { x: init ? r() * W : -160, y: r() * H, vx: 12 + r() * 18, vy: (r() - 0.5) * 4, c: '#dfe2dc', s: S, w: (60 + r() * 90) * S / 3, h: (20 + r() * 24) * S / 3, a: 0.16, t: 0, life: 30 };
+      // scintille d'ombra che salgono dall'abisso
+      case 'shadow': return { x: r() * W, y: init ? r() * H : H + 10, vx: (r() - 0.5) * 8, vy: -(6 + r() * 10), c: r() < 0.7 ? '#b77cff' : '#9ae07a', s: Math.max(2, S - 1), a: 0.45, t: 0, life: 14 };
     }
     return { x: 0, y: 0, vx: 0, vy: 0, c: '#fff', s: 1, a: 0, t: 0, life: 1 };
   }

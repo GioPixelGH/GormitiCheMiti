@@ -269,6 +269,96 @@ SPRITE.magor = () => {
   return { pal: { k: '#1a0a0a', d: '#3a1010', p: '#5a1a14', P: '#7a2a1a', o: '#ff6a1a', O: '#ffc04a', h: '#d8c8a8', H: '#a89878', e: '#ffe24a' }, t };
 };
 
+// =====================================================================================
+//  LE REGIONI DELL'ERA (Fase 3)
+// =====================================================================================
+// Aracno il Crudele: insetto-ragno rosso ed esile, testa gialla con calotta rossa e fauci a
+// tentacoli, quattro braccia grigie con uncini neri, zampe sottili e piedi scuri; sputa acido verde
+SPRITE.aracno = () => {
+  const t = new Tela(24);
+  t.linea(10.6, 15, 9.4, 19.4, 'r', 2);
+  t.poligono([[7.2, 19.4], [10.4, 19.4], [11, 23], [6.4, 23]], 'b').luce({ b: ['B', ''] });
+  t.poligono([[9.6, 9], [11.5, 9], [11.5, 15.6], [10.4, 15.6]], 'r');
+  t.linea(9.6, 10, 5.6, 7.4, 'g').linea(9.6, 10.6, 5.8, 8.2, 'h');
+  t.linea(5.4, 7.2, 4.4, 3.6, 'k').punti([[4, 3], [5, 2], [6, 2], [3, 4]], 'k');
+  t.linea(9.4, 12.6, 4.8, 13.2, 'g').linea(9.4, 13.2, 4.8, 13.8, 'h');
+  t.linea(4.6, 13.4, 2.4, 15, 'k').punti([[2, 16], [2, 17], [3, 17], [1, 14]], 'k');
+  t.ellisse(11.5, 6.6, 3, 2.6, 'y').luce({ y: ['Y', 'o'] });
+  t.ellisse(11.5, 4.6, 2.6, 1.7, 'r');
+  t.rect(9, 6, 2, 1, 'k');
+  t.linea(10.4, 8.6, 9.8, 11.8, 'y').linea(11.2, 8.6, 11.2, 12.4, 'Y');
+  t.luce({ r: ['R', 'd'] });
+  t.specchia();
+  t.punti([[13, 13], [14, 14], [13, 15]], 'v').px(12, 13, 'V');
+  return { pal: { r: '#d82a2a', R: '#ff5a4a', d: '#8a1414', y: '#ffd23a', Y: '#ffe88a', o: '#c89a18', g: '#c8c8d0', h: '#8a8a94', k: '#4a4a58', b: '#3a3a44', B: '#5a5a66', v: '#7aff4a', V: '#c8ffa0' }, t };
+};
+// i ragnetti di Aracno: piccoli, rossi e gialli, zampe nere
+SPRITE.ragnetto = () => {
+  const t = new Tela(16);
+  for (const [x0, y0, x1, y1] of [[6, 10, 2, 7], [6, 11, 1.6, 11], [6, 12, 2.4, 14.6], [7, 9, 4, 5.6]]) t.linea(x0, y0, x1, y1, 'k');
+  t.ellisse(7.5, 11, 3, 2.2, 'r').luce({ r: ['R', 'd'] });
+  t.ellisse(7.5, 8, 1.8, 1.4, 'y').px(7, 8, 'k');
+  t.specchia();
+  return { pal: { r: '#d82a2a', R: '#ff6a4a', d: '#8a1414', y: '#ffd23a', k: '#4a4a58' }, t };
+};
+// Lavion il Signore del Terrore: umanoide rosso muscoloso, elmo-cresta grigio a strisce gialle,
+// maschera e corazza gialle; il braccio sinistro è una creatura grigia viva (testa con occhio e tentacoli)
+SPRITE.lavion = () => {
+  const t = new Tela(24);
+  t.rect(8, 16, 3, 5, 'r').poligono([[6.6, 20.6], [11, 20.6], [11.4, 23], [6.2, 23]], 'r');
+  t.ellisse(11.5, 11, 5.4, 4.4, 'r');
+  t.ellisse(11.5, 5.8, 2.6, 3, 'r');
+  t.luce({ r: ['R', 'd'] });
+  t.poligono([[9, 9.4], [11.5, 9.4], [11.5, 13.6], [9.6, 13]], 'y').rect(9, 14, 3, 2, 'y').luce({ y: ['Y', 'o'] });
+  t.poligono([[8.6, 4.6], [9.4, 2.4], [11.5, 1.6], [11.5, 4.6]], 'g').rect(11, 1, 1, 4, 'y').px(10, 3, 'h');
+  t.px(10, 6, 'k').rect(10, 7, 2, 2, 'y').px(10, 8, 'o');
+  t.punti([[7, 22], [9, 23]], 'k');
+  t.specchia();
+  // braccio destro (a destra di chi guarda): pugno rosso
+  t.ellisse(17.6, 12.6, 1.6, 3.4, 'r').ellisse(18.2, 16.4, 1.9, 1.7, 'r').luce({ r: ['R', 'd'] });
+  // braccio sinistro: la creatura viva
+  t.linea(5.6, 10, 3.6, 15.4, 'g', 2).linea(3.6, 15.4, 3, 19, 'g', 2);
+  t.ellisse(5.4, 8.2, 2.6, 2.2, 'g');
+  t.luce({ g: ['G', 'h'] });
+  t.linea(7, 9, 10, 10.4, 'g').linea(7.4, 8, 10.4, 8.6, 'g');
+  t.px(4.6, 7.6, 'k').px(5, 7, 'G');
+  t.punti([[4, 13], [3, 16], [4, 17]], 'b');
+  t.punti([[1.6, 19], [2.4, 20.6], [3.6, 20.6], [4.6, 19.6]], 'G').punti([[1, 20], [2, 21.6], [4, 21.6]], 'h');
+  return { pal: { r: '#d8281e', R: '#ff5a40', d: '#8a1410', y: '#ffd23a', Y: '#fff09a', o: '#c89a18', g: '#b8bcb8', G: '#e0e4e0', h: '#7a807a', k: '#1a1a1a', b: '#3a3a3a' }, t };
+};
+// il braccio vivo di Lavion, staccato dal corpo: testa con occhio, tentacoli e lunghe dita artigliate
+SPRITE.braccio = () => {
+  const t = new Tela(16);
+  t.linea(8, 8, 5, 13.4, 'g', 2);
+  t.ellisse(9, 5.4, 3.4, 2.8, 'g');
+  t.luce({ g: ['G', 'h'] });
+  t.linea(11.4, 6, 14, 8, 'g').linea(11.6, 4.6, 14.6, 5, 'g').linea(10.4, 7.6, 12, 10.4, 'g');
+  t.px(8, 4.6, 'k').px(9, 4, 'G');
+  t.punti([[6, 11], [7, 9]], 'b');
+  t.punti([[3, 14], [4, 15], [6, 15], [7, 14]], 'G').punti([[2, 15], [5, 15]], 'h');
+  return { pal: { g: '#b8bcb8', G: '#e0e4e0', h: '#7a807a', k: '#1a1a1a', b: '#3a3a3a' }, t };
+};
+// Armageddon il Signore del Vulcano: grande testa-cupola rossa a creste, anello di spine nere,
+// corpo nero, braccio destro enorme, gambe di lava gialla a macchie rosse
+SPRITE.armageddon = () => {
+  const t = new Tela(24);
+  t.poligono([[6.4, 15], [10.6, 15], [11.4, 23], [4.4, 23]], 'y').luce({ y: ['Y', 'o'] });
+  t.punti([[7, 18], [9, 20], [6, 21], [8, 22], [10, 17]], 's');
+  t.ellisse(11.5, 13, 4.6, 3.6, 'n').luce({ n: ['N', ''] });
+  t.rect(10, 13, 3, 3, 'r');
+  t.linea(7, 11, 3.4, 16.6, 'r', 2).punti([[2, 17], [3, 18.6], [4.6, 18]], 'k');
+  t.ellisse(11.5, 6.4, 5.6, 4.6, 'r').luce({ r: ['R', 'd'] });
+  t.linea(9, 3, 8.6, 9, 'd').linea(11, 2, 11, 9, 'd');
+  t.rect(7, 10, 5, 1, 'n');
+  t.punti([[6, 9], [5, 10], [7, 11], [9, 11.4], [4, 11], [5, 12], [6, 4], [7, 2.6], [5.6, 6.4], [4, 9]], 'k');
+  t.specchia();
+  // braccio destro enorme, a solchi
+  t.ellisse(18.6, 14.2, 3.2, 4.4, 'r').luce({ r: ['R', 'd'] });
+  t.punti([[18, 12], [19, 14], [17, 15], [19, 16.6], [18, 18]], 'd');
+  t.punti([[16, 19], [18, 19.4], [20, 19]], 'k');
+  return { pal: { r: '#c8281e', R: '#ee4a3a', d: '#7a1410', n: '#1a1418', N: '#3a3238', y: '#ffc83a', Y: '#ffe27a', o: '#e88a1a', s: '#b8281e', k: '#0e0a0c' }, t };
+};
+
 Object.assign(RITRATTI, require('./ritratti'));
 
 module.exports = { SPRITE, RITRATTI };
