@@ -543,7 +543,7 @@
     }
     // aura nera: ferisce chi gli resta accanto
     if (p2 && d <= 1) {
-      G.dealDamage(m, h, 3, { pierce: true, dot: true, src: 'Aura Nera', color: '#b77cff' });
+      G.dealDamage(m, h, Math.round(3 * (m.dmgMul || 1)), { pierce: true, dot: true, src: 'Aura Nera', color: '#b77cff' });
       if (h.dead) return;
     }
     // divora un servitore vicino per assorbirne la potenza

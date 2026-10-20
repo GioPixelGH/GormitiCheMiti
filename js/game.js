@@ -66,6 +66,8 @@
     };
   };
 
+  // statistiche di tutti i boss (PV, danni, armatura, schivata) rispetto ai valori di base: +50% dalla v1.6.1
+  G.BOSS_STAT_MUL = 1.5;
   // Creazione mostri, con scalatura per piano/Eclissi
   G.makeMonster = function (type, x, y, opts) {
     opts = opts || {};
@@ -81,6 +83,8 @@
     if (ecl >= 3) dmgMul *= 1.15;
     if (d.flags && d.flags.boss && ecl >= 5) { hpMul *= 1.3; dmgMul *= 1.1; }
     if (!isBoss && reg >= 1) { hpMul *= 1 + 0.15 * reg; dmgMul *= 1 + 0.1 * reg; }
+    // tutti i boss più forti: PV, danni (anche degli attacchi speciali), armatura e schivata
+    if (isBoss) { hpMul *= G.BOSS_STAT_MUL; dmgMul *= G.BOSS_STAT_MUL; }
     if (opts.summon) { hpMul = 1; dmgMul = ecl >= 3 ? 1.15 : 1; }
     const e = G.newEntityBase();
     Object.assign(e, {
@@ -90,6 +94,7 @@
       speed: d.speed || 100, elem: d.elem || 'neutro', sight: d.sight || 8, ai: d.ai || 'melee',
       flags: Object.assign({}, d.flags || {}), xp: d.xp || 1, dmgMul,
     });
+    if (isBoss && !opts.summon) { e.def = Math.round(e.def * G.BOSS_STAT_MUL); e.eva = Math.round(e.eva * G.BOSS_STAT_MUL); }
     e.hp = e.maxHp;
     e.energy = R.rng.int(0, 90);
     e.st = { mode: opts.awake ? 'hunt' : (R.rng.chance(d.flags && d.flags.alwaysAwake ? 0 : 0.55) ? 'sleep' : 'wander') };

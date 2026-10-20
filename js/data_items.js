@@ -93,7 +93,7 @@
     R('collana_spine', 'Collana di Spine', 'comune', 'necklace', '#7be04a', 'Chi ti colpisce in mischia subisce 3 danni.', h => { h.mods.thorns += 3; }),
     R('spora', 'Spora Madre', 'comune', 'spore', '#9be35a', 'I tuoi attacchi avvelenano (1).', h => { h.mods.poisonOnHit += 1; }),
     // --- rare ---
-    R('clessidra', 'Clessidra del Saggio', 'rara', 'hourglass', '#ffe9a0', 'Tutte le ricariche delle abilità -1 turno.', h => { h.mods.cdr += 1; }),
+    R('clessidra', 'Clessidra del Saggio', 'leggendaria', 'hourglass', '#ffe9a0', 'Tutte le ricariche delle abilità -1 turno.', h => { h.mods.cdr += 1; }),
     R('mappa_gorm', 'Mappa di Gorm', 'rara', 'map', '#e8d0a0', 'All\'arrivo su ogni piano la mappa è rivelata.', h => { h.mods.revealMap = true; }),
     R('dente_squalo', 'Dente di Squalo', 'rara', 'fang', '#d0e8ff', '+40% danni ai nemici sotto il 30% dei PV.', h => { h.mods.execute += 0.4; }),
     R('tamburo', 'Tamburo di Guerra', 'rara', 'drum', '#c86a3a', '+50% danni ai nemici con i PV al massimo.', h => { h.mods.firstStrike += 0.5; }),
