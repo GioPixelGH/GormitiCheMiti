@@ -14,6 +14,8 @@
     chainEvery: 0, stealth: false, rangeBonus: 0, shopDiscount: 0, lastHope: false, wetBonus: 0, auraBonus: 0, lightBonus: false,
   });
 
+  // capacità innate degli eroi (volare, nuotare), ripristinate anche caricando una partita salvata
+  G.HERO_FLAGS = { noctis: { fly: true }, elios: { fly: true }, poivrons: { swim: true }, carrapax: { swim: true } };
   G.makeHero = function (id) {
     const d = G.HEROES[id];
     const h = G.newEntityBase();
@@ -153,7 +155,7 @@
     if (rng.chance(eliteP)) {
       const type = rng.pick(biome.elites);
       const s = pick((x, y) => far(x, y, 14) && G.canWalk({ flags: G.MON[type].flags, kind: 'monster' }, x, y));
-      if (s) { const e = G.makeMonster(type, s[0], s[1]); e.st.mode = 'sleep'; }
+      if (s) G.makeMonster(type, s[0], s[1]);
     }
     // --- campione (un guerriero dell'era con varianti, al servizio del Signore della regione) ---
     if (R.floor > 1 && rng.chance(0.25 + (FM.danger ? 0.75 : 0))) {
@@ -375,9 +377,12 @@
   G.ensureStockRelics = function (f) {
     for (const s of f.stock) if (s.kind === 'relic' && !s.id) s.id = G.randomRelicId(G.run.rng, s.rarity);
   };
+  // una sola reliquia per mercante: comprata una, l'altra non è più in vendita
+  G.shopRelicLocked = (f, s) => s.kind === 'relic' && !s.sold && f.stock.some(o => o.kind === 'relic' && o.sold);
   G.buy = function (f, idx) {
     const R = G.run, h = R.hero, s = f.stock[idx];
     if (!s || s.sold) return false;
+    if (G.shopRelicLocked(f, s)) { G.log('Tartantica ti concede una sola reliquia.', 'bad'); return false; }
     const price = G.shopPrice(s);
     if (h.gold < price) { G.log('Non hai abbastanza Schegge.', 'bad'); return false; }
     if (s.kind === 'item') {
@@ -709,6 +714,7 @@
       if (R.version !== G.RUN_VERSION) { store.removeItem(RUN_KEY); return false; }
       R.rng = new G.RNG(1); R.rng.s = R.rngState >>> 0;
       R.hero = R.ents.find(e => e.kind === 'hero');
+      Object.assign(R.hero.flags, G.HERO_FLAGS[R.hero.heroId] || {});
       R.vis = new Uint8Array(R.map.w * R.map.h);
       R.distMapsDirty = true; R._dm = null;
       R.stats.startTime = Date.now() - (R.stats.playMs || 0);

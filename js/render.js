@@ -372,7 +372,7 @@
     const a = A(e), spr = G.SPR[e.sprite || e.type] || G.SPR.golem;
     let wx = a.x * TS, wy = a.y * TS;
     if (a.lunge) { const p = Math.sin((a.lunge.t / 0.14) * Math.PI); wx += a.lunge.dx * 5 * p; wy += a.lunge.dy * 5 * p; }
-    const fly = e.flags.fly && e.kind !== 'hero' || e.type === 'noctis';
+    const fly = !!e.flags.fly;
     const bob = Math.round(Math.sin(RD.time * (fly ? 4 : 2.5) + e.id) * (fly ? 1.5 : 0.6));
     const stunned = e.status.stun || e.status.freeze;
     const [px, py] = W2S(wx, wy);

@@ -28,11 +28,11 @@
     elios: {
       name: 'Elios', title: 'Campione dell\'Aria', elem: 'aria',
       hp: 48, atk: [4, 7], def: 2, eva: 14, crit: 12, critMul: 1.9,
-      passive: 'Vento in Poppa', passiveDesc: 'Vede 2 caselle più lontano. Dopo ogni abilità diventa Rapido per un breve momento.',
+      passive: 'Vento in Poppa', passiveDesc: 'Vola: ignora baratri, lava, acqua profonda e trappole. Vede 2 caselle più lontano. Dopo ogni abilità diventa Rapido per un breve momento.',
       desc: 'L\'arciere dei venti, figlio del sole. Colpisce da lontano e non si fa mai raggiungere.',
       skills: ['freccia', 'ventaglio', 'corrente', 'sole'], difficulty: 3,
       unlock: 'Sconfiggi Devilfenix, Signore dell\'Aria.',
-      setup(h) { h.mods.sight += 2; },
+      setup(h) { h.mods.sight += 2; h.flags.fly = true; },
     },
     barbataus: {
       name: 'Barbataus', title: 'Campione della Foresta', elem: 'foresta',

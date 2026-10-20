@@ -99,17 +99,52 @@
     doMove(m, p[0], p[1]);
     return true;
   }
-  function wander(m) {
-    const R = G.run;
-    if (m.flags.stationary) return;
-    if (!m.st.wx || (m.x === m.st.wx && m.y === m.st.wy) || rng().chance(0.04)) {
-      for (let k = 0; k < 20; k++) {
-        const x = m.x + rng().int(-10, 10), y = m.y + rng().int(-10, 10);
-        if (G.inb(x, y) && G.canWalk(m, x, y) && !G.isHazardFor(m, x, y)) { m.st.wx = x; m.st.wy = y; break; }
-      }
+  // ---------------- giro per la mappa ----------------
+  // punti di passaggio sparsi per tutto il piano, ognuno con la sua mappa di distanza:
+  // i nemici che non ti hanno ancora visto vanno dall'uno all'altro e girano per l'intero piano
+  const giri = new WeakMap();
+  function waypoints() {
+    const R = G.run, m = R.map;
+    let w = giri.get(m);
+    if (w) return w;
+    const probe = { flags: {}, kind: 'monster' };
+    const cells = [];
+    for (let y = 1; y < m.h - 1; y++) for (let x = 1; x < m.w - 1; x++) if (G.canWalk(probe, x, y) && !G.isHazardFor(probe, x, y)) cells.push([x, y]);
+    // scelta deterministica (non consuma il caso della partita, così resta uguale dopo un caricamento)
+    let s = (R.seed ^ Math.imul(R.floor + 1, 2654435761)) >>> 0;
+    const rnd = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return s / 4294967296; };
+    const pts = [];
+    for (let k = 0; k < 400 && pts.length < 8 && cells.length; k++) {
+      const c = cells[Math.floor(rnd() * cells.length)];
+      if (pts.every(p => U.cheb(p[0], p[1], c[0], c[1]) >= 10)) pts.push(c);
     }
-    if (rng().chance(0.35)) return; // gironzola con calma
-    if (!m.st.wx || !stepToward(m, { x: m.st.wx, y: m.st.wy })) randomStep(m);
+    const cost = (x, y) => G.canWalk(probe, x, y) ? (G.isHazardFor(probe, x, y) ? 12 : 1) : Infinity;
+    w = { pts, dm: pts.map(p => G.dijkstra(m.w, m.h, [[p[0], p[1], 0]], cost)) };
+    giri.set(m, w);
+    return w;
+  }
+  function wander(m) {
+    if (m.flags.stationary || m.status.root) return;
+    if (rng().chance(m.flags.lurker ? 0.7 : 0.1)) return; // ogni tanto si ferma a guardarsi intorno; chi tende agguati si sposta di rado
+    const w = waypoints(), i0 = G.idx(m.x, m.y);
+    let i = m.st.wp;
+    if (i === undefined || i >= w.pts.length || w.dm[i][i0] <= 1 || !isFinite(w.dm[i][i0]) || (m.st.wpStuck || 0) > 3) {
+      const opts = [];
+      for (let k = 0; k < w.pts.length; k++) if (k !== i && isFinite(w.dm[k][i0]) && w.dm[k][i0] > 3) opts.push(k);
+      i = m.st.wp = opts.length ? rng().pick(opts) : undefined;
+      m.st.wpStuck = 0;
+      if (i === undefined) { randomStep(m); return; }
+    }
+    const dm = w.dm[i];
+    let best = null, bd = dm[i0];
+    for (const [dx, dy] of U.DIRS8) {
+      const nx = m.x + dx, ny = m.y + dy;
+      if (!canMoveInto(m, nx, ny)) continue;
+      const d = dm[G.idx(nx, ny)];
+      if (d < bd) { bd = d; best = [nx, ny]; }
+    }
+    if (best) { doMove(m, best[0], best[1]); m.st.wpStuck = 0; }
+    else { m.st.wpStuck = (m.st.wpStuck || 0) + 1; randomStep(m); }
   }
   AI.stepToward = stepToward; AI.stepAway = stepAway; AI.randomStep = randomStep;
 

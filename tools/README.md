@@ -21,6 +21,7 @@ Riferimenti (30 partite per eroe, margine circa ±17 punti):
 - v1.5.0: 68% (Noctis 20%, Tasarau 43%, Elios 43%, Poivrons 97%, Carrapax 97%). Nuove regioni e boss: Aracno, Lavion, Armageddon; Obscurio spostato in Oscuro Orizzonte.
 - v1.6.0: 71% (Tasarau 47%, Noctis 47%, Barbataus 53%, Carrapax 60%, Saggio 93%, Poivrons 97%). I guerrieri dell'era al posto dei nemici generici; cadere dalle isole non fa più scendere di piano.
 - v1.6.1: 28% (Gheos, Tasarau, Noctis 0%, Elios 3%, Barbataus 10%, Luminescente 13%, Carrapax 37%, Kolossus 57%, Poivrons 80%, Saggio 83%). Tutti i boss +50% a PV, danni, armatura e schivata (`G.BOSS_STAT_MUL` in `js/game.js`).
+- v1.6.2: 30% (Tasarau, Noctis, Barbataus 0%, Gheos ed Elios 7%, Carrapax 30%, Luminescente 33%, Kolossus 57%, Poivrons 80%, Saggio 90%). I nemici girano per tutto il piano e dormono solo al 20% (`G.SLEEP_CHANCE`); una sola reliquia dal mercante; Elios vola.
 
 ## Batteria completa
 

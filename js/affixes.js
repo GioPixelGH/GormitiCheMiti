@@ -48,7 +48,6 @@
     e.xp = Math.round(e.xp * 3);
     const lord = (G.biomeOf(G.run.floor) || {}).lord || 'Magor';
     e.name = base + ', Campione di ' + lord + ' (' + e.affixes.map(a => G.AFFIXES[a].name).join(', ') + ')';
-    e.st.mode = 'sleep';
     return e;
   };
 })();

@@ -538,7 +538,7 @@
     if (f) {
       if (f.type === 'event') { const ev = G.EVENT_BY_ID[f.ev]; return `<h4>${ev.title}</h4>${f.used ? 'Hai già fatto la tua scelta.' : 'Qualcosa ti attende qui. Urtalo per scoprirlo.'}`; }
       if (f.type === 'chest') return `<h4>${f.rare ? 'Scrigno Antico' : 'Forziere'}</h4>${f.rare ? 'Contiene una reliquia.' : 'Schegge e forse un oggetto.'} Urtalo per aprirlo.`;
-      if (f.type === 'merchant') return `<h4>Tartantica la Veggente</h4>L'antica tartaruga del Popolo del Mare vende pozioni e reliquie: sa sempre cosa ti servirà. Urtala per commerciare.`;
+      if (f.type === 'merchant') return `<h4>Tartantica la Veggente</h4>L'antica tartaruga del Popolo del Mare vende pozioni e reliquie (una sola reliquia a testa): sa sempre cosa ti servirà. Urtala per commerciare.`;
       if (f.type === 'rift') return `<h4>Porta Ultradimensionale</h4>Un varco tra le dimensioni, collegato a un varco gemello in questa regione. Urtalo per comparire accanto all'altro.`;
       if (f.type === 'shrine') { const s = G.SHRINES[f.kind]; return `<h4>${s.name}</h4>${esc(s.desc)}${f.used ? '<div class="sub">Già usato.</div>' : '<div class="sub">Urtalo per interagire.</div>'}`; }
     }
@@ -691,9 +691,10 @@
         if (s.kind === 'item') { const d = G.ITEM_BY_ID[s.id]; nm = d.name; ds = d.desc; img = itemImg(s.id); }
         else if (s.kind === 'relic') { const r = G.RELIC_BY_ID[s.id]; nm = `<span style="color:${G.RARITY[r.rarity].color}">${r.name}</span>`; ds = r.desc; img = relicImg(s.id); }
         else { nm = 'Cure di Tartantica'; ds = 'Recuperi il 50% dei PV e rimuovi gli stati negativi.'; img = itemImg('grande_pozione'); }
-        items += `<div class="sitem ${s.sold ? 'sold' : ''} ${h.gold < price ? 'poor' : ''}" data-i="${i}"><div data-ic="${i}"></div><div><div class="nm">${nm}</div><div class="ds">${esc(ds)}</div></div><div class="price">${s.sold ? 'VENDUTO' : price + ' ◆'}</div></div>`;
+        const lock = G.shopRelicLocked(f, s);
+        items += `<div class="sitem ${s.sold || lock ? 'sold' : ''} ${h.gold < price ? 'poor' : ''}" data-i="${i}"><div data-ic="${i}"></div><div><div class="nm">${nm}</div><div class="ds">${esc(ds)}</div></div><div class="price">${s.sold ? 'VENDUTO' : lock ? 'NON PIÙ' : price + ' ◆'}</div></div>`;
       });
-      const m = openModal(`<h2>Tartantica la Veggente</h2><div class="sub">"Sapevo che saresti arrivato, Signore della Natura. Ho già messo da parte ciò che ti servirà." — Hai <b style="color:#7fe8ff">${h.gold} ◆</b></div>
+      const m = openModal(`<h2>Tartantica la Veggente</h2><div class="sub">"Sapevo che saresti arrivato, Signore della Natura. Ho già messo da parte ciò che ti servirà." — Una sola reliquia a testa. Hai <b style="color:#7fe8ff">${h.gold} ◆</b></div>
         <div class="shop">${items}</div><div class="mfoot"><button class="btn" id="leave">Arrivederci (Esc)</button></div>`, { type: 'shop', esc: () => afterModal() });
       m.querySelectorAll('[data-ic]').forEach(el => {
         const s = f.stock[+el.dataset.ic];
@@ -774,8 +775,8 @@
       <h3>Furia e crescita</h3>
       <p>Infliggere e subire danni carica la Furia. Salendo di livello scegli un Dono del Saggio: potenzia le tue abilità o le tue statistiche. Le reliquie danno poteri passivi permanenti.</p>
       <h3>Esplorazione</h3>
-      <p>I PV non si rigenerano da soli: gestisci pozioni e risorse. I nemici addormentati subiscono un colpo critico a sorpresa. Erba alta e porte bloccano la vista. Lava, baratri e fuoco sono pericolosi... anche per i nemici: spingili dentro!</p>
-      <p>Ogni regione ha 3 piani: al terzo ti attende il suo Guardiano, che custodisce un Frammento dell'Occhio della Vita. Tartantica la Veggente, la mercante, si trova al secondo piano di ogni regione.</p>
+      <p>I PV non si rigenerano da soli: gestisci pozioni e risorse. I nemici girano per il piano e ti cercano; quelli addormentati subiscono un colpo critico a sorpresa. Erba alta e porte bloccano la vista. Lava, baratri e fuoco sono pericolosi... anche per i nemici: spingili dentro!</p>
+      <p>Ogni regione ha 3 piani: al terzo ti attende il suo Guardiano, che custodisce un Frammento dell'Occhio della Vita. Tartantica la Veggente, la mercante, si trova al secondo piano di ogni regione: da lei puoi comprare una sola reliquia.</p>
       <h3>Risonanze</h3>
       <p>Ogni reliquia e Dono ha un'affinità (Veleno, Fuoco, Critico, Vita, Difesa, Furia, Tempesta, Saggezza, Fortuna). Con 2 elementi della stessa affinità si attiva un bonus; con 4 un potere che cambia il tuo stile di gioco. Premi <span class="k">I</span> per la Scheda dell'eroe.</p>
       <h3>Bivi e regioni</h3>

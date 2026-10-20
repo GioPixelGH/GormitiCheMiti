@@ -68,6 +68,8 @@
 
   // statistiche di tutti i boss (PV, danni, armatura, schivata) rispetto ai valori di base: +50% dalla v1.6.1
   G.BOSS_STAT_MUL = 1.5;
+  // probabilità che un nemico comune dorma all'inizio del piano (0.55 fino alla v1.6.1); gli altri girano per la mappa
+  G.SLEEP_CHANCE = 0.2;
   // Creazione mostri, con scalatura per piano/Eclissi
   G.makeMonster = function (type, x, y, opts) {
     opts = opts || {};
@@ -97,7 +99,7 @@
     if (isBoss && !opts.summon) { e.def = Math.round(e.def * G.BOSS_STAT_MUL); e.eva = Math.round(e.eva * G.BOSS_STAT_MUL); }
     e.hp = e.maxHp;
     e.energy = R.rng.int(0, 90);
-    e.st = { mode: opts.awake ? 'hunt' : (R.rng.chance(d.flags && d.flags.alwaysAwake ? 0 : 0.55) ? 'sleep' : 'wander') };
+    e.st = { mode: opts.awake ? 'hunt' : (R.rng.chance(d.flags && d.flags.alwaysAwake ? 0 : G.SLEEP_CHANCE) ? 'sleep' : 'wander') };
     if (opts.awake || (d.flags && d.flags.alwaysAwake)) { e.st.mode = 'hunt'; e.st.lx = R.hero ? R.hero.x : x; e.st.ly = R.hero ? R.hero.y : y; }
     if (opts.life) e.status.summon = { t: opts.life, p: 0 };
     if (d.init) d.init(e);
