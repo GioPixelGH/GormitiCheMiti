@@ -14,7 +14,6 @@
     spinoso:   { name: 'Spinoso', color: '#7be04a', desc: 'Chi lo colpisce in mischia si ferisce.', apply(e) { } },
   };
   const IDS = Object.keys(G.AFFIXES);
-  const TITLES = ['Zannaferro', 'Occhiorosso', 'il Divoratore', 'Sfregiato', 'Unghiadura', 'l\'Implacabile', 'Fauci d\'Ombra', 'il Tiranno', 'Cuorpietra', 'il Senzanome', 'Ossarotte', 'la Furia Grigia'];
 
   G.applyAffix = function (e, id) {
     const a = G.AFFIXES[id];
@@ -39,7 +38,7 @@
     }
   };
 
-  // Campione: un nemico comune con due varianti, più PV e un nome proprio
+  // Campione: un guerriero dell'era con due varianti e più PV, al servizio del Signore della regione
   G.makeChampion = function (e, rng) {
     const base = G.MON[e.type].name;
     G.rollAffixes(e, rng, 2);
@@ -47,7 +46,8 @@
     e.atk = [Math.round(e.atk[0] * 1.2), Math.round(e.atk[1] * 1.2)];
     e.flags.champion = true; e.flags.elite = true; e.flags.noKnock = true;
     e.xp = Math.round(e.xp * 3);
-    e.name = rng.pick(TITLES) + ', ' + base + ' (' + e.affixes.map(a => G.AFFIXES[a].name).join(', ') + ')';
+    const lord = (G.biomeOf(G.run.floor) || {}).lord || 'Magor';
+    e.name = base + ', Campione di ' + lord + ' (' + e.affixes.map(a => G.AFFIXES[a].name).join(', ') + ')';
     e.st.mode = 'sleep';
     return e;
   };

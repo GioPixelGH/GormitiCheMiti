@@ -127,6 +127,8 @@
   G.moveTo = function (e, x, y, opts) {
     opts = opts || {};
     const ox = e.x, oy = e.y;
+    // l'ultima casella sicura: chi cade da un bordo ci viene riportato
+    if (e.kind === 'hero' && G.tileAt(ox, oy) !== T.CHASM) e.st.lastSafe = [ox, oy];
     e.x = x; e.y = y;
     G.fx.move(e, ox, oy, opts);
     if (e.kind === 'hero') G.run.distMapsDirty = true;
@@ -198,20 +200,19 @@
     const R = G.run;
     G.fx.sound('fall');
     if (e.kind === 'hero') {
-      if (G.isBossFloor(R.floor) || R.floor >= G.TOTAL_FLOORS) {
-        // nelle arene il vento ti riporta su
-        const dmg = Math.round(e.maxHp * 0.12);
-        G.log('Precipiti nel vuoto... una raffica ti riporta sulla roccia!', 'bad');
-        G.dealDamage(null, e, dmg, { pierce: true, src: 'caduta' });
-        const spot = G.randomFreeTile(e, 6);
-        if (spot && !e.dead) { e.x = spot[0]; e.y = spot[1]; G.fx.teleport(e); R.distMapsDirty = true; }
-        return;
-      }
-      G.log('Precipiti nel baratro fino al piano inferiore!', 'bad');
-      const dmg = Math.round(e.maxHp * 0.12);
-      e.hp = Math.max(1, e.hp - dmg);
+      // si precipita dal bordo, ma una corrente d'aria riporta sulla roccia da cui ci si è lanciati
+      // la caduta fa male ma non uccide (come quando si precipitava al piano di sotto)
+      const lost = Math.min(Math.round(e.maxHp * 0.12), e.hp - 1);
       R.stats.falls = (R.stats.falls || 0) + 1;
-      R.pendingDescend = { fell: true };
+      G.log('Precipiti dal bordo... una corrente d\'aria ti riporta sulla roccia!', 'bad');
+      if (lost > 0) { e.hp -= lost; R.stats.dmgTaken += lost; G.fx.float(e.x, e.y, String(lost), '#ff5050'); G.fx.sound('hurt'); }
+      const ok = (x, y) => G.canEnter(e, x, y) && !G.isHazardFor(e, x, y) && G.tileAt(x, y) !== T.CHASM;
+      const ls = e.st.lastSafe;
+      let spot = null;
+      if (ls) for (let r = 0; r <= 3 && !spot; r++) for (let dy = -r; dy <= r && !spot; dy++) for (let dx = -r; dx <= r && !spot; dx++) if (Math.max(Math.abs(dx), Math.abs(dy)) === r && ok(ls[0] + dx, ls[1] + dy)) spot = [ls[0] + dx, ls[1] + dy];
+      if (!spot) spot = G.randomFreeTile(e, 6);
+      if (spot) { const ox = e.x, oy = e.y; e.x = spot[0]; e.y = spot[1]; G.fx.teleport(e, ox, oy); R.distMapsDirty = true; }
+      G.hint('caduta', 'Se cadi da un bordo perdi un po\' di vita, ma il vento ti riporta da dove sei saltato. I nemici invece precipitano davvero: spingili nel vuoto!');
     } else {
       if (e.flags.boss) { // i boss non cadono
         const spot = G.randomFreeTile(e, 4); if (spot) { e.x = spot[0]; e.y = spot[1]; }
@@ -379,7 +380,7 @@
     const R = G.run;
     if (d.dead || a.dead) return false;
     G.fx.lunge(a, d.x - a.x, d.y - a.y);
-    const sneak = d.kind === 'monster' && d.st.mode === 'sleep';
+    const sneak = d.kind === 'monster' && d.st.mode === 'sleep' && !d.flags.noSneak;
     let acc = a.acc - d.eva - (d.kind === 'hero' && G.synLevel(d, 'tempesta') >= 1 ? 5 : 0);
     if (a.status.blind) acc -= 40;
     if (d.status.stun || d.status.freeze || d.status.root) acc += 20;
@@ -445,6 +446,7 @@
     const hero = R.hero;
     const elem = opts.elem || (src ? src.elem : null);
     if (opts.crit) dmg *= (src ? src.critMul : 1.6);
+    if (src && src.flags && src.flags.executioner && !opts.dot && tgt.hp < tgt.maxHp * 0.5) dmg *= 1.4;
     let em = 1;
     if (elem && !opts.dot) {
       em = G.elemMult(elem, tgt.elem, src && src.kind === 'hero' ? src.mods.elemStrong : 1.5);
@@ -1210,7 +1212,7 @@
     for (const m of R.ents) {
       if (m.dead || m.kind !== 'monster' || m.faction !== 'enemy') continue;
       const d = U.cheb(m.x, m.y, h.x, h.y);
-      const sees = G.visible(m.x, m.y) && d <= m.sight && (!hidden || d <= 1) && !m.status.blind;
+      const sees = G.visible(m.x, m.y) && d <= m.sight && (!hidden || d <= 1 || m.flags.trueSight) && !m.status.blind;
       m.st.seesHero = sees;
       if (m.st.mode === 'sleep' && G.visible(m.x, m.y) && !G.isHiddenMonster(m)) G.hint('sleep', 'Alcuni nemici dormono (zZ): attaccarli di sorpresa garantisce un colpo critico.');
       if (sees) {

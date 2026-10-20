@@ -14,24 +14,11 @@
       desc: 'Un groviglio di spine animato dalla corruzione. Lento, ma le sue spine possono trattenerti.',
       onHit: st('root', 1, 0, 0.3),
     },
-    lupo: {
-      name: 'Lupo Selvaggio', elem: 'terra', hp: 9, atk: [2, 3], eva: 8, speed: 120, xp: 3, ai: 'melee', pack: [2, 3],
-      desc: 'Caccia in branco. Veloce: non provare a fuggire.',
-    },
     fungo: {
       name: 'Fungo Sputaspore', elem: 'foresta', hp: 8, atk: [1, 2], speed: 100, xp: 3, ai: 'turret',
       flags: { stationary: true, noKnock: true },
       ranged: { range: 5, cd: 2, dmg: [1, 3], elem: 'foresta', proj: 'spore', status: ['poison', 4, 2] },
       desc: 'Immobile. Sputa spore velenose da lontano.',
-    },
-    calabrone: {
-      name: 'Calabrone Gigante', elem: 'aria', hp: 6, atk: [1, 3], eva: 25, speed: 140, xp: 2, ai: 'erratic',
-      flags: { fly: true }, desc: 'Ronza in modo imprevedibile. Difficile da colpire.',
-    },
-    fuocofatuo: {
-      name: 'Fuoco Fatuo', elem: 'fuoco', hp: 5, atk: [1, 1], speed: 110, xp: 3, ai: 'kamikaze',
-      flags: { fly: true, fireImmune: true }, explode: { dmg: [6, 9], fire: 3 },
-      desc: 'Una fiammella vagante. Quando ti è accanto si gonfia ed esplode: allontanati!',
     },
     treant: {
       name: 'Treant Corrotto', elem: 'foresta', hp: 40, atk: [4, 7], def: 2, speed: 80, xp: 15, ai: 'melee',
@@ -63,19 +50,6 @@
       name: 'Medusa Elettrica', elem: 'aria', hp: 10, atk: [3, 5], eva: 5, speed: 60, xp: 4, ai: 'jelly', flags: { fly: true },
       desc: 'Fluttua lentamente. La sua scarica è doppia contro chi è Bagnato.',
     },
-    squalo: {
-      name: 'Squalo Predatore', elem: 'mare', hp: 18, atk: [4, 6], def: 1, speed: 100, xp: 6, ai: 'melee', flags: { swim: true, waterFast: true },
-      desc: 'Nell\'acqua è velocissimo. Tienilo all\'asciutto.',
-    },
-    annegato: {
-      name: 'Spirito Annegato', elem: 'tenebre', hp: 12, atk: [3, 5], eva: 10, speed: 90, xp: 6, ai: 'melee', flags: { phase: true, drain: true, fly: true },
-      desc: 'Un fantasma che attraversa la roccia e si nutre della tua vita.',
-    },
-    geyser: {
-      name: 'Geyser l\'Iroso', elem: 'fuoco', hp: 70, atk: [5, 8], def: 5, speed: 90, xp: 25, ai: 'melee',
-      flags: { elite: true, noKnock: true, fireImmune: true }, slam: { cd: 5, shape: 'around', r: 2, dmg: [8, 12], fire: 2, color: '#ffb070', label: 'Getti di Vapore' },
-      desc: 'ÉLITE. Guerriero di Orrore Profondo (Seconda Serie): una bomba ad orologeria. Quando si arrabbia, getti di vapore incandescente escono da tutto il suo corpo.',
-    },
     orrore: {
       name: 'Orrore Profondo', title: 'Il Signore di Vulcano', elem: 'fuoco', hp: 230, atk: [6, 9], def: 3, speed: 80, xp: 60, ai: 'boss_orrore',
       flags: { boss: true, noKnock: true, swim: true, fireImmune: true, alwaysAwake: true }, big: true,
@@ -88,17 +62,9 @@
     },
 
     // ================= CAVERNA DI ROSCAMAR =================
-    golem: {
-      name: 'Golem di Pietra', elem: 'terra', hp: 34, atk: [5, 8], def: 4, speed: 70, xp: 8, ai: 'melee', flags: { noKnock: false },
-      desc: 'Lento e massiccio. Colpisce come una frana.',
-    },
     pipistrello: {
       name: 'Pipistrello d\'Ombra', elem: 'tenebre', hp: 12, atk: [3, 5], eva: 25, speed: 150, xp: 5, ai: 'erratic', flags: { fly: true, drain: true },
       desc: 'Svolazza nel buio e succhia la vita.',
-    },
-    talpa: {
-      name: 'Talpa Scavatrice', elem: 'terra', hp: 22, atk: [4, 7], def: 2, speed: 90, xp: 7, ai: 'melee', flags: { burrow: true },
-      desc: 'Scava attraverso la roccia per raggiungerti.',
     },
     minatore: {
       name: 'Minatore Maledetto', elem: 'tenebre', hp: 20, atk: [3, 5], def: 1, speed: 100, xp: 7, ai: 'ranged', flags: { kiter: true },
@@ -108,11 +74,6 @@
     ombra: {
       name: 'Ombra Strisciante', elem: 'tenebre', hp: 18, atk: [6, 9], crit: 20, speed: 100, xp: 8, ai: 'melee', flags: { lurker: true },
       desc: 'Invisibile finché non è a due passi da te.',
-    },
-    colosso: {
-      name: 'Colosso di Cristallo', elem: 'terra', hp: 110, atk: [7, 11], def: 6, speed: 80, xp: 35, ai: 'melee',
-      flags: { elite: true, noKnock: true }, slam: { cd: 5, shape: 'cross', r: 5, dmg: [10, 15], status: 'vuln', st: 3, color: '#7fd8ff', label: 'Lance di Cristallo' },
-      desc: 'ÉLITE. Un gigante di cristallo vivente. Proietta lance in quattro direzioni.',
     },
     armageddon: {
       name: 'Armageddon', title: 'Il Signore del Vulcano', elem: 'fuoco', hp: 340, atk: [8, 12], def: 4, speed: 85, xp: 90, ai: 'boss_armageddon',
@@ -132,32 +93,14 @@
     },
 
     // ================= PICCHI DELLA VALLE DEL DESTINO =================
-    arpia: {
-      name: 'Arpia', elem: 'aria', hp: 26, atk: [5, 8], eva: 12, speed: 120, xp: 9, ai: 'hitrun', flags: { fly: true },
-      desc: 'Colpisce in picchiata e si ritira subito dopo.',
-    },
     spiritovento: {
       name: 'Spirito del Vento', elem: 'aria', hp: 22, atk: [3, 5], eva: 15, speed: 100, xp: 9, ai: 'ranged', flags: { fly: true, kiter: true },
       ranged: { range: 4, cd: 3, dmg: [3, 6], elem: 'aria', proj: 'wind', push: 2 },
       desc: 'Le sue raffiche ti spingono via... magari dritto in un baratro.',
     },
-    gargolla: {
-      name: 'Gargolla', elem: 'terra', hp: 36, atk: [6, 10], def: 3, speed: 100, xp: 10, ai: 'stone', flags: { stoneForm: true, noKnock: true },
-      desc: 'Sembra una statua. Quando sei vicino si risveglia. In forma di pietra è quasi invulnerabile.',
-    },
-    folgoratore: {
-      name: 'Folgoratore', elem: 'aria', hp: 24, atk: [3, 5], speed: 100, xp: 10, ai: 'caster', flags: { fly: true, kiter: true },
-      cast: { cd: 4, range: 7, shape: 'plus', dmg: [8, 12], color: '#bfe8ff', elem: 'aria', label: 'Fulmine' },
-      desc: 'Evoca fulmini dove ti trovi. Quando vedi il segnale, spostati!',
-    },
     grifone: {
       name: 'Grifone', elem: 'aria', hp: 32, atk: [6, 9], def: 1, speed: 130, xp: 11, ai: 'melee', flags: { fly: true },
       desc: 'Metà aquila e metà leone. Veloce e feroce.',
-    },
-    crudelion: {
-      name: 'Crudelion il Maledetto', elem: 'aria', hp: 140, atk: [8, 12], def: 3, speed: 115, xp: 45, ai: 'melee',
-      flags: { elite: true, fly: true, noKnock: true }, slam: { cd: 4, shape: 'target', r: 1, dmg: [10, 14], status: 'vuln', st: 2, color: '#c04ae0', label: 'Balzo Uncinato' },
-      desc: 'ÉLITE. L\'anima nera del Popolo dell\'Aria (Terza Serie): con salti lunghissimi piomba sui nemici e li dilania con gli uncini delle braccia.',
     },
     devilfenix: {
       name: 'Devilfenix', title: 'La Fenice Infernale', elem: 'aria', hp: 480, atk: [9, 13], def: 3, speed: 110, xp: 60, ai: 'boss_devilfenix',
@@ -191,11 +134,6 @@
     lavico: {
       name: 'Segugio Lavico', elem: 'fuoco', hp: 28, atk: [6, 9], eva: 8, speed: 130, xp: 10, ai: 'melee', flags: { fireImmune: true }, pack: [2, 3],
       desc: 'Cani di magma che cacciano in branco.',
-    },
-    mastodontico: {
-      name: 'Il Mastodontico', elem: 'fuoco', hp: 180, atk: [10, 14], def: 5, speed: 85, xp: 60, ai: 'melee',
-      flags: { elite: true, noKnock: true, fireImmune: true }, slam: { cd: 4, shape: 'around', r: 1, dmg: [13, 18], status: 'stun', st: 1, color: '#ff9a2a', label: 'Pugni Demolitori' },
-      desc: 'ÉLITE. Guerriero del Popolo della Lava (Prima Serie): lento ma potentissimo. "A che servono armi o magia, quando i tuoi pugni possono demolire il mondo?"',
     },
     magmion: {
       name: 'Magmion', title: 'Signore del Magma', elem: 'fuoco', hp: 320, atk: [10, 14], def: 5, speed: 100, xp: 120, ai: 'boss_magmion',

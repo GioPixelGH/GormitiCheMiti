@@ -359,6 +359,9 @@ SPRITE.armageddon = () => {
   return { pal: { r: '#c8281e', R: '#ee4a3a', d: '#7a1410', n: '#1a1418', N: '#3a3238', y: '#ffc83a', Y: '#ffe27a', o: '#e88a1a', s: '#b8281e', k: '#0e0a0c' }, t };
 };
 
+// i guerrieri del male dell'era (Fase 4)
+Object.assign(SPRITE, require('./guerrieri'));
+
 Object.assign(RITRATTI, require('./ritratti'));
 
 module.exports = { SPRITE, RITRATTI };

@@ -162,7 +162,7 @@
           if (o && G.hostile(o, h)) { hit = o; break; }
           if (!G.canEnter(h, nx, ny) || G.isHazardFor(h, nx, ny)) break;
           G.moveTo(h, nx, ny, { dash: true }); steps++;
-          if (h.dead || G.run.pendingDescend) return true;
+          if (h.dead || G.run.pendingDescend || h.x !== nx || h.y !== ny) return true;
         }
         if (!hit && steps === 0) return false;
         G.fx.sound('charge');

@@ -19,6 +19,7 @@ Riferimenti (30 partite per eroe, margine circa ±17 punti):
 - v1.3.0: 67% (Barbataus 40%, Noctis 43%, Tasarau 57%, Carrapax 90%, Poivrons 87%). Orrore Profondo ora è di Fuoco e penalizza gli eroi della Foresta.
 - v1.4.0: identica alla v1.3.0 (la fase ha cambiato solo la grafica).
 - v1.5.0: 68% (Noctis 20%, Tasarau 43%, Elios 43%, Poivrons 97%, Carrapax 97%). Nuove regioni e boss: Aracno, Lavion, Armageddon; Obscurio spostato in Oscuro Orizzonte.
+- v1.6.0: 71% (Tasarau 47%, Noctis 47%, Barbataus 53%, Carrapax 60%, Saggio 93%, Poivrons 97%). I guerrieri dell'era al posto dei nemici generici; cadere dalle isole non fa più scendere di piano.
 
 ## Batteria completa
 
@@ -57,7 +58,7 @@ Il bot è volutamente semplice: non sa tenersi a distanza né usare bene il terr
 Gli eroi, il Vecchio Saggio e i grandi nemici dell'era sono disegnati a mano con forme geometriche (ellissi, poligoni, linee) su una griglia, guardando carte e statuine dell'archivio locale `riferimenti/` (che non viene pubblicato).
 
 - `pittore.js`: la "tela" con le forme e le ombreggiature.
-- `disegni.js`: gli sprite della mappa (16×16, boss 24×24); `ritratti.js`: i ritratti 48×48.
+- `disegni.js`: gli sprite della mappa (16×16, boss 24×24); `guerrieri.js`: i guerrieri del male dell'era; `ritratti.js`: i ritratti 48×48.
 - `genera.js` scrive `js/volti.js`, che il gioco carica dopo gli altri sprite:
 
 ```

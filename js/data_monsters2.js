@@ -1,19 +1,13 @@
 'use strict';
 // ============================================================
-//  data_monsters2.js : Pianura delle Nebbie, Regione di Oscuro Orizzonte,
-//  Lupo Alfa, Riflesso e alleati dei nuovi eroi (+ le loro IA)
+//  data_monsters2.js : Pianura delle Nebbie (con Lavion), Regione di Oscuro Orizzonte,
+//  Riflesso e alleati dei nuovi eroi (+ le loro IA). I guerrieri dell'era sono in data_guerrieri.js
 // ============================================================
 (function () {
   const U = G.U, T = G.T, AI = G.AI;
-  const st = (name, t, p, chance) => (a, d) => { if (!chance || G.run.rng.chance(chance)) G.addStatus(d, name, t, p); };
   const rng = () => G.run.rng;
 
   Object.assign(G.MON, {
-    // ================= FORESTA (sinergia di branco) =================
-    lupoalfa: {
-      name: 'Lupo Alfa', elem: 'terra', hp: 18, atk: [3, 5], eva: 8, speed: 120, xp: 7, ai: 'alpha', escort: ['lupo', 2],
-      desc: 'Il capobranco. Il suo ululato rende più feroci i lupi vicini: abbattilo per primo.',
-    },
     // ================= PIANURA DELLE NEBBIE =================
     lupocenere: {
       name: 'Lupo delle Nebbie', elem: 'aria', hp: 14, atk: [3, 5], eva: 10, speed: 120, xp: 5, ai: 'melee', pack: [2, 3],
@@ -23,20 +17,6 @@
       name: 'Spettro della Nebbia', elem: 'aria', hp: 12, atk: [2, 4], eva: 15, speed: 100, xp: 6, ai: 'ranged', flags: { fly: true, kiter: true },
       ranged: { range: 5, cd: 3, dmg: [3, 5], elem: 'aria', proj: 'mist', status: ['blind', 2, 0] },
       desc: 'Prende forma dalla bruma e ti acceca con soffi gelidi.',
-    },
-    golemlava: {
-      name: 'Golem di Lava', elem: 'fuoco', hp: 28, atk: [4, 7], def: 4, speed: 70, xp: 8, ai: 'melee', flags: { fireImmune: true },
-      desc: 'Roccia fusa che cammina. Quando va in pezzi, i suoi frammenti incandescenti esplodono tutto intorno.',
-    },
-    sciamanolava: {
-      name: 'Sciamano della Lava', elem: 'fuoco', hp: 16, atk: [2, 4], speed: 100, xp: 7, ai: 'support', support: 'ward', flags: { kiter: true, fireImmune: true },
-      ranged: { range: 5, cd: 2, dmg: [3, 5], elem: 'fuoco', proj: 'fire', status: ['burn', 2, 2] },
-      desc: 'Avvolge i compagni in corazze di roccia fusa. Eliminalo per primo.',
-    },
-    lavor: {
-      name: 'Lavor il Potente', elem: 'fuoco', hp: 75, atk: [6, 9], def: 5, speed: 90, xp: 25, ai: 'melee', flags: { elite: true, noKnock: true, fireImmune: true },
-      slam: { cd: 5, shape: 'cross', r: 5, dmg: [8, 12], fire: 2, color: '#ff8a2a', label: 'Dardi Infuocati' },
-      desc: 'ÉLITE. Una corazzata del Popolo della Lava (Prima Serie): spara dardi infuocati dal braccio, dal collo e dalla testa, in ogni direzione.',
     },
     lavion: {
       name: 'Lavion', title: 'Il Signore del Terrore', elem: 'fuoco', hp: 240, atk: [6, 9], def: 3, speed: 90, xp: 60, ai: 'boss_lavion',
@@ -54,24 +34,6 @@
       ranged: { range: 6, cd: 2, dmg: [6, 9], elem: 'tenebre', proj: 'shadow' },
       desc: 'Un cristallo d\'ombra cresciuto oltre la Porta Ultradimensionale. Spara dardi di tenebra e non si muove.',
     },
-    falenanotte: {
-      name: 'Falena della Notte', elem: 'tenebre', hp: 18, atk: [4, 6], eva: 22, speed: 130, xp: 8, ai: 'erratic', flags: { fly: true },
-      onHit: st('confuse', 1, 0, 0.25), desc: 'Le sue ali nere spargono una polvere che confonde.',
-    },
-    cavaliereombra: {
-      name: 'Cavaliere d\'Ombra', elem: 'tenebre', hp: 40, atk: [6, 9], def: 5, speed: 90, xp: 11, ai: 'paladin',
-      desc: 'Un guerriero del Popolo delle Tenebre. Si protegge con uno scudo d\'ombra che si rigenera.',
-    },
-    accolitonotte: {
-      name: 'Accolito della Notte', elem: 'tenebre', hp: 24, atk: [3, 5], speed: 100, xp: 10, ai: 'support', support: 'haste', flags: { kiter: true },
-      ranged: { range: 5, cd: 2, dmg: [5, 8], elem: 'tenebre', proj: 'shadow' },
-      desc: 'Rende più rapidi e feroci i suoi alleati. Eliminalo per primo.',
-    },
-    pantanera: {
-      name: 'Pantanera il Sergente del Terrore', elem: 'tenebre', hp: 130, atk: [8, 12], def: 3, speed: 110, xp: 45, ai: 'melee', flags: { elite: true, noKnock: true },
-      slam: { cd: 4, shape: 'target', r: 1, dmg: [10, 14], status: 'weak', st: 3, color: '#9ae07a', label: 'Assalto del Terrore' },
-      desc: 'ÉLITE. Pantera-demone del Popolo delle Tenebre (Terza Serie): l\'unica ad aver già combattuto la Luce al fianco di Obscurio. Seconda per pericolosità solo al suo Signore.',
-    },
     // ================= SPECIALI =================
     riflesso: {
       name: 'Riflesso', elem: 'neutro', hp: 20, atk: [3, 5], speed: 100, xp: 10, ai: 'melee', flags: { alwaysAwake: true },
@@ -83,40 +45,8 @@
     antico: { name: 'Guardiano Antico', elem: 'foresta', hp: 60, atk: [5, 9], def: 3, speed: 90, xp: 0, ai: 'ally', flags: { noKnock: true }, desc: 'Un treant millenario risvegliato da Barbataus.' },
   });
 
-  // ------------------------------------------------------------ effetti alla morte
-  G.MON.golemlava.onDeath = (e) => {
-    const tiles = AI.shapes.square(e.x, e.y, 1, true);
-    G.telegraph(null, tiles, { k: 'blast', dmg: [5, 8], elem: 'fuoco', fire: 2, friendly: true, color: '#ff8a2a', src: 'frammenti di lava', sound: 'boom' }, { color: '#ff8a2a', label: 'Frammenti di lava', cancelOnDeath: false });
-    if (G.visible(e.x, e.y)) G.log('Il Golem di Lava va in pezzi: i frammenti incandescenti stanno per esplodere!', 'bad');
-  };
-
   // ------------------------------------------------------------ IA
   const dist = (a, b) => U.cheb(a.x, a.y, b.x, b.y);
-  AI.alpha = function (m) {
-    if (m.st.mode === 'wander') return AI.wander(m);
-    if (AI.ready(m, 'howl')) {
-      const pack = G.run.ents.filter(o => !o.dead && o !== m && o.faction === 'enemy' && /lupo|lavico/.test(o.type) && dist(o, m) <= 5);
-      if (pack.length) {
-        for (const o of pack) { G.addStatus(o, 'empower', 4); G.alert(o, G.run.hero); }
-        G.fx.ring(m.x, m.y, 4, '#ffb04a'); G.fx.sound('roar');
-        G.fx.float(m.x, m.y, 'Ululato!', '#ffb04a', { small: true });
-        if (G.visible(m.x, m.y)) G.log('Il Lupo Alfa ulula: il branco diventa più feroce!', 'bad');
-        AI.setCd(m, 'howl', 6);
-        return;
-      }
-    }
-    AI.melee(m);
-  };
-  AI.paladin = function (m) {
-    if (m.st.mode === 'wander') return AI.wander(m);
-    if (!m.status.shield && AI.ready(m, 'ward') && m.st.seesHero) {
-      G.addStatus(m, 'shield', 30, 12 + G.regionOf(G.run.floor) * 3);
-      G.fx.ring(m.x, m.y, 0.8, '#b77cff'); G.fx.sound('shield');
-      AI.setCd(m, 'ward', 6);
-      return;
-    }
-    AI.melee(m);
-  };
   AI.flower = function (m) {
     const h = G.run.hero;
     if (dist(m, h) <= 2 && h.hp < h.maxHp) {

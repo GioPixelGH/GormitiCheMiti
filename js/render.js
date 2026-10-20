@@ -598,6 +598,7 @@
     arcane: { color: '#d8b0ff', trail: '#f0e0ff', speed: 260 }, bomb: { color: '#ff6a2a', trail: '#ffd23a', speed: 160, arc: 14 },
     ice: { color: '#bff4ff', trail: '#ffffff', speed: 160, arc: 14 },
     mist: { color: '#d8dcd8', trail: '#ffffff', speed: 180 }, shadow: { color: '#6a3aa0', trail: '#b77cff', speed: 220 },
+    mind: { color: '#7aff4a', trail: '#d8ffb0', speed: 240 }, spark: { color: '#ffe27a', trail: '#ffffff', speed: 300 },
   };
 
   // ---------------------------------------------------------------- ambiente

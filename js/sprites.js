@@ -22,12 +22,6 @@
   S.fungo = { sym: true, pal: { r: '#c83a5a', p: '#ff7a9a', w: '#f8e8d0', s: '#d0c0a0', e: '#2a1a10', g: '#9be35a' }, rows: [
     '........', '........', '........', '.....rrr', '...rrprw', '..rpwrrr', '.rrrrrrr', '.rwrrrwr',
     'rrrrrrrr', '....swww', '....swew', '....swww', '....ssww', '...gsssw', '..g.....', '........'] };
-  S.calabrone = { sym: true, pal: { y: '#ffd23a', k: '#1a1410', w: '#d0f0ff', e: '#ff3a3a' }, rows: [
-    '........', '........', '........', '.ww.....', 'wwww..yy', 'wwwww.ey', '.wwww.yy', '..ww.kkk',
-    '.....yyy', '.....kkk', '.....yyy', '......kk', '......yk', '.......k', '........', '........'] };
-  S.fuocofatuo = { sym: true, pal: { r: '#ff4a1a', o: '#ff9a2a', y: '#ffe27a', w: '#ffffff', e: '#5a1a0a' }, rows: [
-    '........', '.......o', '......oo', '......oy', '.....ooy', '....rooy', '...rooyy', '...royyy',
-    '..rooyyw', '..royeyw', '..rooyyy', '...rooyy', '....rroo', '.....rr.', '........', '........'] };
   S.treant = { sym: true, pal: { b: '#3a2a1e', n: '#5a4030', l: '#7a5a40', g: '#3a6a2a', v: '#8a3a9a', e: '#ff3a3a' }, rows: [
     '..n...n.', '..nn.nn.', '...nnnn.', '.n..nnnn', '.nn.bnnn', '..nnbnnl', '...bnnnl', '...bnenl',
     '...bnnvn', '.nnbbnvv', 'n..bnnnl', '...bnnll', '..gbnnnl', '..bb.bnn', '.bb..b.n', '........'] };
@@ -43,13 +37,6 @@
   S.medusa = { sym: true, pal: { c: '#5ae0ff', l: '#b0f4ff', w: '#ffffff', b: '#2a9ac8', y: '#ffe27a' }, rows: [
     '........', '........', '.....ccc', '...cclll', '..cllwll', '..clllll', '.cclllll', '.bcccccc',
     '.b.b.bc.', '..b.b.c.', '.b..y.b.', '..b.b..b', '.y..b.b.', '...b....', '........', '........'] };
-  S.squalo = { pal: { d: '#2a4a6a', b: '#4a7aa0', l: '#7aaad0', w: '#f0f4f8', e: '#101010', t: '#ffffff' }, rows: [
-    '................', '................', '................', '......d.........', '.....dd.........', '....ddb.........',
-    'd..dbbbbbbbb....', 'dddbbbbbbbbbbb..', '.dbbbbbbbbbbeb..', 'dd.wwwbbbbbbbbb.', 'd...wwwwwwwtwtw.', '.....wwwwwww....',
-    '......b...b.....', '................', '................', '................'] };
-  S.annegato = { sym: true, pal: { g: '#6ac0b0', l: '#c0fff0', d: '#2a7a7a', e: '#0a2a2a', k: '#0a2a2a' }, rows: [
-    '........', '........', '.....ggg', '....glll', '...gllll', '...gleel', '...gleel', '...gllll',
-    '..gllllk', '..gllllg', '.ggllgll', '.gdglgll', '..g.gdlg', '....g.dg', '.......g', '........'] };
   S.tentacolo = { pal: { p: '#6a2a7a', l: '#b05ac0', w: '#f0c0f0' }, rows: [
     '................', '................', '..........pp....', '.........plp....', '........pll.....', '.......plw......',
     '.......pll......', '......pllw......', '......plll......', '......pllw......', '.......plll.....', '.......pllw.....',
@@ -62,9 +49,6 @@
   S.pipistrello = { sym: true, pal: { d: '#2a1a3a', p: '#4a2a6a', l: '#7a4a9a', e: '#ff3a3a', w: '#f0f0f0' }, rows: [
     '........', '........', '........', '........', '......p.', 'p.....pp', 'pp...ppp', 'lpp.pepp',
     'llppppwp', 'lllpppp.', '.llp.pp.', '..l..p..', '........', '........', '........', '........'] };
-  S.talpa = { sym: true, pal: { b: '#4a2e20', n: '#7a5a40', l: '#a08060', p: '#ff9ab0', c: '#e8e8d8', e: '#101010' }, rows: [
-    '........', '........', '........', '.....nnn', '...nnnnn', '..nnnenl', '..nnnnlp', '.nnnnnll',
-    'cnbnnnll', 'ccbnnnnl', 'c.bbnnnn', '...bbnnn', '...bb.bn', '..cc..cc', '........', '........'] };
   S.minatore = { pal: { h: '#8a7a3a', y: '#ffe27a', s: '#2a1a2a', e: '#ff5a3a', c: '#4a3a5a', l: '#7a6a90', b: '#3a2a20', n: '#9a7a50', g: '#b0b0c0' }, rows: [
     '................', '................', '......hhhh......', '.....hhyyhh.....', '.....hhhhhh.....', '......sees......',
     '......ssss...gg.', '.....cccccc.gn..', '....cclllccng...', '....c.lccl.n....', '....s.cccc.n....', '......cccc.n....',
@@ -72,30 +56,16 @@
   S.ombra = { sym: true, pal: { d: '#1a0a2a', p: '#3a1a5a', v: '#6a3a9a', e: '#ff5aff' }, rows: [
     '........', '........', '........', '......dd', '.....dpp', '....dppp', '...dpepp', '...dpppp',
     '..dppvpp', '.dppvppp', 'd.dpppvp', '..dp.ppd', '.d.dp.pd', 'd...d..d', '......d.', '........'] };
-  S.colosso = { sym: true, pal: { c: '#3a8ab0', l: '#7ad8ff', w: '#e0f8ff', d: '#1a4a6a', e: '#ffffff', p: '#b07aff' }, rows: [
-    '........', '.w......', '.lw...l.', '..lw.cll', '..llccwl', '...ccelc', '.l.cclll', 'lll.dccc',
-    'lwlcdccl', 'lllcdcpl', 'cc.cdccc', 'cc..dccl', '.....dcc', '....dcc.', '...ddcc.', '........'] };
   S.clone = { base: 'obscurio', size: 24, pal: { n: '#1a1030', N: '#2a1a4a', M: '#4a3a7a', b: '#0a0612', k: '#000000', l: '#505060', r: '#401020', R: '#602040', e: '#ff4aff' } };
 
   // ---------------------------------------------------------------- CIELI
-  S.arpia = { sym: true, pal: { b: '#6a4a3a', n: '#9a7a5a', l: '#c8a888', f: '#f0d0b0', e: '#ff3a3a', h: '#3a2030', y: '#ffd23a' }, rows: [
-    '........', '........', '......hh', '.....hhf', 'b...hfef', 'nb..hfff', 'nnb..ffl', 'lnnb.lnn',
-    '.lnnbnnn', '..lnnbnn', '...lnnbn', '....l.bn', '......nn', '......y.', '.....y..', '........'] };
   S.spiritovento = { sym: true, pal: { w: '#ffffff', c: '#c0f0ff', b: '#7ac0e0', e: '#2a6aa0' }, rows: [
     '........', '........', '....cccc', '...cwwww', '..cwwwcc', '..cwwecw', '.bcwwwww', '.bccwwcc',
     '..bbccww', '...bbcww', 'c...bccw', '.c..bbcc', '..c..bbc', '...c..bb', '....cc..', '........'] };
-  S.gargolla = { sym: true, pal: { d: '#3a3a42', s: '#5a5a66', l: '#8a8a96', e: '#ff5a2a' }, rows: [
-    '........', '...d....', '...dd.d.', '....dsss', 's...sels', 'ss..ssss', 'lss.dsls', 'llss.dss',
-    '.llssdls', '..lsdsss', '...sdsls', '...ssdss', '..ss.dss', '..dd..dd', '........', '........'] };
-  S.folgoratore = { sym: true, pal: { b: '#2a3a8a', l: '#4a6ad0', c: '#a0d0ff', y: '#ffe27a', w: '#ffffff', e: '#ffff8a' }, rows: [
-    '........', '....y..y', '.....y.y', '.....bbb', '....blll', '....bell', '....bllc', 'y..bbbll',
-    '.yybllcc', '..ybllcl', '...bllcl', '....bllc', '....blll', '.....bll', '......c.', '........'] };
   S.grifone = { pal: { y: '#d0a040', o: '#a07020', w: '#f4f0e8', b: '#7a5030', e: '#101010', a: '#ffb030' }, rows: [
     '................', '................', '............ww..', '..bb.......wwea.', '.bbbb......www..', '..bbbbb...ywww..',
     '...bbbbb.yyw....', '....bbbbyyyy....', '..yyyyybyyyy....', '.yyyyyyyyyyy....', 'y.yyyooyyyoy....', '..yy.o...y.y....',
     '..o..o...o..o...', '................', '................', '................'] };
-  // Crudelion il Maledetto (Terza Serie): corpo blu e viola, piccole ali rosse
-  S.crudelion = { base: 'noctis', pal: { t: '#7a2a8a', T: '#9a4aaa', u: '#4a1a5a', w: '#6a8ae0', W: '#4a5ab8', a: '#c83a2a', A: '#8a1a1a', y: '#7a2a8a', o: '#e8c83a', k: '#ff4a4a' } };
   S.uovo = { sym: true, pal: { o: '#ff8a2a', y: '#ffd06a', w: '#fff2c0', r: '#c02a1a' }, rows: [
     '........', '........', '........', '......yy', '.....yww', '....yyww', '....yyyw', '...oyyyy',
     '...oyryy', '...ooyry', '...ooyyr', '...ooyyy', '....ooyy', '.....ooo', '........', '........'] };
@@ -108,8 +78,6 @@
   S.guerriero = { sym: true, pal: { d: '#2a1a1a', s: '#4a3030', l: '#6a4a40', o: '#ff6a1a', y: '#ffc83a' }, rows: [
     '........', '...d....', '...dd.ss', '....ssss', '....sdoo', '....ssss', '.ss.dsls', 'sllsdslo',
     'slosdsoy', 'sls.dslo', 'ss..dsss', 'oo..dsls', '.o...dss', '.....ds.', '....dds.', '........'] };
-  // Geyser l'Iroso (Seconda Serie): rosso scuro con placche grigie e vapore giallo
-  S.geyser = { base: 'guerriero', pal: { d: '#3a1010', s: '#8a1c1c', l: '#6a6a6a', o: '#ffd23a', y: '#ffb070' } };
   S.bombo = { sym: true, pal: { d: '#2a1a1a', b: '#4a3030', l: '#6a4a4a', o: '#ff6a1a', y: '#ffe27a', e: '#ff3a1a' }, rows: [
     '........', '........', '.......y', '.......o', '......dd', '....bbbb', '...bblll', '..bbllll',
     '..bbleel', '..bbbbll', '..bbbobb', '...bbbbb', '....bbbb', '........', '........', '........'] };

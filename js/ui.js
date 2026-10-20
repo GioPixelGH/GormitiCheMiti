@@ -531,7 +531,7 @@
       const sts = Object.keys(e.status).filter(k => G.STATUS_INFO[k]).map(k => `<span style="color:${G.STATUS_INFO[k].color}">${G.STATUS_INFO[k].name}</span>`).join(', ');
       const mode = e.kind === 'ally' ? 'Alleato' : e.st.mode === 'sleep' ? 'Addormentato (colpo a sorpresa: critico!)' : e.st.mode === 'wander' ? 'Vaga senza averti notato' : 'Ti dà la caccia';
       const afx = (e.affixes || []).map(a => `<span style="color:${G.AFFIXES[a].color}">${G.AFFIXES[a].name}: ${esc(G.AFFIXES[a].desc)}</span>`).join('<br>');
-      return `<h4>${esc(d.name)}${e.flags.champion ? ' ♛' : e.flags.elite ? ' ★' : ''}</h4>${elemBadge(e.elem)} <span class="sub">${mode}</span><br>PV <span class="k">${e.hp}/${e.maxHp}</span> · Danno ${e.atk[0]}-${e.atk[1]} · Arm ${G.effDef(e)}${e.eva ? ' · Schiv ' + e.eva : ''}${sts ? '<br>' + sts : ''}${afx ? '<br>' + afx : ''}<br><span class="sub">${esc(d.desc)}</span>${rel ? '<br>' + rel : ''}`;
+      return `<h4>${esc(d.name)}${e.flags.champion ? ' ♛' : e.flags.elite ? ' ★' : ''}</h4>${elemBadge(e.elem)} <span class="sub">${mode}</span><br>PV <span class="k">${e.hp}/${e.maxHp}</span> · Danno ${e.atk[0]}-${e.atk[1]} · Arm ${G.effDef(e)}${e.eva ? ' · Schiv ' + e.eva : ''}${sts ? '<br>' + sts : ''}${afx ? '<br>' + afx : ''}<br><span class="orig">${esc(G.monsterOrigin(G.MON[e.type]))}</span><br><span class="sub">${esc(d.desc)}</span>${rel ? '<br>' + rel : ''}`;
     }
     if (m.t[i] === T.STAIRS) { const pi = G.portalInfo(G.portalAt(x, y)); return `<h4>${pi.name}</h4>${esc(pi.desc)}${R.sealed ? '<div class="sub">Sigillato: sconfiggi il guardiano.</div>' : ''}`; }
     const f = G.featureAt(x, y);
@@ -834,7 +834,7 @@
       for (const b of G.BIOMES) { for (const [k] of b.monsters) order.push(k); order.push(...b.elites, b.boss); if (b.id === 'vulcano') order.splice(order.length - 1, 0, 'magmion'); }
       body = '<div class="codex">' + order.filter((k, i) => order.indexOf(k) === i).map(k => {
         const d = G.MON[k], known = meta.monsters[k] || meta.bosses[k];
-        return `<div class="cx ${known ? '' : 'unknown'}"><div data-spr="${k}"></div><div><div class="nm">${known ? d.name : '???'}</div><div class="ds">${known ? G.ELEMS[d.elem].name + ' · ' + esc(d.desc) : 'Non ancora incontrato.'}</div></div></div>`;
+        return `<div class="cx ${known ? '' : 'unknown'}"><div data-spr="${k}"></div><div><div class="nm">${known ? d.name : '???'}</div><div class="ds">${known ? '<span class="orig">' + esc(G.monsterOrigin(d)) + '</span><br>' + G.ELEMS[d.elem].name + ' · ' + esc(d.desc) : 'Non ancora incontrato.'}</div></div></div>`;
       }).join('') + '</div>';
     } else if (tab === 'imprese') {
       const rows = G.HERO_ORDER.map(id => {

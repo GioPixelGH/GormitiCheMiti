@@ -42,6 +42,7 @@ Dimensioni: **P** piccola · **M** media · **G** grande.
 | 1 — Coerenza con l'era | 1.3.0 | ✅ completata (vedi note sotto) |
 | 2 — I volti dell'era | 1.4.0 | ✅ completata (vedi note sotto) |
 | 3 — Le regioni dell'era | 1.5.0 | ✅ completata (vedi note sotto) |
+| 4 — Gli eserciti dell'era | 1.6.0 | ✅ completata (vedi note sotto) |
 
 Note sulla Fase 1:
 - Crabs il Vendicatore e Mystral Corrotto sono stati sostituiti subito da due guerrieri dell'era, invece che da nemici generici: **Geyser l'Iroso** (Seconda Serie, élite della Fossa) e **Crudelion il Maledetto** (Terza Serie, élite dei Picchi). Gli sprite definitivi arrivano con la Fase 4.
@@ -68,6 +69,17 @@ Note sulla Fase 3:
 - Sprite e ritratti nuovi per Aracno, Lavion e Armageddon (più i ragnetti e il braccio di Lavion), disegnati con `tools/pixel` guardando carte e statuine.
 - Salvataggi della v1.4.0 convertiti automaticamente: regioni, percorsi e storico (Ghiacciai → Pianura delle Nebbie, Tempio → Oscuro Orizzonte), nemici in partita (es. Glaciator → Lavion, Luxalion → Obscurio, Lavion élite → Il Mastodontico; i piloni vengono tolti), vittorie contro i boss (Cerbante → Aracno, Glaciator → Lavion, Luxalion → Obscurio).
 - Bilanciamento con i duelli da checkpoint: Aracno ~92% di duelli vinti (Cerbante era al 100%), Lavion ~90%, Armageddon ~95%, Obscurio nella nuova regione ~100% (PV lasciati a 380). Mini-verifica: 68% di vittorie (v1.4.0: 67%). Noctis resta molto debole (~20%): muore soprattutto contro Aracno e i suoi ragnetti; da valutare un rinforzo dell'eroe.
+
+Note sulla Fase 4:
+- I 39 personaggi del male dell'era sono tutti nel gioco: i 7 Signori come boss e **32 guerrieri** come nemici ed élite, più **Magicorvo** e **Vorticus** (i traditori dell'Aria della Seconda Serie) nella Valle del Destino. Ognuno ha uno sprite disegnato guardando la sua statuina e la sua carta (`tools/pixel/guerrieri.js`).
+- Ogni guerriero ha un comportamento preso dal testo della carta: per esempio L'Anonimo Multiforme sparisce e riappare, il Guardiano Urlante sveglia i dintorni quando ti vede col terzo occhio, Lamacciaio e Brags infieriscono sui feriti, Incubo di Fuoco e Skorpios sono invisibili finché non sono vicini, Sentinel chiama i rinforzi, Magufo ti scaraventa con lo Psicopotere, Magicorvo evoca le ombre, Lunaris lancia magie di un elemento sempre diverso, Ombrassassina balza fuori dall'ombra, Buconero ti risucchia e a volte ti scaglia lontano, Electricon non si fa cogliere di sorpresa, Forgius vede anche chi è invisibile.
+- Le élite provvisorie della Fase 3 (Lavor, Pantanera, Il Mastodontico) e quelle della Fase 1 (Geyser, Crudelion) hanno lo sprite definitivo; Forgius Martello di Fuoco è la nuova élite di Roscamar.
+- Restano poche creature maledette di contorno (rovi, funghi, ragnetti, granchi, polipi, meduse, lupi e spettri delle nebbie, minatori, pipistrelli, spiriti del vento, ombre, cristalli oscuri, salamandre, segugi, sacerdoti); il resto è stato tolto.
+- I **Campioni** sono guerrieri dell'era al servizio del Signore della regione (per esempio "Lamacciaio il Tagliagole, Campione di Orrore Profondo"), al posto dei nomi inventati.
+- Il **Codex** mostra popolo e serie di ogni nemico (per esempio "Popolo del Vulcano (Magma) · Prima Serie"), e anche il riquadro che appare passando il mouse sui nemici.
+- Corretto un difetto segnalato: cadendo dal bordo delle isole sospese non si scende più al piano successivo; si perde il 12% della vita (senza mai morire) e il vento riporta sulla casella da cui si è saltati. Le cariche (Tsunami, Carica del Masso) si fermano sull'orlo dei baratri.
+- Salvataggi della v1.5.0 (e precedenti) convertiti automaticamente: le creature tolte diventano i guerrieri che ne prendono il posto.
+- Mini-verifica: 71% di vittorie (v1.5.0: 68%). Noctis sale dal 20% al 47%; Carrapax scende dal 97% al 60% perché prima il bot "saltava" i piani dei Picchi cadendo nei baratri con lo Tsunami, e ora i Picchi pieni di guerrieri dell'Aria gli sono sfavorevoli. Restano deboli gli eroi della Foresta contro Orrore Profondo (Tasarau 47%) e forti Poivrons (97%) e il Vecchio Saggio (93%).
 
 ## Panoramica
 

@@ -40,7 +40,7 @@
       if (o.dead || !G.hostile(o, m)) continue;
       let d = dist(o, m);
       if (o.kind === 'hero') { d -= 0.5; if (m.faction === 'enemy' && m.st.mode !== 'hunt') continue; }
-      if (o.kind === 'hero' && (o.status.invis) && d > 1) continue;
+      if (o.kind === 'hero' && (o.status.invis) && d > 1 && !m.flags.trueSight) continue;
       if (d < bd) { bd = d; best = o; }
     }
     return best;
@@ -293,8 +293,16 @@
     const c = G.MON[m.type].cast, h = G.run.hero;
     const d = dist(m, h);
     if (ready(m, 'cast') && m.st.seesHero && d <= c.range) {
-      const tiles = c.shape === 'plus' ? SH.plus(h.x, h.y) : SH.circle(h.x, h.y, c.r || 1);
-      tele(m, tiles, { dmg: c.dmg, elem: c.elem, color: c.color, src: c.label, sound: 'thunder', wetBonus: true }, { label: c.label });
+      let tiles;
+      if (c.shape === 'plus') tiles = SH.plus(h.x, h.y);
+      else if (c.shape === 'barrage') { // raffica: la casella dell'eroe e altre vicine a caso
+        tiles = [[h.x, h.y]];
+        for (let k = 1; k < (c.n || 3); k++) { const x = h.x + rng().int(-2, 2), y = h.y + rng().int(-2, 2); if (!G.isSolid(x, y) && !tiles.some(p => p[0] === x && p[1] === y)) tiles.push([x, y]); }
+      } else tiles = SH.circle(h.x, h.y, c.r || 1);
+      // "piega gli elementi": ogni magia con un elemento diverso
+      const elem = c.elem === 'random' ? rng().pick(['fuoco', 'mare', 'aria', 'terra', 'foresta', 'tenebre']) : c.elem;
+      const color = c.color || G.ELEMS[elem].color;
+      tele(m, tiles, { dmg: c.dmg, elem, color, fire: c.fire, push: c.push, status: c.status, st: c.st, src: c.label, sound: c.sound || 'thunder', wetBonus: !!c.wetBonus }, { label: c.label });
       setCd(m, 'cast', c.cd);
       return;
     }

@@ -5,7 +5,7 @@
 // ============================================================
 var G = (typeof window !== 'undefined' ? window : globalThis).G = {};
 // versione del gioco: va aggiornata a ogni rilascio (anche in sw.js e nel messaggio di commit)
-G.VERSION = '1.5.0';
+G.VERSION = '1.6.0';
 
 // ---------- RNG deterministico (mulberry32) ----------
 G.RNG = class {

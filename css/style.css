@@ -217,6 +217,7 @@ button { font-family: 'Press Start 2P', monospace; }
 .cx canvas { width: 48px; height: 48px; }
 .cx .nm { color: #ffe9a0; }
 .cx .ds { color: var(--dim); font-size: 17px; line-height: 1; }
+.cx .orig, #tooltip .orig { color: #e8b86a; font-size: 16px; }
 .cx.unknown { filter: brightness(0.25); }
 .opt-row { display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; margin: 10px 0; text-align: left; }
 .opt-row input[type=range] { width: 100%; accent-color: #e0b44a; }

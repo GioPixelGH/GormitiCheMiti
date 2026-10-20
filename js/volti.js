@@ -122,6 +122,176 @@
     '.....kRddnnnnnndRrdrrd..', '.....RddnnRRRRnnRrrrrd..', '....Rdd.NnRddRnNRrrdrd..', '....RdYYNnddddnNRdrrrd..',
     '...RddYyyNnnnnNydrrrrd..', '..kdd.Yyyys..syyyRrdrd..', '.....kYsyyo..oyysdddd...', '...k.Yyyyyo..oyykyk.k...',
     '.....Yyyyso..osyyyY.....', '.....Ysyyyo..oyyysY.....', '.....ooosoo..oosooo.....', '........................'] },
+  'insecticus': { pal: { y: '#ffc83a', g: '#b4b4b0', G: '#dcdcd8', h: '#80807c', k: '#2a2a30', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '.......RR.......', '......dddd......', '......kyyk......',
+    '.......dd.......', '....GGh..hGG....', '...hhghddhghh...', '....yhddddhy....',
+    '...y..dddd..y...', '...y.yyyyyy.y...', '..kyk.d..d.kyk..', '...k..d..d..k...',
+    '......d..d......', '......d..d......', '....kk....kk....', '................'] },
+  'strappapensieri': { pal: { y: '#ffc83a', g: '#b4b4b0', G: '#dcdcd8', k: '#2a2a30', v: '#7aff4a', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '..kk........kk..', '.k....k..k....k.', '...y.k.GG.k.y...', '...y..vGGv..y...',
+    '...yy.dddd.yy...', '....y..GG..y....', '.....yRRRRy.....', '....kRrrrrRk....',
+    '.....drrrrd.....', '....k.RrrR.k....', '.....dddddd.....', '.....GG..GG.....',
+    '.....Gg..gG.....', '.....Gg..gG.....', '....k.k..k.k....', '................'] },
+  'anonimo': { pal: { y: '#ffc83a', Y: '#fff09a', k: '#2a0a08', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '......d..d......', '.....d.RR.d.....', '......kRRk......',
+    '......drrd......', '.....R.RR.R.....', '......RrrR......', '....RRrrrrRR....',
+    '....RrrrrrrR....', '...RddrrrrddR...', '..dd..RrrR..dd..', '..yYdRrddrRdYy..',
+    '..dd.Rd..dR.dd..', '.....dd..dd.....', '....d.d..d.d....', '................'] },
+  'guardiano': { pal: { y: '#ffc83a', g: '#a8aaa8', G: '#d0d2d0', h: '#707270', k: '#2a2a30', b: '#3a3a40', e: '#1a1a20', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '.......ee.......', '.......dd.......', '.......GG.......', '......khhk......',
+    '.....yyyyyy.....', '...yGGh..hGGy...', '...GggghhgggG...', '...GhhhddhhhG...',
+    '...h..RddR..h...', '...h..dyyd..h...', '.k...dd..dd...k.', '..kk.bb..bb.kk..',
+    '.k...bb..bb...k.', '....ddd..ddd....', '................', '................'] },
+  'geyser': { pal: { m: '#9a1c1c', M: '#c43a2a', n: '#5a0e0e', o: '#ff7a1a', O: '#ffa848', y: '#ffd23a', g: '#7a746c', G: '#a8a098', h: '#4a4640', k: '#1e1210', w: '#f4f0e8' }, rows: [
+    '................', '................', '.......gg.......', 'w.....OggO......',
+    '.w....kggk.....w', '...MMn.OO.nMM.w.', '...MnnyyyynnM...', '...n.nyyyyn.n...',
+    '...n.nMMMMn.n...', '..gg..MnnM..gg..', '..yg.Mn..nM.gy..', '..gg.Mn..nM.gg..',
+    '.....nn..nn.....', '....OgO..OgO....', '....OOoOOoOO....', '................'] },
+  'incandescente': { pal: { m: '#9a1c1c', M: '#c43a2a', n: '#5a0e0e', o: '#ff7a1a', O: '#ffa848', y: '#ffd23a', g: '#7a746c', G: '#a8a098', h: '#4a4640', k: '#1e1210', w: '#f4f0e8' }, rows: [
+    '................', '................', '......kyyk......', '......yooy......',
+    '....GhokkohG....', '....hho..ohh....', '..nMn.oooo.nMn..', '.n.n..MMMM..n.n.',
+    '.n....MmmM....n.', '.....MmnnmM.....', '.....nn..nn.....', '.....on..no.....',
+    '...GGGh..hGGG...', '...Gggh..hggG...', '...hhhh..hhhh...', '................'] },
+  'lamacciaio': { pal: { m: '#9a1c1c', M: '#c43a2a', n: '#5a0e0e', o: '#ff7a1a', O: '#ffa848', y: '#ffd23a', g: '#7a746c', G: '#a8a098', h: '#4a4640', k: '#1e1210', w: '#f4f0e8' }, rows: [
+    '................', '......M..M......', '.......MM.......', '......yMMy......',
+    '...gy.MMMM.yg...', '......gMMg......', '......OOOO......', '...GgnOooOngG...',
+    '..GGgnOyyOngGG..', '..Gg..MMMM..gG..', '.GG..MmnnmM..GG.', '.Gg..Mn..nM..gG.',
+    '.gg..nn..nn..gg.', '....OOy..yOO....', '....OoO..OoO....', '................'] },
+  'cavaliere': { pal: { m: '#9a1c1c', M: '#c43a2a', n: '#5a0e0e', o: '#ff7a1a', O: '#ffa848', y: '#ffd23a', g: '#7a746c', G: '#a8a098', h: '#4a4640', k: '#1e1210', w: '#f4f0e8' }, rows: [
+    '................', '................', '......GhhG......', '....o.hkkh.o....',
+    '....oohkkhoo....', '....o......o....', '......ynny......', '..yMnMnyynMnMy..',
+    '.y.n.nyMMyn.n.y.', '.ooo..nmmn..ooo.', '.oOo...nn...oOo.', '..o..Gh..hG..o..',
+    '....yGh..hGy....', '.....hh..hh.....', '.....nn..nn.....', '................'] },
+  'incubo': { pal: { m: '#9a1c1c', M: '#c43a2a', n: '#5a0e0e', o: '#ff7a1a', O: '#ffa848', y: '#ffd23a', g: '#7a746c', G: '#a8a098', h: '#4a4640', k: '#1e1210', w: '#f4f0e8' }, rows: [
+    '................', '................', '..y..........y..', '.y....yooy....y.',
+    '..no..y..y..on..', '...onoonnoono...', '.....onoono.....', '......onno......',
+    '......noon......', '......MMMM......', '.....MmnnmM.....', '.....nn..nn.....',
+    '....nyn..nyn....', '....MMn..nMM....', '...nnn....nnn...', '................'] },
+  'bombos': { pal: { m: '#9a1c1c', M: '#c43a2a', n: '#5a0e0e', o: '#ff7a1a', O: '#ffa848', y: '#ffd23a', g: '#7a746c', G: '#a8a098', h: '#4a4640', k: '#1e1210', w: '#f4f0e8' }, rows: [
+    '................', '................', '................', '......GooG......',
+    '......GggG......', '.....GggggG.....', '...m.oggggo.m...', '...m.GggggG.m...',
+    '..GhoGoyyoGohG..', '.hoh.hhhhhh.hoh.', '..hh..o..o..hh..', '....Ghh..hhG....',
+    '....hoh..hoh....', '....hhh..hhh....', '....mmm..mmm....', '................'] },
+  'sparafuoco': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#c88a10', g: '#a8aaa8', G: '#d0d2d0', k: '#2a2a30', b: '#3a3a40', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '................', '................', '......RYYR......',
+    '......RyyR......', '.....yrrrry.....', '......dddd......', '......RRRR......',
+    '....yRRRRRRy....', '....RRrrrrRR....', '...ydRrrrrRdy...', '..ddyRRddRRydd..',
+    '.d.d.Rd..dR.d.d.', '.....dd..dd.....', '....d......d....', '................'] },
+  'malvagius': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#c88a10', g: '#a8aaa8', G: '#d0d2d0', k: '#2a2a30', b: '#3a3a40', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '................', '......y..y......', '.......RR.......',
+    '......krrk......', '......GGGG......', '......RrrR......', '.....RrrrrR.....',
+    '....RrrrrrrR....', '....ddrrrrdd....', '...d..RddR..d...', '..dddRd..dRddd..',
+    '..kk.dd..dg.kk..', '....k.k..k.gg.g.', '.............g..', '................'] },
+  'angelo': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#c88a10', g: '#a8aaa8', G: '#d0d2d0', k: '#2a2a30', b: '#3a3a40', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '................', '..bb........bb..', '..bb........bb..',
+    '...dd.yyyy.dd...', '...Yd..RR..dY...', '..YyydRrrRdyyY..', '..Yyo.RrrR.oyY..',
+    '..Yyo.drrd.oyY..', '..ooobbddbbooo..', '....oRd..dRo....', '.....Rd..dR.....',
+    '.....dd..dd.....', '....kk....kk....', '................', '................'] },
+  'lavor': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#c88a10', g: '#a8aaa8', G: '#d0d2d0', k: '#2a2a30', b: '#3a3a40', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '................', '......Y..Y......', '......Y..Y......',
+    '.....yykkyy.....', '...ddyk..kydd...', '...dyooooooyd...', '......RRRR......',
+    '....RRrrrrRR....', '...RdyrrrrydR...', '...d.RyrryR.d...', '..yd.RrddrR.dy..',
+    '.....Rd..dR.....', '.....dd..dd.....', '....ddd..ddd....', '................'] },
+  'navus': { pal: { r: '#e02a1a', R: '#ff6040', d: '#8a1410', D: '#a01818', k: '#141010', K: '#3a3030', y: '#ffc83a', Y: '#ffe88a' }, rows: [
+    '................', '.......rr.......', '......rrrr......', '.......kk.......',
+    '...kk.RkkR.kk...', '..kkkkkkkkkkkk..', '...kkkkkkkkkk...', '....d.RrrR.d....',
+    '...RddrrrrddR...', '...d..RddR..d...', '..yyyRdyydRyyy..', '.dyyydd..ddyyyd.',
+    '..ddykk..kkydd..', '....kkk..kkk....', '................', '................'] },
+  'skorpios': { pal: { r: '#e02a1a', R: '#ff6040', d: '#8a1410', D: '#a01818', k: '#141010', K: '#3a3030', y: '#ffc83a', Y: '#ffe88a' }, rows: [
+    '................', '......d..d......', '.....d....d.....', '......yddy......',
+    '......kkkk......', '.......RR.......', '....yyRrrRyy....', '..Rd..RrrR..dR..',
+    '..Rd..RddR..dR..', '..Rd..dRRd..dR..', '.kdk..dddd..kdk.', '.....yy..yy.....',
+    '.....yy..yr...k.', '.....d....drrr..', '....kRd..dRkrr..', '.....d....d.....'] },
+  'forgius': { pal: { r: '#e02a1a', R: '#ff6040', d: '#8a1410', D: '#a01818', k: '#141010', K: '#3a3030', y: '#ffc83a', Y: '#ffe88a' }, rows: [
+    '.......DD.......', '......D..D......', '......D..D......', '.......kk.......',
+    '.......DD.......', '....yy.DD.yy....', '....yyRRRRyy..D.', '....rRrrrrRrrDkD',
+    'ykkr.RrrrrR..DDD', 'kkkr.drrrrd.....', 'kky..kRddRk.....', '.....kd..dk.....',
+    '.....Rd..dR.....', '.....dy..yd.....', '................', '................'] },
+  'sentinel': { pal: { r: '#e02a1a', R: '#ff6040', d: '#8a1410', D: '#a01818', k: '#141010', K: '#3a3030', y: '#ffc83a', Y: '#ffe88a' }, rows: [
+    '................', '................', '.......yy.......', '......yRRy......',
+    '......yrry......', '...kykddddkyk...', '...ykkYYYYkky...', '...d..RRRR..d...',
+    '...d.RrrrrR.d...', '...d.drddrd.d...', '...d..dkkd..d...', '..Rd.dd..dd.dR..',
+    '.dd..dd..dd..dd.', '.....dd..dd.....', '................', '................'] },
+  'brags': { pal: { r: '#e02a1a', R: '#ff6040', d: '#8a1410', D: '#a01818', k: '#141010', K: '#3a3030', y: '#ffc83a', Y: '#ffe88a' }, rows: [
+    '................', '................', '.......DD.......', '......kDDk......',
+    '...kk.DDDD.kk...', '....kkDDDDkk....', '....kkkDDkkk....', '....d.dyyd.D....',
+    '...Rd.dyyd.dDDD.', '...d..dyyd..DDR.', '...d.RrddrR.dDD.', '..d..dd..dd..dD.',
+    '....kkk..kkk..D.', '....kkk..kkk....', '....d......d....', '................'] },
+  'falena': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '......n..n......', '...nn.n..n.nn...', '.W..n..BB..n..W.',
+    '.WW.n.eBBe.n.WW.', '.WwWnn.BB.nnWwW.', 'Wwwwwn.nn.nwwwwW', 'Wwwww.mmmm.wwwwW',
+    'Wwwww.BBBB.wwwwW', '..Www.BbbB.wwW..', '.....BbnnbB.....', '.....nn..nn.....',
+    '....mmm..mmm....', '....mmm..mmm....', '................', '................'] },
+  'beccoduro': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '................', '......emme......', '.......mm.......',
+    '.......GG.......', '.....w.bb.w.....', '...www.bb.www...', '.wwwww.BB.wwwww.',
+    'wwwww.BbbB.wwwww', 'wwww..nbbn..wwww', '.wwW...nn...Www.', '.W...nn..nn...W.',
+    '.....nn..nn.....', '.....nn..nn.....', '................', '................'] },
+  'dragon': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '................', '......MMMM......', 'W....MmmmmM....W',
+    'WWWW..emme..WWWW', 'WwwwW.nnnn.WwwwW', '.Wwww..BB..wwwW.', '.WwwwBBnnBBwwwW.',
+    '...WBnnnnnnBW...', '....n.nnnn.n....', '....n.nnnn.n....', '...mm......mm...',
+    '....Mmm..bmM....', '....mmm..mbb....', '....mmm..mmmbn..', '................'] },
+  'crudelion': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '...m........m...', '..mm........mm..', '...mm.mmmm.mm...',
+    '....n.eBBe.n....', '....nn.BB.nn....', 'WWWWWn.nn.nWWWWW', 'WwwwwwnnnnwwwwwW',
+    '.WwwwwBnnBwwwwW.', '......nnnn......', '.....nnnnnn.....', '.....nn..nn.....',
+    '....mmm..mmm....', '....mmm..mmm....', '................', '................'] },
+  'magufo': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '................', '.....mmBBmm.....', '......eBBe......',
+    'W.....BnnB.....W', 'WWWW..noon..WWWW', 'mwnnnn....nnnnwm', 'mnwww.mmmm.wwwnm',
+    '.Wwww.mmmm.wwwW.', '.Wwww.mmmm.wwwW.', '.Wwww..mm..wwwW.', '...Wnnn..nnnW...',
+    '....nnn..nnn....', '....nnn..nnn....', '....nnn..nnn....', '................'] },
+  'magicorvo': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '.h............h.', 'h..............h', '..h...nnnn...h..',
+    '..hh..nggn..hh..', '....h.nkkn.h....', '.....hcccch.....', '......GGGG......',
+    '......GggG......', '......GggG......', '......GhhG......', '....cGh..hGc....',
+    '...nGgh..hgGn...', '....hhh..hhh....', '....n.n..n.n....', '................'] },
+  'vorticus': { pal: { b: '#4a6ad8', B: '#7a9aee', n: '#26338a', m: '#a01a62', M: '#d03a8a', w: '#e03a2a', W: '#ff6a4a', e: '#ff4a6a', o: '#ff8a2a', g: '#8a9aa8', G: '#b8c4cc', h: '#5a6874', c: '#6ae0e8', k: '#14141e', s: '#f0f2f4' }, rows: [
+    '................', '................', '................', '.......ss.......',
+    '......kssk......', '.......ss.......', '......GkkG......', '.BBBBBGggGBBBBB.',
+    '.BnBbGhgghGbBnB.', '.BBb.hhGGhh.bBB.', '......hhhh......', '....BB....BB....',
+    '....BB....BB....', '....Bb....bB....', '.....B....B.....', '................'] },
+  'lunaris': { pal: { n: '#1e2a6a', N: '#33449a', k: '#141420', K: '#2e2e40', v: '#9ae07a', V: '#5aa04a', r: '#d82a2a', R: '#ff5a4a', e: '#ff3a3a', g: '#6a6a78', s: '#e8e8f0' }, rows: [
+    '................', '................', '.......VV.......', '......VvvV......',
+    'nkk...vvvv...kkn', 'nkkkk..vv..kkkkn', 'nkkkk..rr..kkkkn', 'nnkkk.rrrr.kkknn',
+    '.nkkk.rvvr.kkkn.', '.nkkk..rr..kkkn.', '.nkkknn..nnkkkn.', '....knn..nnk....',
+    '....rrr..rrr....', '....rrr..rrr....', '................', '................'] },
+  'ombrassassina': { pal: { n: '#1e2a6a', N: '#33449a', k: '#141420', K: '#2e2e40', v: '#9ae07a', V: '#5aa04a', r: '#d82a2a', R: '#ff5a4a', e: '#ff3a3a', g: '#6a6a78', s: '#e8e8f0' }, rows: [
+    '................', '.v............v.', 'v..............v', 'vkk..........kkv',
+    '..kk...nn...kk..', '....k.enne.k....', '.....kvnnvk.....', '......rrrr......',
+    '......rkkr......', '......rrrr......', '.....n....n.....', '....r......r....',
+    '...n........n...', '..kk........kk..', '..kk........kk..', '................'] },
+  'pantanera': { pal: { n: '#1e2a6a', N: '#33449a', k: '#141420', K: '#2e2e40', v: '#9ae07a', V: '#5aa04a', r: '#d82a2a', R: '#ff5a4a', e: '#ff3a3a', g: '#6a6a78', s: '#e8e8f0' }, rows: [
+    '................', '................', '......v..v......', '.....v.nn.v.....',
+    '......enne......', '......nnnn......', '.......ss.......', '....KKKKKKKK....',
+    '....KkkkkkkK....', '...K.KkkkkK.K...', '...K.rKkkKr.K...', '..K..nnKKnn..K..',
+    '.gg..nn..nn..gg.', '.....rn..nr.....', '................', '................'] },
+  'spiritonero': { pal: { n: '#1e2a6a', N: '#33449a', k: '#141420', K: '#2e2e40', v: '#9ae07a', V: '#5aa04a', r: '#d82a2a', R: '#ff5a4a', e: '#ff3a3a', g: '#6a6a78', s: '#e8e8f0' }, rows: [
+    '................', '................', '.......kk.......', '......kkkk......',
+    '......kvvk......', '....vnvVVvnv....', '...nrrrrrrrrn...', '..vnrrrrrrrrnv..',
+    '.rnrrrrrrrrrrnr.', 'rnrrrrrrrrrrrrnr', 'rrrrrrrrrrrrrrrr', 'rrrrrrrrrrrrrrrr',
+    'RrrrrrrrrrrrrrrR', '..R..........R..', '.....gggggg.....', '......gggg......'] },
+  'buconero': { pal: { n: '#1e2a6a', N: '#33449a', k: '#141420', K: '#2e2e40', v: '#9ae07a', V: '#5aa04a', r: '#d82a2a', R: '#ff5a4a', e: '#ff3a3a', g: '#6a6a78', s: '#e8e8f0' }, rows: [
+    '................', '......k..k......', '.....k....k.....', '.......kk.......',
+    '......vkkv......', '....rr.kk.rr....', '...rrr.NN.rrr...', '....N.NnnN.N....',
+    '...NnNnnnnNnN...', '...N..rrrr..N...', '...N...NN...N...', '..vvkkk..kkkvv..',
+    '....kkk..kkk....', '....kkk..kkk....', '................', '................'] },
+  'electricon': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#ff8a2a', K: '#4a4448', k: '#1a1418', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '......dKKd......', '......K..K......', '......d..d......',
+    '......y..y......', '......d..d......', '......RRRR......', '.....dKrrKd.....',
+    '....dKRrrRKd....', '...Rd.RKKR.dR...', '..yy.RrddrR.yy..', '..yy.dd..dd.yy..',
+    '.....Kd..drr....', '.....dd..ddrrrr.', '................', '................'] },
+  'maglio': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#ff8a2a', K: '#4a4448', k: '#1a1418', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '................', '.......yy.......', '.....yyyyyy.....',
+    '......ryyr......', '.......yy.......', '......RrrR......', '.y..RRdrrdRR....',
+    '.ooRddrrrrddR...', 'ooKK.dRddRd.yy..', '.KKKKRrddrR.yy..', '..KK.Rd..dR.yy..',
+    '.....dd..dd.....', '....K.K..K.K....', '................', '................'] },
+  'mastodontico': { pal: { y: '#ffc83a', Y: '#ffe88a', o: '#ff8a2a', K: '#4a4448', k: '#1a1418', r: '#d82a1e', R: '#ff5a40', d: '#8a1410' }, rows: [
+    '................', '................', '................', '......kyyk......',
+    '....kkyyyykk....', '...k..YrrY..k...', '......RrrR......', '....RRdrrdRR....',
+    '....drrrrrrd....', '...d.drrrrd.d...', '..Yo.RrddrR.oY..', '.oyyoRd..dRoyyo.',
+    '..oo.Rd..dR.oo..', '.....dd..dd.....', '.....K....K.....', '................'] },
   });
   G.PORTRAIT_DEFS = {
   'gheos': { size: 48, pal: { o: '#e07438', O: '#f49a5c', R: '#a8482a', D: '#6a2a1a', s: '#b4b4bc', S: '#7a7a84', b: '#9a9aa4', G: '#2e2e36', g: '#4a4a54', m: '#6a6a76', h: '#5a4030', l: '#d8d8e0', e: '#ffe25a', k: '#1a0a06' }, rows: [

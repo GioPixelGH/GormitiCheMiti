@@ -178,11 +178,11 @@
             if (!o.dead) { G.addStatus(o, 'wet', 5); G.knockback(h, o, 2, [-dy, dx]); }
             if (!o.dead && G.entityAt(nx, ny) === o) break;
           } else if (o) break;
-          if (!G.canEnter(h, nx, ny)) break;
+          if (!G.canEnter(h, nx, ny) || G.isHazardFor(h, nx, ny)) break; // la carica si ferma sull'orlo di lava e baratri
           const t = G.tileAt(h.x, h.y);
           if (t === T.FLOOR || t === T.SAND || t === T.ASH || t === T.GRASS) G.setTile(h.x, h.y, T.SHALLOW);
           G.moveTo(h, nx, ny, { dash: true, slide: true }); moved++;
-          if (h.dead || G.run.pendingDescend) return true;
+          if (h.dead || G.run.pendingDescend || h.x !== nx || h.y !== ny) return true;
         }
         if (!moved) G.fx.ring(h.x, h.y, 1, '#4aa0ff');
         return true;

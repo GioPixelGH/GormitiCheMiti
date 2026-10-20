@@ -139,6 +139,8 @@ Sono gli stessi personaggi della Terza Serie nei **popoli evoluti**, cioè Diama
 
 Realizzato nella v1.5.0 (Fase 3 del piano): tutte le regioni e i boss di questa tabella. Nel Monte Vulcano l'élite Lavion è stata sostituita da Il Mastodontico.
 
+Realizzato nella v1.6.0 (Fase 4): tutti i guerrieri dell'elenco qui sotto sono nemici o élite nella loro regione, e i Campioni sono guerrieri dell'era.
+
 ### Nemici: i guerrieri veri dell'era
 - Foresta (avanguardia di Magmion): Insecticus · Lo Strappapensieri · L'Anonimo Multiforme · Il Guardiano Urlante
 - Fossa (esercito di Orrore Profondo): Geyser l'Iroso · L'Incandescente Fantasma · Lamacciaio il Tagliagole · Il Misterioso Cavaliere · Incubo di Fuoco · Bombos Potenza di Fuoco

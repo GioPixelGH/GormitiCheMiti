@@ -5,7 +5,7 @@
 //  cache come riserva quando si gioca senza connessione.
 //  Aggiorna VERSION quando cambi l'elenco dei file.
 // ============================================================
-const VERSION = 'gormiti-1.5.0';
+const VERSION = 'gormiti-1.6.0';
 const FILES = [
   './',
   'index.html',
@@ -24,6 +24,7 @@ const FILES = [
   'js/data_items.js',
   'js/data_monsters.js',
   'js/data_monsters2.js',
+  'js/data_guerrieri.js',
   'js/data_world.js',
   'js/events.js',
   'js/explore.js',

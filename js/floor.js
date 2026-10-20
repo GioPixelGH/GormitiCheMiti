@@ -155,9 +155,10 @@
       const s = pick((x, y) => far(x, y, 14) && G.canWalk({ flags: G.MON[type].flags, kind: 'monster' }, x, y));
       if (s) { const e = G.makeMonster(type, s[0], s[1]); e.st.mode = 'sleep'; }
     }
-    // --- campione (un nemico comune con varianti e un nome) ---
+    // --- campione (un guerriero dell'era con varianti, al servizio del Signore della regione) ---
     if (R.floor > 1 && rng.chance(0.25 + (FM.danger ? 0.75 : 0))) {
-      const type = rng.weighted(biome.monsters, e => e[1])[0];
+      const warriors = biome.monsters.filter(e => G.isWarrior(e[0]));
+      const type = rng.weighted(warriors.length ? warriors : biome.monsters, e => e[1])[0];
       const s = pick((x, y) => far(x, y, 12) && G.canWalk({ flags: G.MON[type].flags || {}, kind: 'monster' }, x, y));
       if (s) G.makeChampion(G.makeMonster(type, s[0], s[1]), rng);
     }
@@ -584,7 +585,7 @@
   const RUN_KEY = 'gormiti_run_v4', META_KEY = 'gormiti_meta_v1';
   G.STORE_KEYS = { run: RUN_KEY, meta: META_KEY };
   // formato della partita salvata: le versioni precedenti vengono convertite, non cancellate
-  G.RUN_VERSION = 6;
+  G.RUN_VERSION = 7;
 
   // ---------------- conversione dei salvataggi delle versioni precedenti ----------------
   // v1.3.0 (storia originale): identificativi di reliquie, eventi e acquisti del Santuario cambiati
@@ -613,11 +614,19 @@
   // tipo vecchio -> [tipo nuovo, nome vecchio]; null = tolto dalla partita
   G.REPLACED_MONSTERS_V6 = {
     cerbante: ['aracno', 'Cerbante'], glaciator: ['lavion', 'Glaciator'], luxalion: ['obscurio', 'Luxalion Corrotto'], lavion: ['mastodontico', 'Lavion'],
-    lupoghiaccio: ['lupocenere', 'Lupo dei Ghiacci'], spiritogelido: ['spettronebbia', 'Spirito Gelido'], golemghiaccio: ['golemlava', 'Golem di Ghiaccio'],
-    tricheco: ['lupocenere', 'Tricheco Zannuto'], sciamano: ['sciamanolava', 'Sciamano dei Ghiacci'], yeti: ['lavor', 'Yeti Ancestrale'],
-    sentinella: ['cristallonero', 'Sentinella di Cristallo'], falena: ['falenanotte', 'Falena Abbagliante'], paladino: ['cavaliereombra', 'Paladino Corrotto'],
-    prisma: ['cavaliereombra', 'Prisma Vivente'], accolito: ['accolitonotte', 'Accolito dell\'Alba'], arconte: ['pantanera', 'Arconte di Luce'],
+    lupoghiaccio: ['lupocenere', 'Lupo dei Ghiacci'], spiritogelido: ['spettronebbia', 'Spirito Gelido'], golemghiaccio: ['sparafuoco', 'Golem di Ghiaccio'],
+    tricheco: ['lupocenere', 'Tricheco Zannuto'], sciamano: ['malvagius', 'Sciamano dei Ghiacci'], yeti: ['lavor', 'Yeti Ancestrale'],
+    sentinella: ['cristallonero', 'Sentinella di Cristallo'], falena: ['ombrassassina', 'Falena Abbagliante'], paladino: ['buconero', 'Paladino Corrotto'],
+    prisma: ['buconero', 'Prisma Vivente'], accolito: ['lunaris', 'Accolito dell\'Alba'], arconte: ['pantanera', 'Arconte di Luce'],
     frammento: null, pilone: null, scheggia: null,
+  };
+  // v1.6.0 (gli eserciti dell'era): le creature generiche lasciano il posto ai guerrieri delle carte originali
+  G.REPLACED_MONSTERS_V7 = {
+    lupo: ['insecticus', 'Lupo Selvaggio'], lupoalfa: ['guardiano', 'Lupo Alfa'], calabrone: ['anonimo', 'Calabrone Gigante'], fuocofatuo: ['incubo', 'Fuoco Fatuo'],
+    squalo: ['lamacciaio', 'Squalo Predatore'], annegato: ['incandescente', 'Spirito Annegato'], golem: ['navus', 'Golem di Pietra'], talpa: ['skorpios', 'Talpa Scavatrice'],
+    colosso: ['forgius', 'Colosso di Cristallo'], arpia: ['beccoduro', 'Arpia'], gargolla: ['magufo', 'Gargolla'], folgoratore: ['vorticus', 'Folgoratore'],
+    golemlava: ['sparafuoco', 'Golem di Lava'], sciamanolava: ['malvagius', 'Sciamano della Lava'], falenanotte: ['ombrassassina', 'Falena della Notte'],
+    cavaliereombra: ['buconero', 'Cavaliere d\'Ombra'], accolitonotte: ['lunaris', 'Accolito della Notte'],
   };
   // le vittorie contro i boss tolti passano al boss che ne ha preso il posto
   const BOSS_V6 = { cerbante: 'aracno', glaciator: 'lavion', luxalion: 'obscurio' };
@@ -641,6 +650,11 @@
       for (const hs of d.history || []) if (hs.route) hs.route = hs.route.map(region);
       d.v = 2;
     }
+    // v1.6.0: le creature tolte spariscono dal Codex (i guerrieri si incontrano di nuovo)
+    if (!(d.v >= 3)) {
+      if (d.monsters) for (const t in G.REPLACED_MONSTERS_V7) delete d.monsters[t];
+      d.v = 3;
+    }
     return d;
   };
   G.migrateRun = function (R) {
@@ -660,6 +674,12 @@
       for (const e of R.ents) if (e.kind === 'monster' && M[e.type]) convertMonster(e, M[e.type]);
       if (R.seenMonsters) for (const t of Object.keys(R.seenMonsters)) if (t in M) { delete R.seenMonsters[t]; if (M[t]) R.seenMonsters[M[t][0]] = true; }
       R.version = 6;
+    }
+    if (R.version === 6) {
+      const M = G.REPLACED_MONSTERS_V7;
+      for (const e of R.ents || []) if (e.kind === 'monster' && M[e.type]) convertMonster(e, M[e.type]);
+      if (R.seenMonsters) for (const t of Object.keys(R.seenMonsters)) if (M[t]) { delete R.seenMonsters[t]; R.seenMonsters[M[t][0]] = true; }
+      R.version = 7;
     }
     return R;
   };
