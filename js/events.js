@@ -108,7 +108,7 @@
           run(R, h, f) {
             const m = G.spawnNear('riflesso', f.x, f.y, 1)[0];
             if (m) {
-              m.sprite = h.heroId; m.name = 'Riflesso di ' + h.name; m.elem = h.elem;
+              m.sprite = G.heroVolto(h); m.name = 'Riflesso di ' + h.name; m.elem = h.elem;
               m.maxHp = m.hp = Math.round(h.maxHp * 0.6); m.atk = [Math.round((h.atk[0] + h.mods.dmg) * 0.8), Math.round((h.atk[1] + h.mods.dmg) * 0.8)];
               m.def = Math.max(0, h.def - 1); m.eva = h.eva; m.crit = h.crit; m.xp = 10 + h.level * 3;
               m.flags.champion = true; m.flags.elite = true;

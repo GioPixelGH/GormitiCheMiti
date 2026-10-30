@@ -363,6 +363,23 @@ body.touch #minimap { width: 178px; height: 125px; }
 .volto-head { display: flex; gap: 16px; align-items: center; justify-content: center; margin-bottom: 6px; }
 .volto-head canvas { width: 96px; height: 96px; flex: none; background: radial-gradient(circle at 50% 60%, #3a2a50, #120c1c); border: 2px solid var(--gold2); border-radius: 4px; }
 .volto-head .sub { margin-bottom: 0; }
+/* evoluzioni */
+.evo-forme { display: flex; gap: 18px; align-items: center; justify-content: center; margin: 4px 0 6px; }
+.evo-forme canvas { width: 104px; height: 104px; background: radial-gradient(circle at 50% 60%, #3a2a50, #120c1c); border: 2px solid var(--gold2); border-radius: 4px; image-rendering: pixelated; }
+.evo-forme .freccia { font-size: 34px; }
+.evo-testo { max-width: 820px; margin: 0 auto; text-align: left; }
+.evo-testo .narratore { margin: 6px auto; }
+.narratore.magor { border-color: #8a2a1a; background: rgba(60, 16, 12, 0.6); }
+.narratore.magor .chi { color: #ff9a6a; }
+.carta { font-size: 19px; line-height: 1.15; color: #e8dcc0; font-style: italic; max-width: 760px; margin: 6px auto 8px; padding: 6px 12px; border-left: 3px solid var(--gold2); }
+.carta small { display: block; font-style: normal; color: #a89cb8; font-size: 15px; margin-top: 2px; }
+.card.evo { width: 300px; }
+.card .carta-mini { font-size: 14px; line-height: 1.05; color: #c8bca8; font-style: italic; }
+.forme { margin-top: 6px; }
+.forme .fl { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.forme .fl > div { display: flex; flex-direction: column; align-items: center; width: 84px; text-align: center; line-height: 0.95; }
+.forme canvas { width: 48px; height: 48px; background: radial-gradient(circle at 50% 60%, #3a2a50, #120c1c); border: 1px solid #4a3a60; border-radius: 4px; image-rendering: pixelated; }
+.forme small { font-size: 13px; }
 @media (max-width: 760px), (max-height: 560px) {
   .narratore { grid-template-columns: 52px 1fr; }
   .narratore canvas, .volto-head canvas { width: 48px; height: 48px; }

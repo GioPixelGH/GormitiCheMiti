@@ -11,11 +11,12 @@
 //   inject      id di reliquie date all'inizio
 //   ecl         livello di Eclissi
 //   bossReplays quante volte rigiocare ogni boss da checkpoint (duelli)
+//   evo         variante scelta nelle evoluzioni (0 o 1) | null = la prima (o a caso con perks 'random')
 // Stampa su stdout un array JSON con un risultato per partita. Con DEBUG=1 descrive i blocchi.
 const { carica, percorsi } = require('./lib/gioco');
 carica();
 const U = G.U;
-const CFG = Object.assign({ policy: 'always', perks: 'best', mode: 'normal', r0: 0, runs: 10, route: 'cycle', disable: null, inject: [], ecl: 0, bossReplays: 0 }, JSON.parse(process.argv[2] || '{}'));
+const CFG = Object.assign({ policy: 'always', perks: 'best', mode: 'normal', r0: 0, runs: 10, route: 'cycle', disable: null, inject: [], ecl: 0, bossReplays: 0, evo: null }, JSON.parse(process.argv[2] || '{}'));
 if (!CFG.hero || !G.HEROES[CFG.hero]) { console.error('Eroe mancante o sconosciuto: ' + CFG.hero); process.exit(2); }
 const ROUTES = percorsi();
 
@@ -35,6 +36,7 @@ function handlePending() {
     const p = R.pending.shift();
     if (p.type === 'levelup') { const k = pickPerk(h, p.opts); if (k) G.applyPerk(h, k); }
     else if (p.type === 'relic') { if (p.opts.length) G.gainRelic(h, CFG.perks === 'random' ? p.opts[Math.floor(pickRng() * p.opts.length)] : p.opts[0]); }
+    else if (p.type === 'evolve') G.evolve(h, p.stage, CFG.evo != null ? CFG.evo : CFG.perks === 'random' ? Math.floor(pickRng() * 2) : 0);
     else if (p.type === 'shop') {
       const f = R.features.find(x => x.id === p.fid);
       f.stock.forEach((s, i) => { if ((s.kind === 'relic' && CFG.mode !== 'base') || (s.kind === 'heal' && h.hp < h.maxHp * 0.6) || s.id === 'pozione') G.buy(f, i); });

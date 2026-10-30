@@ -57,6 +57,10 @@
     dardo: 'star', passo: 'portal', sigillo: 'seal', occhio: 'eye', raggio: 'sun', bagliore: 'flash', prisma: 'prism', supernova: 'nova',
     martello: 'hammer', muraglia: 'wall', sfida: 'shout', valanga: 'boulders', chela: 'pincer', guscio: 'shell', marea: 'tide', tsunami: 'tsunami',
     freccia: 'arrow2', ventaglio: 'fan', corrente: 'updraft', sole: 'sun', lupo_sp: 'wolf', fiore: 'flower', sciame: 'bees', guardiano: 'tree',
+    // Poteri Supremi delle evoluzioni
+    terremoto_mystico: 'quake', maglio_devastante: 'hammer', urlo_lamentoso: 'shout', risveglio_secolare: 'tree', maremoto_mystico: 'tsunami', mari_profondi: 'wave',
+    tempesta_notturna: 'storm', picchiata_terribile: 'dash', valanga_atomica: 'boulders', custode_invisibile: 'tree', tsunami_spiriti: 'tsunami',
+    sole_atomico: 'sun', ali_oscure: 'fan', supernova_mythos: 'nova', energia_neozon: 'sun', occhio_risvegliato: 'eye',
   };
 
   // immagine dell'icona di un'abilità (con cache)

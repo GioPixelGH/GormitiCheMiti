@@ -22,6 +22,7 @@ Riferimenti (30 partite per eroe, margine circa ±17 punti):
 - v1.6.0: 71% (Tasarau 47%, Noctis 47%, Barbataus 53%, Carrapax 60%, Saggio 93%, Poivrons 97%). I guerrieri dell'era al posto dei nemici generici; cadere dalle isole non fa più scendere di piano.
 - v1.6.1: 28% (Gheos, Tasarau, Noctis 0%, Elios 3%, Barbataus 10%, Luminescente 13%, Carrapax 37%, Kolossus 57%, Poivrons 80%, Saggio 83%). Tutti i boss +50% a PV, danni, armatura e schivata (`G.BOSS_STAT_MUL` in `js/game.js`).
 - v1.6.2: 30% (Tasarau, Noctis, Barbataus 0%, Gheos ed Elios 7%, Carrapax 30%, Luminescente 33%, Kolossus 57%, Poivrons 80%, Saggio 90%). I nemici girano per tutto il piano e dormono solo al 20% (`G.SLEEP_CHANCE`); una sola reliquia dal mercante; Elios vola.
+- v2.0.0: 41% (Noctis 3%, Barbataus 7%, Gheos 13%, Elios 20%, Tasarau 30%, Luminescente 37%, Carrapax 53%, Kolossus 70%, Saggio 87%, Poivrons 93%). Le evoluzioni al 2° e al 4° Frammento (`js/data_evoluzioni.js`); il bot sceglie sempre la prima variante (con `evo: 1` in `tools/sim.js` la seconda). Chi muore prima del secondo boss (Noctis, Gheos) non ne approfitta.
 
 ## Batteria completa
 

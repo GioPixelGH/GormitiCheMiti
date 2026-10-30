@@ -301,6 +301,7 @@
     if (name === 'poison' && e.flags.poisonImmune) return;
     if (e.kind === 'hero' && G.NEG_STATUS.includes(name)) {
       if ((name === 'stun' || name === 'freeze') && e.mods.stunImmune) return;
+      if ((name === 'root' || name === 'slow') && e.mods.rootImmune) return;
       if (e.mods.statusResist) t = Math.max(1, Math.ceil(t * (1 - e.mods.statusResist)));
     }
     if (e.flags.boss && ['stun', 'freeze', 'root', 'confuse'].includes(name)) t = Math.max(1, Math.floor(t / 2));
@@ -413,6 +414,7 @@
   // critici dell'eroe: reliquie e risonanza Critico
   G.onHeroCrit = function (h, d) {
     if (h.mods.critHeal) G.heal(h, h.mods.critHeal, true);
+    if (h.mods.critConfuse && !d.dead) G.addStatus(d, 'confuse', h.mods.critConfuse);
     if (G.synLevel(h, 'critico') >= 2) {
       if (!d.dead && !d.flags.boss) G.addStatus(d, 'stun', 1);
       const cds = h.skills.filter(s => s.cd > 0);
@@ -429,6 +431,9 @@
     } else if (a.kind === 'hero') {
       const m = a.mods;
       if (m.poisonOnHit) G.addStatus(d, 'poison', 4, m.poisonOnHit);
+      if (m.wetOnHit) G.addStatus(d, 'wet', m.wetOnHit);
+      if (m.rootOnHit && R.rng.chance(m.rootOnHit)) G.addStatus(d, 'root', 1);
+      if (m.stunOnHit && R.rng.chance(m.stunOnHit)) G.addStatus(d, 'stun', 1);
       if (a.status.thorns) G.addStatus(d, 'poison', 4, 1);
       if (m.burnOnHit && R.rng.chance(m.burnOnHit)) G.addStatus(d, 'burn', 3, 2 + G.regionOf(R.floor));
       if (m.chainEvery) {
@@ -473,6 +478,8 @@
       if (tgt.status.poison) dmg *= 1 + (m.poisonedBonus || 0) + (G.synLevel(src, 'veleno') >= 1 ? 0.1 : 0);
       if (tgt.status.burn && G.synLevel(src, 'fuoco') >= 2) dmg *= 1.25;
       if (tgt.status.wet && m.wetAll) dmg *= 1 + m.wetAll;
+      if (m.skillDmg && G._inSkill) dmg *= 1 + m.skillDmg;
+      if (m.unawareBonus && tgt.kind === 'monster' && tgt.st && tgt.st.mode !== 'hunt') dmg *= 1 + m.unawareBonus;
     }
     if (src && src.status.empower) dmg *= 1.25;
     if (src && src.kind === 'ally' && hero) dmg *= hero.mods.dmgMul * (1 + (hero.mods.allyDmg || 0));
@@ -498,7 +505,7 @@
     const total = dmg + absorbed;
     // furia
     if (src && src.kind === 'hero' && !opts.noFury) G.addFury(src, total * 1.1);
-    if (tgt.kind === 'hero' && total > 0) G.addFury(tgt, total * 1.6);
+    if (tgt.kind === 'hero' && total > 0) G.addFury(tgt, total * 1.6 * (1 + (tgt.mods.furyTaken || 0)));
     // statistiche
     if (src && (src.kind === 'hero' || src.kind === 'ally')) R.stats.dmgDealt += total;
     if (tgt.kind === 'hero') { R.stats.dmgTaken += total; R.tookDamageThisTurn = true; }
@@ -528,7 +535,7 @@
       if (tgt.kind === 'monster' && G.MON[tgt.type].thorns) G.dealDamage(tgt, src, G.MON[tgt.type].thorns, { pierce: true, thorns: true, color: '#7be04a' });
       if (tgt.kind === 'monster' && tgt.affixes && tgt.affixes.includes('spinoso') && !src.dead) G.dealDamage(tgt, src, 3 + G.regionOf(R.floor), { pierce: true, thorns: true, color: '#7be04a' });
       if (tgt.status.shell && !src.dead) G.dealDamage(tgt, src, Math.max(1, Math.round(total * 0.5)), { pierce: true, thorns: true, color: '#7ac0e0', noFury: true });
-      if (tgt.kind === 'hero' && tgt.heroId === 'carrapax' && tgt.hp > 0 && !src.dead && !opts.counter && U.cheb(src.x, src.y, tgt.x, tgt.y) <= 1 && R.rng.chance(0.2)) {
+      if (tgt.kind === 'hero' && tgt.heroId === 'carrapax' && tgt.hp > 0 && !src.dead && !opts.counter && U.cheb(src.x, src.y, tgt.x, tgt.y) <= 1 && R.rng.chance(0.2 + (tgt.mods.counter || 0))) {
         G.fx.float(tgt.x, tgt.y, 'Contrattacco!', '#7ac0e0', { small: true });
         G.attack(tgt, src, { counter: true, sure: true });
       }
@@ -832,15 +839,21 @@
     'Tre Frammenti... Magor ti ha sentito arrivare. Non temere: i Popoli della Natura sono con te.',
     'Quattro Frammenti. L\'ultimo è nelle mani di Magor, nel cuore del Monte Vulcano. Vai, e torna vincitore.',
   ];
+  // Elios dopo il grande inganno: il Saggio non smette di sperare
+  const FRAGMENT_LINES_TRADITORE = {
+    3: 'Tre Frammenti... Hai stretto un patto con Magor, Elios, eppure l\'Occhio della Vita ti riconosce ancora. Non è troppo tardi.',
+    4: 'Quattro Frammenti. Magor crede che gli porterai l\'ultimo. Tanto più alto è il tuo volo... ricorda per chi stai volando.',
+  };
   G.collectEyeFragment = function (h, it) {
     const R = G.run;
     h.hp = h.maxHp; G.cleanse(h);
     h.maxHp += 5; h.hp += 5;
     R.stones = (R.stones || 0) + 1;
     G.log('Hai recuperato il ' + it.name + ' (' + R.stones + '/' + G.SLOTS.length + ')! Sei completamente guarito (+5 PV max).', 'level');
-    G.say(FRAGMENT_LINES[Math.min(R.stones, FRAGMENT_LINES.length) - 1]);
+    G.say((h.traitor && FRAGMENT_LINES_TRADITORE[R.stones]) || FRAGMENT_LINES[Math.min(R.stones, FRAGMENT_LINES.length) - 1]);
     G.fx.ring(h.x, h.y, 5, '#ffe66a');
     G.fx.sound('levelup');
+    for (const s of (G.evolutionsDue ? G.evolutionsDue(h, R.stones) : [])) R.pending.push({ type: 'evolve', stage: s });
     R.pending.push({ type: 'relic', title: 'Ricompensa del Guardiano', opts: G.relicChoices(R.rng, 3, ['rara', 'leggendaria', 'boss']) });
   };
 
@@ -1183,8 +1196,10 @@
     }
     // aura di luce
     if (h.heroId === 'luminescente') {
-      const dmg = 1 + Math.floor(h.level / 6) + (h.mods.auraBonus || 0);
-      for (const o of R.ents) if (!o.dead && o.faction === 'enemy' && U.cheb(o.x, o.y, h.x, h.y) <= 1) G.dealDamage(h, o, dmg, { pierce: true, dot: true, color: '#fff3a0', noFury: false });
+      const dmg = 1 + Math.floor(h.level / 6) + (h.mods.auraBonus || 0), r = 1 + (h.mods.auraRange || 0);
+      let n = 0;
+      for (const o of R.ents) if (!o.dead && o.faction === 'enemy' && U.cheb(o.x, o.y, h.x, h.y) <= r) { G.dealDamage(h, o, dmg, { pierce: true, dot: true, color: '#fff3a0', noFury: false }); n++; }
+      if (n && h.mods.auraHeal && !h.dead) G.heal(h, n * h.mods.auraHeal, true);
     }
     if (h.dead) return false;
     return G.startTurn(h);

@@ -12,6 +12,9 @@
     burnOnHit: 0, poisonOnHit: 0, sight: 0, reflectShield: false, killHeal: 0, killShield: 0, noKnock: false, flatReduce: 0,
     dmgTakenMul: 1, stunImmune: false, extraChoice: false, revealMap: false, revealStairs: false, floorHeal: 0, floorInvis: 0,
     chainEvery: 0, stealth: false, rangeBonus: 0, shopDiscount: 0, lastHope: false, wetBonus: 0, auraBonus: 0, lightBonus: false,
+    // passive delle evoluzioni
+    skillDmg: 0, unawareBonus: 0, furyTaken: 0, wetOnHit: 0, rootOnHit: 0, stunOnHit: 0, critConfuse: 0, counter: 0, hasteBonus: 0,
+    auraHeal: 0, auraRange: 0, rootImmune: false,
   });
 
   // capacità innate degli eroi (volare, nuotare), ripristinate anche caricando una partita salvata
@@ -553,7 +556,7 @@
         h.fury = Math.max(0, h.fury - cost);
         if (G.synLevel(h, 'furia') >= 2) { h.fury = Math.max(h.fury, 35); G.addStatus(h, 'haste', 3); }
       } else s.cd = G.skillCd(h, s.id);
-      if (h.heroId === 'elios' && !d.ult) G.addStatus(h, 'haste', 2);
+      if (h.heroId === 'elios' && !d.ult) G.addStatus(h, 'haste', 2 + (h.mods.hasteBonus || 0));
       R.hazardConfirm = null;
       return 100;
     },
@@ -590,7 +593,7 @@
   const RUN_KEY = 'gormiti_run_v4', META_KEY = 'gormiti_meta_v1';
   G.STORE_KEYS = { run: RUN_KEY, meta: META_KEY };
   // formato della partita salvata: le versioni precedenti vengono convertite, non cancellate
-  G.RUN_VERSION = 7;
+  G.RUN_VERSION = 8;
 
   // ---------------- conversione dei salvataggi delle versioni precedenti ----------------
   // v1.3.0 (storia originale): identificativi di reliquie, eventi e acquisti del Santuario cambiati
@@ -686,6 +689,12 @@
       if (R.seenMonsters) for (const t of Object.keys(R.seenMonsters)) if (M[t]) { delete R.seenMonsters[t]; R.seenMonsters[M[t][0]] = true; }
       R.version = 7;
     }
+    // v2.0.0: le evoluzioni. Chi aveva già raccolto 2 o 4 Frammenti evolve appena riprende la partita
+    if (R.version === 7) {
+      const h = (R.ents || []).find(e => e.kind === 'hero');
+      if (h && G.evolutionsDue) { R.pending = R.pending || []; for (const st of G.evolutionsDue(h, R.stones || 0)) R.pending.push({ type: 'evolve', stage: st }); }
+      R.version = 8;
+    }
     return R;
   };
   const store = (typeof localStorage !== 'undefined') ? localStorage : null;
@@ -734,7 +743,7 @@
       return { unlocked: { gheos: true, tasarau: true, poivrons: true, noctis: true, saggio: false, luminescente: false, kolossus: false, carrapax: false, elios: false, barbataus: false },
         maxEclissi: 0, runs: 0, wins: {}, bestFloor: 0, bosses: {}, monsters: {}, relics: {}, history: [], daily: {},
         settings: { music: 0.5, sfx: 0.7, shake: true, keys: null }, tutorialSeen: false, totalKills: 0, hints: {},
-        essence: 0, essenceTotal: 0, purchases: {}, regions: {} };
+        essence: 0, essenceTotal: 0, purchases: {}, regions: {}, forms: {} };
     },
     load() {
       let d = null;

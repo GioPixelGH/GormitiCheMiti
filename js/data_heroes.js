@@ -253,7 +253,7 @@
     // ===================== POIVRONS =====================
     getto: {
       name: 'Getto d\'Acqua', glyph: '≋', elem: 'mare', cd: 2, target: 'enemy', range: 7,
-      desc: (h) => `Spara un getto d'acqua ad alta pressione che ignora l'armatura: 110% danni, Bagna il bersaglio e lo spinge indietro di 1.${h.up.getto_pierce ? ' Perfora: colpisce tutti i nemici in linea.' : ''}`,
+      desc: (h) => `Spara un getto d'acqua ad alta pressione che ignora l'armatura: 110% danni, Bagna il bersaglio e ${h.up.getto_pull ? 'lo attira di 2 caselle verso di te, immobilizzandolo per 1 turno' : 'lo spinge indietro di 1'}.${h.up.getto_pierce ? ' Perfora: colpisce tutti i nemici in linea.' : ''}`,
       use(h, t) {
         const range = 7 + h.mods.rangeBonus;
         const path = G.projectilePath(h.x, h.y, t.x, t.y, range, !!h.up.getto_pierce);
@@ -265,7 +265,7 @@
         for (const p of path) { const o = G.entityAt(p[0], p[1]); if (o && G.hostile(o, h)) victims.push(o); }
         for (const o of victims) {
           G.dealDamage(h, o, H.dmg(h, 1.1), { elem: 'mare', delay: 120, pierce: true });
-          if (!o.dead) { G.addStatus(o, 'wet', 4); G.knockback(h, o, 1); }
+          if (!o.dead) { G.addStatus(o, 'wet', 4); if (h.up.getto_pull) { G.pull(h, o, 2); if (!o.dead) G.addStatus(o, 'root', 1); } else G.knockback(h, o, 1); }
         }
         return true;
       },
@@ -461,7 +461,7 @@
     // ===================== SOMMO LUMINESCENTE =====================
     raggio: {
       name: 'Raggio di Luce', glyph: '☀', elem: 'luce', cd: 4, target: 'dir',
-      desc: (h) => `Un raggio perforante lungo 8 caselle: 120% danni a tutti i nemici sulla linea.${h.up.raggio_up ? ' Li acceca.' : ''}`,
+      desc: (h) => `Un raggio perforante lungo 8 caselle: ${h.up.raggio_sole ? 180 : 120}% danni a tutti i nemici sulla linea${h.up.raggio_sole ? ', che restano in fiamme' : ''}.${h.up.raggio_up ? ' Li acceca.' : ''}`,
       area: (h, dx, dy) => H.lineTiles(h, dx, dy, 8, true),
       use(h, dir) {
         const tiles = H.lineTiles(h, dir[0], dir[1], 8, true);
@@ -469,7 +469,7 @@
         G.fx.beam(h.x, h.y, tiles[tiles.length - 1][0], tiles[tiles.length - 1][1], '#fff3a0'); G.fx.sound('holy');
         for (const [x, y] of tiles) {
           const o = G.entityAt(x, y);
-          if (o && G.hostile(o, h)) { G.dealDamage(h, o, H.dmg(h, 1.2), { elem: 'luce' }); if (!o.dead && h.up.raggio_up) G.addStatus(o, 'blind', 3); }
+          if (o && G.hostile(o, h)) { G.dealDamage(h, o, H.dmg(h, h.up.raggio_sole ? 1.8 : 1.2), { elem: 'luce' }); if (!o.dead && h.up.raggio_up) G.addStatus(o, 'blind', 3); if (!o.dead && h.up.raggio_sole) G.addStatus(o, 'burn', 3, 2 + G.regionOf(G.run.floor)); }
         }
         return true;
       },
@@ -490,9 +490,9 @@
     },
     prisma: {
       name: 'Scudo Prismatico', glyph: '◇', elem: 'luce', cd: 11, target: 'self',
-      desc: (h) => `Scudo di ${10 + h.level * 2} PV per 8 turni e cura il ${h.up.prisma_up ? 25 : 15}% dei PV massimi.`,
+      desc: (h) => `Scudo di ${(10 + h.level * 2) * (h.up.prisma_sole ? 2 : 1)} PV per 8 turni e cura il ${h.up.prisma_up ? 25 : 15}% dei PV massimi.`,
       use(h) {
-        G.addStatus(h, 'shield', 8, 10 + h.level * 2);
+        G.addStatus(h, 'shield', 8, (10 + h.level * 2) * (h.up.prisma_sole ? 2 : 1));
         G.heal(h, h.maxHp * (h.up.prisma_up ? 0.25 : 0.15));
         G.fx.ring(h.x, h.y, 1, '#fff3a0'); G.fx.sound('shield');
         return true;

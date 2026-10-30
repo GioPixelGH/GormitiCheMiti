@@ -43,6 +43,7 @@ Dimensioni: **P** piccola · **M** media · **G** grande.
 | 2 — I volti dell'era | 1.4.0 | ✅ completata (vedi note sotto) |
 | 3 — Le regioni dell'era | 1.5.0 | ✅ completata (vedi note sotto) |
 | 4 — Gli eserciti dell'era | 1.6.0 | ✅ completata (vedi note sotto) |
+| 5 — Evoluzioni | 2.0.0 | ✅ completata (vedi note sotto) |
 
 Note sulla Fase 1:
 - Crabs il Vendicatore e Mystral Corrotto sono stati sostituiti subito da due guerrieri dell'era, invece che da nemici generici: **Geyser l'Iroso** (Seconda Serie, élite della Fossa) e **Crudelion il Maledetto** (Terza Serie, élite dei Picchi). Gli sprite definitivi arrivano con la Fase 4.
@@ -80,6 +81,15 @@ Note sulla Fase 4:
 - Corretto un difetto segnalato: cadendo dal bordo delle isole sospese non si scende più al piano successivo; si perde il 12% della vita (senza mai morire) e il vento riporta sulla casella da cui si è saltati. Le cariche (Tsunami, Carica del Masso) si fermano sull'orlo dei baratri.
 - Salvataggi della v1.5.0 (e precedenti) convertiti automaticamente: le creature tolte diventano i guerrieri che ne prendono il posto.
 - Mini-verifica: 71% di vittorie (v1.5.0: 68%). Noctis sale dal 20% al 47%; Carrapax scende dal 97% al 60% perché prima il bot "saltava" i piani dei Picchi cadendo nei baratri con lo Tsunami, e ora i Picchi pieni di guerrieri dell'Aria gli sono sfavorevoli. Restano deboli gli eroi della Foresta contro Orrore Profondo (Tasarau 47%) e forti Poivrons (97%) e il Vecchio Saggio (93%).
+
+Note sulla Fase 5:
+- Si evolve raccogliendo il **2° e il 4° Frammento** dell'Occhio della Vita. La Prima Serie diventa **Mystica** e poi **Energheia**; la Seconda Serie diventa **Atomic** una volta sola, con un aumento più forte; il Sommo Luminescente diventa **Mythos** e poi **Final Evolution** (Signore del Sole); il Vecchio Saggio ha il **Risveglio dell'Occhio**.
+- Ogni evoluzione dà più PV, danni, armatura o critico, un nuovo titolo preso dalle carte (Gheos il Potente, Tasarau il Saggio, Poivrons il Guardiano dei Mari, Noctis il Terribile, Barbataus l'Invisibile, Carrapax la Speranza di Gorm…), un **Potere Supremo trasformato** e una **passiva a scelta tra due**. La scena mostra il prima e il dopo, le parole del Saggio e la frase della carta della linea.
+- **Il grande inganno**: Elios sceglie tra la mutazione del Saggio (più armatura, Sole Atomico) e la Leggerezza Magica di Magor, che lo rende il Grande Traditore (più danni e schivata, ma subisce più danni; Potere Supremo "Ali che Oscurano il Sole"). Magor gli parla nella scena e il Saggio ne tiene conto ai Frammenti successivi.
+- Sprite e ritratti nuovi per tutte le 15 forme (`tools/pixel/evoluzioni.js`), presi dalle statuine: le Mystica sono la stessa statuina ridipinta d'oro, d'argento e di bronzo; Energheia, Atomic, Mythos e Final Evolution hanno colori e forme delle loro statuine. Il Saggio non ha statuina: il suo risveglio accende l'Occhio sul bastone, gli occhi e i bordi d'oro della veste.
+- La scelta dell'eroe mostra le forme di ogni eroe; quelle mai raggiunte restano in ombra (salvate nei progressi, quindi anche nel file esportato).
+- Le partite salvate della v1.6.x con 2 o 4 Frammenti già raccolti ricevono le evoluzioni appena si riprendono.
+- Mini-verifica: 41% di vittorie (v1.6.2: 30%). Gli eroi che muoiono prima del secondo boss non ne approfittano: Noctis 3%, Gheos 13%, Barbataus 7%.
 
 ## Panoramica
 

@@ -224,10 +224,18 @@
     $('#hero-detail').innerHTML = `<div><h3>${d.name} — ${d.title}</h3><p>${esc(d.desc)}</p>
       <p style="margin-top:10px"><b style="color:#ffe9a0">Passiva: ${d.passive}</b><br>${esc(d.passiveDesc)}</p>
       <p style="margin-top:10px;color:#a89cb8">Elemento ${elemBadge(d.elem)} — forte contro ${G.ELEMS[G.ELEMS[d.elem].beats] ? G.ELEMS[G.ELEMS[d.elem].beats].name : 'nessuno'}, debole contro ${Object.keys(G.ELEMS).filter(k => G.ELEMS[k].beats === d.elem).map(k => G.ELEMS[k].name).join(', ') || 'nessuno'}.</p>
-      <p style="color:#a89cb8">Danno ${d.atk[0]}-${d.atk[1]} · Schivata ${d.eva} · Critico ${d.crit}% (×${d.critMul})</p></div><div>${sk}</div>`;
+      <p style="color:#a89cb8">Danno ${d.atk[0]}-${d.atk[1]} · Schivata ${d.eva} · Critico ${d.crit}% (×${d.critMul})</p>${formeHtml(UI.sel.hero)}</div><div>${sk}</div>`;
     s.querySelectorAll('[data-sicon]').forEach(el => el.appendChild(iconCanvas(G.skillIcon(el.dataset.sicon))));
+    s.querySelectorAll('.forme [data-forma]').forEach(el => { const c = voltoCanvas(el.dataset.forma); if (!el.dataset.vista) c.style.filter = 'brightness(0)'; el.prepend(c); });
     startTitleBg(true);
   };
+  // le forme evolute di un eroe nella scelta: quelle raggiunte almeno una volta si vedono a colori
+  function formeHtml(id) {
+    const forms = G.heroForms ? G.heroForms(id) : [];
+    if (!forms.length) return '';
+    const seen = G.meta.data.forms || {};
+    return `<div class="forme"><b style="color:#ffe9a0">Evoluzioni</b> <small>(al 2° e al 4° Frammento)</small><div class="fl">${forms.map(f => `<div data-forma="${f.sprite}" ${seen[f.key] ? 'data-vista="1"' : ''}><small style="color:${G.EVO_LINES[f.line].color}">${G.EVO_LINES[f.line].name}</small><small>${seen[f.key] ? esc(f.title.split(' · ')[0]) : '???'}</small></div>`).join('')}</div></div>`;
+  }
   UI.selectKey = function (e) {
     const list = G.HERO_ORDER.filter(id => G.meta.data.unlocked[id]);
     let i = list.indexOf(UI.sel.hero);
@@ -325,9 +333,9 @@
     const R = G.run; if (!R) return;
     const h = R.hero;
     // ritratto
-    drawVolto($('#portrait').getContext('2d'), h.heroId);
+    drawVolto($('#portrait').getContext('2d'), G.heroVolto(h));
     $('#hero-lvl').textContent = 'Lv' + h.level;
-    $('#hero-name').innerHTML = `${h.name}<small>${G.HEROES[h.heroId].title}</small>`;
+    $('#hero-name').innerHTML = `${h.name}<small>${G.heroTitle(h).split(' · ')[0]}</small>`;
     const sh = h.status.shield ? h.status.shield.p : 0;
     const hpEl = $('.bar.hp');
     hpEl.querySelector('.fill').style.width = (100 * Math.max(0, h.hp) / h.maxHp) + '%';
@@ -589,6 +597,7 @@
     else if (p.type === 'shrine') UI.showShrine(R.features.find(f => f.id === p.fid));
     else if (p.type === 'intro') UI.showIntro();
     else if (p.type === 'event') UI.showEvent(R.features.find(f => f.id === p.fid));
+    else if (p.type === 'evolve') UI.showEvolution(p);
   };
   UI.afterModal = () => afterModal();
 
@@ -627,6 +636,44 @@
   }
   function ritratti(root) { root.querySelectorAll('.narratore [data-spr]').forEach(el => el.replaceWith(voltoCanvas(el.dataset.spr))); }
   UI.saggio = saggio;
+  // Magor che tenta Elios (il grande inganno)
+  function magor(text) {
+    return `<div class="narratore magor"><div data-spr="magor"></div><div><div class="chi">Magor</div><div class="parola">«${text}»</div></div></div>`;
+  }
+
+  // ---------------------------------------------------------------- evoluzione
+  // il 2° e il 4° Frammento fanno evolvere l'eroe: scena del Saggio, nuova forma, passiva a scelta
+  UI.showEvolution = function (p) {
+    const R = G.run, h = R.hero, st = (G.EVOLUTIONS[h.heroId] || [])[p.stage];
+    if (!st || (h.evo || 0) !== p.stage) { afterModal(); return; }
+    const line = G.EVO_LINES[st.line], d = G.HEROES[h.heroId], s = st.stats;
+    const prima = G.heroVolto(h), dopo = st.options.map(o => G.formSprite(h.heroId, st, o));
+    const ultOf = (o) => G.SKILLS[o.ult || st.ult];
+    let cards = '';
+    st.options.forEach((o, i) => {
+      cards += `<div class="card evo" data-i="${i}"><span class="key">${i + 1}</span>
+        <div class="nm" style="color:${line.color}">${esc(o.name)}</div><div class="ds">${esc(o.desc)}</div>
+        ${st.choice ? `<div class="tag" style="color:${line.color}">${esc(d.name + ', ' + (o.title || st.title).split(' · ')[0])}</div>${o.carta ? `<div class="tag carta-mini">«${esc(o.carta)}»</div>` : ''}` : ''}</div>`;
+    });
+    const stat = `+${s.hp} PV massimi · danni +${s.atk[0]}/+${s.atk[1]}${s.def ? ' · +' + s.def + ' armatura' : ''}${s.crit ? ' · +' + s.crit + '% critico' : ''}`;
+    const titolo = st.choice ? d.name + ' ' + line.name : d.name + ', ' + st.title.split(' · ')[0];
+    const m = openModal(`<h2 style="color:${line.color}">Evoluzione ${line.name}!</h2>
+      <div class="evo-forme"><div data-v="${prima}"></div><div class="freccia" style="color:${line.color}">▶</div><div data-v="${dopo[0]}"></div></div>
+      <div class="evo-testo">${st.magor ? magor(st.magor) : ''}${saggio(st.saggio)}
+      ${st.carta && !st.choice ? `<div class="carta">«${esc(st.carta)}»<small>— dalla carta ${line.name}</small></div>` : ''}</div>
+      <div class="sub"><b style="color:#ffe9a0">${esc(titolo)}</b> · ${stat}${st.choice ? '' : ' · Potere Supremo: <b style="color:#ffe9a0">' + esc(ultOf({}).name) + '</b>'}</div>
+      <div class="sub">${st.choice ? 'Il grande inganno: scegli la tua strada' : 'Scegli la nuova passiva'} (tasti 1-${st.options.length}).</div>
+      <div class="cards">${cards}</div>`, { type: 'choice', pick: (i) => pick(i) });
+    ritratti(m);
+    m.querySelectorAll('.evo-forme [data-v]').forEach(el => el.replaceWith(voltoCanvas(el.dataset.v)));
+    const pick = (i) => {
+      if (!st.options[i]) return;
+      G.audio.play('select');
+      G.evolve(h, p.stage, i);
+      afterModal();
+    };
+    m.querySelectorAll('.card').forEach(c => c.onclick = () => pick(+c.dataset.i));
+  };
 
   UI.showIntro = function () {
     const h = G.run.hero;
@@ -777,6 +824,8 @@
       <h3>Esplorazione</h3>
       <p>I PV non si rigenerano da soli: gestisci pozioni e risorse. I nemici girano per il piano e ti cercano; quelli addormentati subiscono un colpo critico a sorpresa. Erba alta e porte bloccano la vista. Lava, baratri e fuoco sono pericolosi... anche per i nemici: spingili dentro!</p>
       <p>Ogni regione ha 3 piani: al terzo ti attende il suo Guardiano, che custodisce un Frammento dell'Occhio della Vita. Tartantica la Veggente, la mercante, si trova al secondo piano di ogni regione: da lei puoi comprare una sola reliquia.</p>
+      <h3>Evoluzioni</h3>
+      <p>Il <b>2°</b> e il <b>4° Frammento</b> fanno evolvere il tuo eroe, come nelle linee delle statuine: la Prima Serie diventa <b>Mystica</b> e poi <b>Energheia</b>, la Seconda Serie diventa <b>Atomic</b> (una volta sola, ma più forte), il Sommo Luminescente <b>Mythos</b> e poi <b>Final Evolution</b>, il Vecchio Saggio risveglia l'Occhio della Vita. Ogni evoluzione dà nuove statistiche, un nuovo aspetto, un Potere Supremo trasformato e una passiva a scelta tra due. Elios deve scegliere tra la mutazione del Saggio e la Leggerezza Magica di Magor.</p>
       <h3>Risonanze</h3>
       <p>Ogni reliquia e Dono ha un'affinità (Veleno, Fuoco, Critico, Vita, Difesa, Furia, Tempesta, Saggezza, Fortuna). Con 2 elementi della stessa affinità si attiva un bonus; con 4 un potere che cambia il tuo stile di gioco. Premi <span class="k">I</span> per la Scheda dell'eroe.</p>
       <h3>Bivi e regioni</h3>
@@ -933,9 +982,11 @@
     const relics = h.relics.map(id => { const r = G.RELIC_BY_ID[id], tg = r.tag ? G.SYNERGIES[r.tag] : null; return `<div class="bl" data-relic="${id}"><span style="color:${G.RARITY[r.rarity].color}">${r.name}</span>${tg ? ` <span style="color:${tg.color}">${tg.glyph}</span>` : ''}<br><small>${esc(r.desc)}</small></div>`; }).join('') || '<div class="sub">Nessuna reliquia ancora.</div>';
     const cnt = G.synCounts(h);
     const syns = G.SYN_ORDER.map(t => { const S = G.SYNERGIES[t], n = cnt[t] || 0, lv = G.synLevel(h, t); return `<div class="bl synrow lv${lv}"><b style="color:${S.color}">${S.glyph} ${S.name}</b> <span class="sub">${n}/4</span><br><small class="${lv >= 1 ? 'on' : ''}">(2) ${esc(S.t1)}</small><br><small class="${lv >= 2 ? 'on' : ''}">(4) ${esc(S.t2)}</small></div>`; }).join('');
-    const md = openModal(`<div class="volto-head"><div data-volto="${h.heroId}"></div><div><h2>${h.name} — livello ${h.level}</h2><div class="sub">${G.HEROES[h.heroId].title} · ${G.biomeOf(R.floor).name}, piano ${R.floor}</div></div></div>
+    const hd = G.HEROES[h.heroId];
+    const passives = `<div class="bl"><b>${hd.passive}</b><br><small>${esc(hd.passiveDesc)}</small></div>` + G.evoPassives(h).map(p => `<div class="bl"><b>${p.name}</b> <span class="sub">${p.line}</span><br><small>${esc(p.desc)}</small></div>`).join('');
+    const md = openModal(`<div class="volto-head"><div data-volto="${G.heroVolto(h)}"></div><div><h2>${h.name} — livello ${h.level}</h2><div class="sub">${G.heroTitle(h)} · ${G.biomeOf(R.floor).name}, piano ${R.floor}</div></div></div>
       <div class="build">
-        <div><h3>Statistiche</h3><div class="bstats">${stats.map(s => `<div>${s[0]}<b>${s[1]}</b></div>`).join('')}</div><h3>Abilità</h3>${skills}</div>
+        <div><h3>Statistiche</h3><div class="bstats">${stats.map(s => `<div>${s[0]}<b>${s[1]}</b></div>`).join('')}</div><h3>Passive</h3>${passives}<h3>Abilità</h3>${skills}</div>
         <div><h3>Doni del Saggio</h3>${perks}<h3>Reliquie (${h.relics.length})</h3>${relics}</div>
         <div><h3>Risonanze</h3>${syns}</div>
       </div><div class="mfoot"><button class="btn gold" id="ok">Chiudi (${G.KEYS.primary('build')})</button></div>`, { type: 'build', esc: () => closeModal(), enter: () => closeModal() });

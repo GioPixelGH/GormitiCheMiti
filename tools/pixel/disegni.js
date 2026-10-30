@@ -364,4 +364,9 @@ Object.assign(SPRITE, require('./guerrieri'));
 
 Object.assign(RITRATTI, require('./ritratti'));
 
+// le forme evolute dei Signori della Natura (Fase 5): partono anche dai disegni base
+const EVO = require('./evoluzioni')(Object.assign({}, SPRITE), Object.assign({}, RITRATTI));
+Object.assign(SPRITE, EVO.SPRITE);
+Object.assign(RITRATTI, EVO.RITRATTI);
+
 module.exports = { SPRITE, RITRATTI };
